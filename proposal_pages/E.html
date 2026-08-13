@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>專案 E：兩趟分季旅居 Trial — 旅居行程</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Arial', 'PingFang TC', 'Microsoft JhengHei', sans-serif; background: #111820; color: #dde; min-height: 100vh; }
+
+  .page-header { background: linear-gradient(135deg, #1a2e26 0%, #0e1a14 100%); border-bottom: 3px solid #A29BFE; position: sticky; top: 0; z-index: 100; }
+  .header-inner { max-width: 960px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back-btn { display: flex; align-items: center; gap: 6px; color: #A29BFE; text-decoration: none; font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 20px; border: 1.5px solid #A29BFE; transition: all .2s; white-space: nowrap; }
+  .back-btn:hover { background: #A29BFE22; }
+  .plan-badge { background: #A29BFE; color: #111; font-weight: 900; font-size: 22px; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .header-text .title { font-size: 18px; font-weight: 800; color: #fff; }
+  .header-text .subtitle { font-size: 12px; color: #7AAA98; margin-top: 3px; }
+  .duration-badge { margin-left: auto; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; border: 1.5px solid #A29BFE; color: #A29BFE; white-space: nowrap; }
+
+  .hero { background: #0e1a14; border-bottom: 1px solid #1e2d28; padding: 28px 24px; }
+  .hero-inner { max-width: 960px; margin: 0 auto; }
+
+  .kpi-row { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
+  .kpi-card { background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 10px; padding: 14px 18px; flex: 1; min-width: 150px; }
+  .kpi-label { font-size: 10px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; }
+  .kpi-value { font-size: 14px; font-weight: 700; color: #fff; margin-top: 5px; line-height: 1.4; }
+  .kpi-value.gold { color: #C9A84C; }
+  .kpi-value.warn { color: #E8825A; }
+
+  .ratings-block { background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 10px; padding: 16px 20px; }
+  .ratings-title { font-size: 11px; color: #7AAA98; text-transform: uppercase; margin-bottom: 12px; }
+  .rating-row { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+  .rating-label { font-size: 13px; color: #ccc; width: 100px; flex-shrink: 0; }
+  .rating-score { font-size: 12px; color: #7AAA98; width: 28px; }
+  .bar-wrap { flex: 1; height: 8px; background: #1e3028; border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; }
+
+  .content { max-width: 960px; margin: 0 auto; padding: 24px; }
+  .section { margin-bottom: 28px; }
+  .section-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #2D4A3E; display: flex; align-items: center; gap: 8px; }
+  .section-title span { font-size: 18px; }
+
+  .stop-card { display: flex; gap: 14px; padding: 12px 16px; background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 8px; margin-bottom: 10px; position: relative; }
+  .stop-card.is-trial { border-color: #A29BFE55; background: #1a2a24; }
+  .stop-card.is-trial::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #A29BFE; border-radius: 8px 0 0 8px; }
+  .stop-num { width: 28px; height: 28px; border-radius: 50%; background: #A29BFE22; border: 2px solid #A29BFE; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #A29BFE; flex-shrink: 0; margin-top: 2px; }
+  .stop-header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 5px; }
+  .stop-city { font-size: 15px; font-weight: 700; color: #fff; }
+  .stop-days { font-size: 12px; color: #7AAA98; margin-left: auto; white-space: nowrap; }
+  .stop-notes { font-size: 12px; color: #888; line-height: 1.5; }
+  .trial-badge { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; background: #A29BFE22; border: 1px solid #A29BFE55; color: #A29BFE; }
+  .tour-badge { padding: 2px 8px; border-radius: 10px; font-size: 10px; background: #2D4A3E; color: #7AAA98; }
+  .winter-badge { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; background: #5B9BD522; border: 1px solid #5B9BD5; color: #5B9BD5; }
+  .summer-badge { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; background: #E8825A22; border: 1px solid #E8825A; color: #E8825A; }
+
+  ul { list-style: none; }
+  ul li { padding: 7px 0 7px 20px; position: relative; font-size: 13px; color: #ccc; line-height: 1.5; border-bottom: 1px solid #1a2a20; }
+  ul li:last-child { border-bottom: none; }
+  ul li::before { content: '›'; position: absolute; left: 0; color: #A29BFE; font-weight: 700; font-size: 16px; }
+  ul li.warn-item { color: #E8825A; }
+  ul li.warn-item::before { color: #E8825A; }
+
+  .cost-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .cost-table td { padding: 9px 12px; border-bottom: 1px solid #1a2a20; color: #ccc; }
+  .cost-table .cost-val { color: #C9A84C; font-weight: 700; text-align: right; }
+  .cost-table tr:last-child td { border-bottom: none; font-size: 14px; }
+
+  .luggage-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .luggage-table th { background: #1a2a24; color: #7AAA98; text-align: left; padding: 8px 12px; font-size: 11px; text-transform: uppercase; border-bottom: 1px solid #2D4A3E; }
+  .luggage-table td { padding: 9px 12px; border-bottom: 1px solid #1a2a20; color: #ccc; }
+  .luggage-table tr:last-child td { border-bottom: none; }
+  .ok-cell { color: #5A8A72; font-weight: 600; }
+  .warn-cell { color: #E8825A; font-weight: 600; }
+
+  .concept-box { background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 8px; padding: 14px 16px; margin-bottom: 20px; display: flex; gap: 12px; font-size: 13px; color: #A8C5B8; line-height: 1.7; }
+  .concept-icon { font-size: 20px; flex-shrink: 0; }
+  .warning-box { background: #2D1A0E; border: 1.5px solid #E8825A; border-radius: 8px; padding: 12px 16px; display: flex; gap: 10px; font-size: 13px; color: #E8825A; line-height: 1.5; margin-bottom: 20px; }
+  .note-box { background: #1A2A3E; border: 1px solid #5B9BD5; border-radius: 8px; padding: 12px 16px; display: flex; gap: 10px; font-size: 13px; color: #A8C5FF; line-height: 1.5; margin-bottom: 20px; }
+
+  .flow-list { background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 8px; padding: 12px 16px; }
+  .flow-list li { color: #A8C5B8; }
+
+  .compare-link { display: inline-block; margin-top: 14px; padding: 8px 18px; border-radius: 20px; border: 1.5px solid #A29BFE; color: #A29BFE; text-decoration: none; font-size: 12px; font-weight: 700; transition: all .2s; }
+  .compare-link:hover { background: #A29BFE22; }
+
+  .page-footer { text-align: center; padding: 20px; font-size: 12px; color: #3a4a42; border-top: 1px solid #1e2d28; margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-inner">
+    <a class="back-btn" href="../city_map.html">← 返回地圖</a>
+    <div class="plan-badge">E</div>
+    <div class="header-text">
+      <div class="title">專案 E：兩趟分季旅居 Trial</div>
+      <div class="subtitle">冬趟：廣州→深圳→珠海→惠州→廈門→南京 ｜ 夏趟：成都→重慶→貴陽→桂林→昆明→大理→麗江</div>
+    </div>
+    <div class="duration-badge">冬趟30天 + 夏趟35天，共65天（分兩次出發）</div>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-label">最佳出發月份</div>
+        <div class="kpi-value">冬趟：11月底最佳 ｜ 夏趟：10月最佳</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">入境航班</div>
+        <div class="kpi-value">冬趟：TPE → CAN（廣州）多班直飛 ｜ 夏趟：TPE → CTU（成都）部分直飛</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">出境航班</div>
+        <div class="kpi-value ">冬趟：NKG → TPE（南京）直飛 ｜ 夏趟：KMG → TPE（昆明）部分直飛</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">機票費用（來回）</div>
+        <div class="kpi-value gold">冬趟：NT$9,500–17,000 ｜ 夏趟：NT$13,500–22,000</div>
+      </div>
+    </div>
+    <div class="ratings-block">
+      <div class="ratings-title">方案評分</div>
+      
+        <div class="rating-row">
+          <span class="rating-label">旅居試住城市數</span>
+          <span class="rating-score">5/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-label">季節均衡</span>
+          <span class="rating-score">5/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-label">健行跑步</span>
+          <span class="rating-score">5/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-label">美食</span>
+          <span class="rating-score">5/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-label">靈活度</span>
+          <span class="rating-score">4/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:80%;background:#5A8A72"></div></div>
+        </div>
+    </div>
+    <a class="compare-link" href="../proposal_compare.html">⇄ 五方案總覽比較 →</a>
+  </div>
+</div>
+
+<div class="content">
+  
+  
+  
+      <div class="concept-box">
+        <span class="concept-icon">💡</span>
+        <div>將旅遊與旅居試住拆成兩趟不同季節的行程，兩趟合計試住6–7個城市，幾乎涵蓋旅居候選清單的精華。</div>
+      </div>
+
+  <div class="section">
+    <h2 class="section-title"><span>🗺</span>行程停靠城市</h2>
+    
+        <div class="stop-card is-trial">
+          <div class="stop-num">1</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">【冬趟】廣州</span>
+              <span class="winter-badge">冬趟</span>
+              <span class="trial-badge">旅居 Trial</span>
+              <span class="stop-days">4天（1觀光+3 Trial）</span>
+            </div>
+            <div class="stop-notes">已熟悉城市，直接進旅居模式；從化溫泉</div>
+          </div>
+        </div>
+        <div class="stop-card is-trial">
+          <div class="stop-num">2</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">【冬趟】深圳</span>
+              <span class="winter-badge">冬趟</span>
+              <span class="trial-badge">旅居 Trial</span>
+              <span class="stop-days">4天（1觀光+3 Trial）</span>
+            </div>
+            <div class="stop-notes">梅林山晨跑、南山共享工作空間實測</div>
+          </div>
+        </div>
+        <div class="stop-card is-trial">
+          <div class="stop-num">3</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">【冬趟】珠海</span>
+              <span class="winter-badge">冬趟</span>
+              <span class="trial-badge">旅居 Trial</span>
+              <span class="stop-days">4天（1觀光+3 Trial）</span>
+            </div>
+            <div class="stop-notes">情侶路晨跑、澳門一日遊</div>
+          </div>
+        </div>
+        <div class="stop-card is-trial">
+          <div class="stop-num">4</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">【冬趟】惠州</span>
+              <span class="winter-badge">冬趟</span>
+              <span class="trial-badge">旅居 Trial</span>
+              <span class="stop-days">4天（1觀光+3 Trial）</span>
+            </div>
+            <div class="stop-notes">紅花湖18km環湖、惠東溫泉</div>
+          </div>
+        </div>
+        <div class="stop-card is-trial">
+          <div class="stop-num">5</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">【冬趟】廈門</span>
+              <span class="winter-badge">冬趟</span>
+              <span class="trial-badge">旅居 Trial</span>
+              <span class="stop-days">4天（1觀光+3 Trial）</span>
+            </div>
+            <div class="stop-notes">環島路晨跑、台灣人社群最親切</div>
+          </div>
+        </div>
+        <div class="stop-card is-trial">
+          <div class="stop-num">6</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">【冬趟】南京</span>
+              <span class="winter-badge">冬趟</span>
+              <span class="trial-badge">旅居 Trial</span>
+              <span class="stop-days">5天（2觀光+3 Trial）</span>
+            </div>
+            <div class="stop-notes">中山陵跑步、湯山溫泉、秦淮河</div>
+          </div>
+        </div>
+        <div class="stop-card is-trial">
+          <div class="stop-num">7</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">【夏趟】成都</span>
+              <span class="summer-badge">夏趟</span>
+              <span class="trial-badge">旅居 Trial</span>
+              <span class="stop-days">6天（3觀光+3 Trial）</span>
+            </div>
+            <div class="stop-notes">峨眉山/青城山觀光天、Trial：錦江晨跑</div>
+          </div>
+        </div>
+        <div class="stop-card ">
+          <div class="stop-num">8</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">【夏趟】重慶</span>
+              <span class="summer-badge">夏趟</span>
+              <span class="tour-badge">觀光</span>
+              <span class="stop-days">3天（純觀光）</span>
+            </div>
+            <div class="stop-notes">洪崖洞、火鍋（非旅居候選）</div>
+          </div>
+        </div>
+        <div class="stop-card is-trial">
+          <div class="stop-num">9</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">【夏趟】貴陽+鎮遠</span>
+              <span class="summer-badge">夏趟</span>
+              <span class="trial-badge">旅居 Trial</span>
+              <span class="stop-days">6天（3觀光+3 Trial）</span>
+            </div>
+            <div class="stop-notes">Trial：貴陽市區測試</div>
+          </div>
+        </div>
+        <div class="stop-card ">
+          <div class="stop-num">10</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">【夏趟】桂林+陽朔</span>
+              <span class="summer-badge">夏趟</span>
+              <span class="tour-badge">觀光</span>
+              <span class="stop-days">4天（純觀光）</span>
+            </div>
+            <div class="stop-notes">漓江、陽朔騎行</div>
+          </div>
+        </div>
+        <div class="stop-card is-trial">
+          <div class="stop-num">11</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">【夏趟】昆明</span>
+              <span class="summer-badge">夏趟</span>
+              <span class="trial-badge">旅居 Trial</span>
+              <span class="stop-days">5天（2觀光+3 Trial）</span>
+            </div>
+            <div class="stop-notes">Trial：翠湖晨跑、西山步道</div>
+          </div>
+        </div>
+        <div class="stop-card is-trial">
+          <div class="stop-num">12</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">【夏趟】大理</span>
+              <span class="summer-badge">夏趟</span>
+              <span class="trial-badge">旅居 Trial</span>
+              <span class="stop-days">5天（2觀光+3 Trial）</span>
+            </div>
+            <div class="stop-notes">Trial：洱海環湖跑、網路測試（最關鍵）</div>
+          </div>
+        </div>
+        <div class="stop-card is-trial">
+          <div class="stop-num">13</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">【夏趟】麗江（選填）</span>
+              <span class="summer-badge">夏趟</span>
+              <span class="trial-badge">旅居 Trial</span>
+              <span class="stop-days">5天（2觀光+3 Trial）</span>
+            </div>
+            <div class="stop-notes">Trial：虎跳峽健行、高原晨跑體驗</div>
+          </div>
+        </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span>🚄</span>交通方式</h2>
+    <ul><li class="">冬趟：台灣直飛廣州（多班）→ 廣州→深圳30m→珠海1.5h→惠州2h→廈門2.5h→南京4.5h → 南京直飛台灣</li><li class="">夏趟：台灣部分直飛成都 → 成都→重慶1.5h→貴陽2h→桂林3h→昆明3.5h→大理1.5h → 昆明直飛台灣</li></ul>
+  </div>
+
+  
+
+  <div class="section">
+    <h2 class="section-title"><span>💰</span>費用概估</h2>
+    <table class="cost-table"><tr><td>冬趟（30天）住宿</td><td class="cost-val">200–350 CNY/天</td></tr><tr><td>冬趟合計</td><td class="cost-val">約 10,200–17,100 CNY</td></tr><tr><td>夏趟（35天）住宿</td><td class="cost-val">150–280 CNY/天</td></tr><tr><td>夏趟合計</td><td class="cost-val">約 9,800–17,150 CNY</td></tr></table>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span>🧳</span>行李建議（28吋行李箱 + 後背包）</h2>
+    <table class="luggage-table">
+      <thead><tr><th>城市段</th><th>28吋適用度</th><th>說明</th></tr></thead>
+      <tbody><tr>
+      <td>冬趟全程</td>
+      <td class="ok-cell">✅ 方便</td>
+      <td>廣東沿海均為大城市，行李移動方便；廈門鼓浪嶼輕裝</td>
+    </tr><tr>
+      <td>夏趟大城市</td>
+      <td class="ok-cell">✅ 方便</td>
+      <td>成都、重慶、貴陽、昆明均無問題</td>
+    </tr><tr>
+      <td>夏趟大理</td>
+      <td class="warn-cell">⚠️ 注意</td>
+      <td>古城石板路，建議住洱海邊</td>
+    </tr></tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span>📝</span>注意事項</h2>
+    <ul><li class="">兩趟分開，可依工作假期靈活安排，不需一次請假65天</li><li class="">冬趟11月最佳：廣東沿海晴朗乾爽，台灣冬雨，完美互補</li><li class="">夏趟七/八月為雲貴雨季，建議選9–11月或3–5月</li><li class="">涵蓋城市最多，旅居決策依據最充分</li><li class="">兩趟合計機票費用：約 NT$23,000–39,000</li></ul>
+  </div>
+</div>
+
+<div class="page-footer">旅居城市評估 — 43歲台灣軟體工程師視角 | 重訓・跑步・美食・數位遊牧</div>
+
+</body>
+</html>

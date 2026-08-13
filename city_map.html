@@ -1,0 +1,2240 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2D4A3E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="旅居地圖">
+<title>旅居城市地圖</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon.svg">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Arial', sans-serif; background: #1a1a2e; color: #eee; height: 100vh; display: flex; flex-direction: column; }
+
+  #header {
+    background: linear-gradient(135deg, #2D4A3E 0%, #1a2e26 100%);
+    padding: 14px 24px;
+    display: flex; align-items: center; gap: 20px;
+    border-bottom: 2px solid #5A8A72;
+    z-index: 1000;
+  }
+  #header h1 { font-size: 20px; color: #fff; font-weight: 700; }
+  #header p  { font-size: 12px; color: #A8C5B8; }
+
+  /* Filter panel */
+  #filter-panel {
+    position: absolute; top: 80px; left: 14px; z-index: 1000;
+    background: rgba(20,28,36,.95); border: 1px solid #3A4A42;
+    border-radius: 12px; padding: 14px 16px;
+    backdrop-filter: blur(6px); min-width: 0;
+  }
+  .fp-group { margin-bottom: 10px; }
+  .fp-group:last-child { margin-bottom: 0; }
+  .fp-label {
+    font-size: 10px; color: #7AAA98; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 7px; font-weight: 600;
+  }
+  .fp-row { display: flex; flex-wrap: wrap; gap: 5px; }
+  .fp-btn {
+    padding: 4px 11px; border-radius: 16px; border: 1.5px solid #3A4A42;
+    background: transparent; color: #888; font-size: 11px; font-weight: 600;
+    cursor: pointer; transition: all .15s; white-space: nowrap; line-height: 1.4;
+  }
+  .fp-btn:hover { border-color: #7AAA98; color: #ccc; }
+  /* active states per filter type */
+  .fp-btn.active[data-filter="season"][data-value="all"]        { border-color:#888;     background:#888;     color:#fff; }
+  .fp-btn.active[data-filter="season"][data-value="summer"]     { border-color:#E8825A;  background:#E8825A;  color:#fff; }
+  .fp-btn.active[data-filter="season"][data-value="winter"]     { border-color:#5B9BD5;  background:#5B9BD5;  color:#fff; }
+  .fp-btn.active[data-filter="season"][data-value="year_round"] { border-color:#5A8A72;  background:#5A8A72;  color:#fff; }
+  .fp-btn.active[data-filter="season"][data-value="guangxi"]    { border-color:#C9A84C;  background:#C9A84C;  color:#fff; }
+  .fp-btn.active[data-filter="season"][data-value="overseas"]   { border-color:#9B59B6;  background:#9B59B6;  color:#fff; }
+  .fp-btn.active[data-filter="stars"]  { border-color:#FFD700;  background:#FFD70022;   color:#FFD700; }
+  .fp-btn.active[data-filter="cost"][data-value="low"]  { border-color:#5A8A72; background:#5A8A7222; color:#5A8A72; }
+  .fp-btn.active[data-filter="cost"][data-value="mid"]  { border-color:#C9A84C; background:#C9A84C22; color:#C9A84C; }
+  .fp-btn.active[data-filter="cost"][data-value="high"] { border-color:#E8825A; background:#E8825A22; color:#E8825A; }
+  .fp-sep { height: 1px; background: #2D4A3E; margin: 10px 0; }
+
+  /* 面板收合（桌機）：標題列可點，收合後只剩膠囊不擋地圖 */
+  .panel-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 14px; cursor: pointer; user-select: none;
+  }
+  .panel-head .panel-title {
+    font-size: 12px; font-weight: 700; color: #A8C5B8; letter-spacing: .5px;
+  }
+  .panel-head .panel-chevron {
+    font-size: 11px; color: #7AAA98; transition: transform .2s;
+  }
+  #filter-panel .fp-body, #route-panel .rp-body { margin-top: 12px; }
+  #filter-panel.collapsed .fp-body, #route-panel.collapsed .rp-body { display: none; }
+  #filter-panel.collapsed .panel-chevron,
+  #route-panel.collapsed .panel-chevron { transform: rotate(-90deg); }
+
+  #map { flex: 1; }
+
+  /* Leaflet popup override */
+  .leaflet-popup-content-wrapper {
+    background: #1e2d28;
+    border: 1.5px solid #5A8A72;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.5);
+    padding: 0;
+    min-width: 240px;
+  }
+  .leaflet-popup-content { margin: 0; width: auto !important; }
+  .leaflet-popup-tip { background: #1e2d28; }
+  .leaflet-popup-close-button { color: #A8C5B8 !important; font-size: 18px; top: 10px !important; right: 12px !important; }
+
+  .popup-inner { padding: 16px 18px; }
+  .popup-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; border-bottom: 1px solid #2D4A3E; padding-bottom: 10px; }
+  .popup-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .popup-name { font-size: 18px; font-weight: 700; color: #fff; }
+  .popup-province { font-size: 11px; color: #7AAA98; margin-top: 2px; }
+  .popup-season-tag { font-size: 10px; padding: 2px 8px; border-radius: 10px; color: #fff; margin-left: auto; flex-shrink: 0; }
+
+  .popup-row { display: flex; justify-content: space-between; align-items: center; margin: 5px 0; font-size: 12px; }
+  .popup-label { color: #7AAA98; }
+  .popup-value { color: #fff; font-weight: 600; }
+  .popup-cost  { color: #C9A84C; font-weight: 700; font-size: 13px; }
+  .popup-stars { color: #FFD700; letter-spacing: 2px; }
+  .popup-stars span { color: #444; }
+
+  .popup-divider { height: 1px; background: #2D4A3E; margin: 8px 0; }
+
+  .popup-ratings { margin-top: 6px; }
+  .rating-row { display: flex; justify-content: space-between; align-items: center; margin: 3px 0; font-size: 11px; }
+  .rating-label { color: #888; }
+  .bar-wrap { width: 80px; height: 6px; background: #2D4A3E; border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; }
+
+  .popup-warning { background: #2D1A0E; border: 1px solid #E8825A; border-radius: 6px; padding: 6px 10px; font-size: 10px; color: #E8825A; margin-top: 8px; }
+
+  .popup-detail-btn {
+    display: block; width: 100%; margin-top: 10px;
+    padding: 8px 0; text-align: center;
+    background: linear-gradient(135deg, #2D4A3E, #1e3028);
+    border: 1.5px solid #5A8A72; border-radius: 6px;
+    color: #A8C5B8; font-size: 12px; font-weight: 700;
+    text-decoration: none; cursor: pointer;
+    transition: all .2s; letter-spacing: 0.5px;
+  }
+  .popup-detail-btn:hover { background: #2D4A3E; color: #fff; border-color: #C9A84C; }
+
+  /* 逐日行程頁入口（只有備妥行程的城市才會出現） */
+  .popup-itin-btn {
+    display: flex; align-items: center; gap: 8px; width: 100%; margin-top: 10px;
+    padding: 8px 10px; text-decoration: none; cursor: pointer;
+    background: linear-gradient(135deg, #3A2230, #24191f);
+    border: 1.5px solid #D9506E; border-radius: 6px; transition: all .2s;
+  }
+  .popup-itin-btn:hover { background: #4A2B3C; border-color: #F0708C; }
+  .popup-itin-icon { font-size: 16px; flex-shrink: 0; }
+  .popup-itin-label { display: block; font-size: 9px; color: #D9506E; letter-spacing: 0.8px; font-weight: 700; }
+  .popup-itin-title { display: block; font-size: 11px; color: #fff; font-weight: 700; margin-top: 1px; line-height: 1.35; }
+  .popup-itin-arrow { margin-left: auto; color: #D9506E; font-size: 14px; flex-shrink: 0; }
+
+  /* Route panel */
+  #route-panel {
+    position: absolute; top: 80px; right: 14px; z-index: 1000;
+    background: rgba(20,28,36,.95); border: 1px solid #3A4A42;
+    border-radius: 12px; padding: 14px 16px; min-width: 190px;
+    backdrop-filter: blur(6px);
+  }
+  #route-panel h3 { font-size: 11px; color: #7AAA98; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+  .route-btn {
+    display: flex; align-items: center; gap: 8px;
+    width: 100%; padding: 7px 10px; margin-bottom: 6px;
+    background: transparent; border: 1.5px solid transparent;
+    border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600;
+    color: #aaa; transition: all .18s; text-align: left;
+  }
+  .route-btn:last-child { margin-bottom: 0; }
+  .route-btn .rb-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .route-btn .rb-arrow { margin-left: auto; font-size: 10px; opacity: .5; }
+  .route-btn.active { color: #fff; }
+  .route-btn[data-plan="A"].active { border-color: #FF7675; background: #FF767518; color: #FF7675; }
+  .route-btn[data-plan="B"].active { border-color: #00CEC9; background: #00CEC918; color: #00CEC9; }
+  .route-btn[data-plan="C"].active { border-color: #FDCB6E; background: #FDCB6E18; color: #FDCB6E; }
+  .route-btn[data-plan="D"].active { border-color: #55EFC4; background: #55EFC418; color: #55EFC4; }
+  .route-btn[data-plan="E"].active { border-color: #A29BFE; background: #A29BFE18; color: #A29BFE; }
+  .route-btn[data-plan="F"].active { border-color: #E8825A; background: #E8825A18; color: #E8825A; }
+  .route-btn[data-plan="G"].active { border-color: #00CEC9; background: #00CEC918; color: #00CEC9; }
+  .route-btn[data-plan="I"].active { border-color: #C9A84C; background: #C9A84C18; color: #C9A84C; }
+  .route-btn[data-plan="J"].active { border-color: #5B9BD5; background: #5B9BD518; color: #5B9BD5; }
+  .route-btn[data-plan="K"].active { border-color: #9B59B6; background: #9B59B618; color: #9B59B6; }
+  .route-panel-sep { height: 1px; background: #2D4A3E; margin: 8px 0; }
+  .route-panel-hint { font-size: 10px; color: #445; line-height: 1.5; }
+
+  /* Route popup */
+  .route-popup-inner { padding: 14px 16px; min-width: 220px; }
+  .route-popup-title { font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 4px; }
+  .route-popup-sub { font-size: 11px; color: #7AAA98; margin-bottom: 10px; line-height: 1.5; }
+  .route-popup-meta { font-size: 12px; color: #ccc; margin-bottom: 10px; }
+  .route-popup-detail { display: block; width: 100%; padding: 8px 0; text-align: center; border-radius: 6px; font-size: 12px; font-weight: 700; text-decoration: none; transition: all .2s; margin-top: 6px; cursor: pointer; }
+
+  /* Waypoint marker */
+  .waypoint-marker { width: 10px; height: 10px; border-radius: 50%; border: 2px solid rgba(255,255,255,.4); }
+
+  /* Waypoint tooltip */
+  .waypoint-tooltip.leaflet-tooltip {
+    background: #1e2d28; border: 1px solid #3A4A42; color: #ccc;
+    font-size: 11px; padding: 3px 8px; border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.5);
+  }
+  .waypoint-tooltip.leaflet-tooltip::before { display: none; }
+
+  /* Legend */
+  #legend {
+    position: absolute; bottom: 30px; right: 14px; z-index: 1000;
+    background: rgba(26,30,38,.92); border: 1px solid #3A4A42;
+    border-radius: 10px; padding: 12px 16px; min-width: 160px;
+    backdrop-filter: blur(4px);
+  }
+  #legend h3 { font-size: 11px; color: #7AAA98; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+  /* 旅遊地區有 14 個，單欄會高到蓋住右側城市的 popup（釜山／青森）→ 排兩欄壓低高度 */
+  #legend .only-travel { display: grid; grid-template-columns: repeat(2, auto); gap: 0 16px; }
+  #legend .only-travel > div:last-child { grid-column: 1 / -1; }
+  /* popup 被關在 .leaflet-pane(z-index:400) 的堆疊脈絡裡，抬不到圖例(1000)之上，
+     所以開 popup 時把圖例淡出——看城市卡時本來就不需要對照圖例 */
+  #legend { transition: opacity .18s ease; }
+  #legend.popup-open { opacity: 0; pointer-events: none; }
+  @media (prefers-reduced-motion: reduce) { #legend { transition: none; } }
+  .legend-item { display: flex; align-items: center; gap: 8px; margin: 5px 0; font-size: 12px; color: #ccc; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+
+  /* custom marker */
+  .city-marker {
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .marker-circle {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 2.5px solid rgba(255,255,255,.3);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,.5);
+    cursor: pointer; transition: transform .15s;
+    font-size: 10px; font-weight: 700; color: #fff; line-height: 1.1;
+    text-align: center;
+  }
+  .marker-tail {
+    width: 0; height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+  }
+
+/* ══════════════════════════════════════════
+   BEST MONTHS BADGES (popup)
+══════════════════════════════════════════ */
+.popup-months {
+  display: flex; flex-wrap: wrap; gap: 4px;
+  margin: 8px 0 4px;
+}
+.month-badge {
+  font-size: 10px; font-weight: 700; padding: 2px 6px;
+  border-radius: 10px; line-height: 1.4;
+}
+.month-badge.score-5 { background:#1e4a30; color:#5AE89A; border:1px solid #5AE89A55; }
+.month-badge.score-4 { background:#2a3a1a; color:#A8D870; border:1px solid #A8D87055; }
+.month-badge.score-3 { background:#2a2a1a; color:#C9A84C; border:1px solid #C9A84C55; }
+.month-badge.score-2 { background:#2a1a10; color:#E8825A44; border:1px solid #E8825A22; }
+.month-badge.score-1 { background:#1e1010; color:#88444444; border:1px solid #E8825A11; }
+.popup-run-route {
+  font-size:11px; color:#7DCCA8; margin:5px 0 2px;
+  padding: 5px 8px; background:#0e2018; border-radius:6px;
+  border-left:2px solid #5A8A72; line-height:1.5;
+}
+
+/* ══════════════════════════════════════════
+   COMPARE TOOL
+══════════════════════════════════════════ */
+
+/* 城市 popup 裡的比較按鈕 */
+.popup-compare-btn {
+  display: block; width: 100%; margin-top: 6px;
+  padding: 7px 0; text-align: center;
+  background: transparent;
+  border: 1.5px dashed #3A6A52; border-radius: 6px;
+  color: #5A8A72; font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: all .18s;
+}
+.popup-compare-btn:hover  { border-color: #5A8A72; color: #A8C5B8; background: #1e3028; }
+.popup-compare-btn.added  { border-color: #C9A84C; border-style: solid; color: #C9A84C; background: #1e2010; }
+
+/* 比較列（底部，桌機中央，手機全寬） */
+#compare-bar {
+  display: none;
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+  z-index: 1500;
+  background: rgba(16,26,22,.97); border: 1.5px solid #5A8A72;
+  border-bottom: none; border-radius: 14px 14px 0 0;
+  padding: 10px 16px 14px;
+  align-items: center; gap: 10px;
+  box-shadow: 0 -4px 24px rgba(0,0,0,.6);
+  min-width: 260px; max-width: 90vw;
+}
+#compare-bar.visible { display: flex; }
+#compare-cities { display: flex; gap: 8px; align-items: center; flex: 1; flex-wrap: wrap; }
+.cmp-pill {
+  display: flex; align-items: center; gap: 5px;
+  background: #1e3028; border: 1px solid #3A6A52;
+  border-radius: 20px; padding: 4px 10px;
+  font-size: 12px; font-weight: 700; color: #A8C5B8;
+}
+.cmp-pill-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.cmp-pill-rm {
+  background: none; border: none; color: #5A6A62;
+  cursor: pointer; font-size: 14px; padding: 0 0 0 2px;
+  line-height: 1;
+}
+.cmp-pill-rm:hover { color: #E8825A; }
+#compare-go {
+  padding: 7px 16px; border-radius: 20px;
+  background: #5A8A72; border: none;
+  color: #fff; font-size: 12px; font-weight: 700;
+  cursor: pointer; white-space: nowrap;
+  transition: background .15s;
+}
+#compare-go:hover { background: #7AAA98; }
+#compare-clear {
+  background: none; border: none; color: #3A5A4A;
+  font-size: 18px; cursor: pointer; padding: 0 2px;
+}
+#compare-clear:hover { color: #E8825A; }
+
+/* 比較 Overlay */
+#compare-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 3000;
+  background: rgba(0,0,0,.7);
+  align-items: center; justify-content: center;
+  padding: 16px;
+}
+#compare-overlay.visible { display: flex; }
+
+#compare-panel {
+  background: #111820; border: 1.5px solid #3A4A42;
+  border-radius: 16px; width: 100%; max-width: 780px;
+  max-height: 90vh; overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.cmp-panel-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; border-bottom: 1px solid #2D4A3E;
+  position: sticky; top: 0; background: #111820; z-index: 1;
+}
+.cmp-panel-title { font-size: 16px; font-weight: 800; color: #fff; }
+#cmp-close {
+  background: none; border: none; color: #7AAA98;
+  font-size: 22px; cursor: pointer; line-height: 1;
+}
+
+/* 雷達圖 */
+.cmp-radar-wrap {
+  padding: 16px 20px 8px;
+  border-bottom: 1px solid #2D4A3E;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.cmp-radar-title { font-size:11px; color:#7AAA98; text-transform:uppercase; letter-spacing:1px; align-self:flex-start; }
+.cmp-radar-legend { display:flex; flex-wrap:wrap; gap:6px 14px; align-self:flex-start; }
+.cmp-radar-legend-item { display:flex; align-items:center; gap:5px; font-size:11px; color:#ccc; }
+.cmp-radar-legend-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+
+/* 比較表格 */
+.cmp-table { padding: 0 16px 20px; }
+
+/* 城市名稱橫列 */
+.cmp-city-header {
+  display: grid; gap: 8px;
+  padding: 14px 0 10px;
+  border-bottom: 2px solid #2D4A3E;
+}
+.cmp-city-name-cell {
+  background: #1a2a24; border-radius: 10px; padding: 12px;
+  text-align: center;
+}
+.cmp-city-name { font-size: 18px; font-weight: 800; color: #fff; }
+.cmp-city-sub  { font-size: 11px; color: #7AAA98; margin-top: 3px; }
+.cmp-season-badge {
+  display: inline-block; margin-top: 6px;
+  padding: 2px 10px; border-radius: 10px;
+  font-size: 10px; font-weight: 700; color: #fff;
+}
+
+/* 資料列 */
+.cmp-row {
+  display: grid; gap: 8px;
+  padding: 10px 0; border-bottom: 1px solid #1a2a20;
+  align-items: center;
+}
+.cmp-row:last-child { border-bottom: none; }
+.cmp-row-label {
+  font-size: 11px; color: #7AAA98; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.cmp-cell { text-align: center; }
+.cmp-value { font-size: 15px; font-weight: 700; color: #fff; }
+.cmp-value.best { color: #5A8A72; }
+.cmp-value.worst { color: #E8825A; }
+.cmp-stars { font-size: 14px; color: #FFD700; }
+.cmp-bar-wrap { width: 80%; height: 8px; background: #1e3028; border-radius: 4px; overflow: hidden; margin: 4px auto 0; }
+.cmp-bar-fill { height: 100%; border-radius: 4px; }
+
+@media (max-width: 768px) {
+  #compare-bar {
+    left: 0; right: 0; transform: none;
+    min-width: unset; border-radius: 14px 14px 0 0;
+    bottom: 90px; /* above FABs */
+  }
+  #compare-overlay { padding: 0; align-items: flex-end; }
+  #compare-panel { border-radius: 16px 16px 0 0; max-height: 85vh; }
+}
+
+/* ══════════════════════════════════════════
+   MOBILE UI ELEMENTS
+══════════════════════════════════════════ */
+
+/* FAB buttons — hidden on desktop, shown on mobile */
+.mob-fab {
+  display: none;
+  position: fixed; z-index: 1001;
+  width: 52px; height: 52px; border-radius: 50%;
+  border: 1.5px solid #3A4A42;
+  cursor: pointer; font-size: 22px;
+  align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px rgba(0,0,0,.6);
+  transition: transform .15s, border-color .2s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.mob-fab:active { transform: scale(.88); }
+#fab-filter {
+  bottom: 28px; left: 16px;
+  background: rgba(26,40,34,.96); color: #A8C5B8;
+}
+#fab-route {
+  bottom: 28px; right: 16px;
+  background: rgba(20,26,40,.96); color: #A8C5B8;
+}
+#fab-filter.has-active { border-color: #5A8A72; color: #7DCCA8; }
+
+/* Backdrop */
+#mob-backdrop {
+  display: none; position: fixed; inset: 0; z-index: 1999;
+  background: rgba(0,0,0,.5);
+}
+#mob-backdrop.show { display: block; }
+
+/* Bottom sheets */
+.mob-sheet {
+  display: none;
+  position: fixed; bottom: 0; left: 0; right: 0;
+  z-index: 2000;
+  background: rgba(16,24,30,.98);
+  border-top: 2px solid #3A4A42;
+  border-radius: 18px 18px 0 0;
+  padding: 10px 16px 40px;
+  max-height: 80vh; overflow-y: auto;
+  transform: translateY(110%);
+  transition: transform .28s cubic-bezier(.25,.8,.25,1);
+  -webkit-overflow-scrolling: touch;
+}
+.mob-sheet.open { transform: translateY(0); }
+
+.mob-sheet-handle {
+  width: 38px; height: 4px; background: #3A4A42;
+  border-radius: 2px; margin: 0 auto 14px;
+}
+.mob-sheet-title {
+  font-size: 12px; font-weight: 700; color: #7AAA98;
+  text-transform: uppercase; letter-spacing: 1px;
+  margin-bottom: 14px;
+}
+
+/* Route buttons inside sheet need full width */
+#sheet-route .route-btn { font-size: 14px; padding: 11px 14px; }
+#sheet-route .rb-dot { width: 12px; height: 12px; }
+
+/* Popup sheet */
+#sheet-popup .popup-inner { padding: 6px 2px; }
+
+/* ══════════════════════════════════════════
+   MEDIA QUERY  ≤768 px
+══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Compact header */
+  #header { padding: 10px 14px; }
+  #header h1 { font-size: 15px; }
+  #header p  { display: none; }
+
+  /* Hide desktop panels */
+  #filter-panel,
+  #route-panel,
+  #legend { display: none !important; }
+
+  /* Show FABs & make sheets usable */
+  .mob-fab  { display: flex; }
+  .mob-sheet { display: block; }
+
+  /* Larger tap targets for markers */
+  .marker-circle {
+    width: 44px; height: 44px; font-size: 12px;
+  }
+
+  /* Popup: disable native Leaflet popup, sheet handles it */
+  .leaflet-popup-pane { display: none !important; }
+
+  /* fp-btn bigger on mobile */
+  .fp-btn { padding: 7px 14px; font-size: 13px; }
+}
+</style>
+</head>
+<body>
+
+<style>
+/* ── 模式切換（旅居 / 旅遊）── */
+body:not(.mode-travel) .only-travel { display: none !important; }
+body.mode-travel .only-reside { display: none !important; }
+#mode-toggle { display: flex; gap: 6px; }
+.mode-btn { padding: 6px 14px; border-radius: 20px; border: 1.5px solid #2D4A3E; background: transparent; color: #7AAA98; font-size: 13px; font-weight: 700; cursor: pointer; text-decoration: none; white-space: nowrap; transition: all .2s; }
+body:not(.mode-travel) .mode-btn[data-mode="reside"] { border-color: #5A8A72; background: #5A8A7222; color: #A8C5B8; }
+body.mode-travel .mode-btn[data-mode="travel"] { border-color: #E8825A; background: #E8825A22; color: #E8A57A; }
+</style>
+
+<div id="header">
+  <div>
+    <h1 id="map-title">🗺️ 旅居城市評估地圖</h1>
+    <p id="map-sub">51 個城市 × 月均費用 × 綜合推薦評分 × 5 條路線方案</p>
+  </div>
+  <div id="mode-toggle" style="margin-left:auto;">
+    <a class="mode-btn" data-mode="reside" href="?mode=reside">🏠 旅居</a>
+    <a class="mode-btn" data-mode="travel" href="?mode=travel">✈ 旅遊</a>
+  </div>
+  <a href="heatmap.html" style="display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;border:1.5px solid #5A8A72;color:#A8C5B8;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;transition:all .2s;" onmouseover="this.style.background='#1e3028'" onmouseout="this.style.background='transparent'">🌡 月份熱力圖</a>
+</div>
+
+<div id="map"></div>
+
+<div id="filter-panel" class="collapsed">
+  <div class="panel-head" onclick="this.parentElement.classList.toggle('collapsed')">
+    <span class="panel-title">🔍 篩選</span>
+    <span class="panel-chevron">▾</span>
+  </div>
+  <div class="fp-body">
+  <div class="fp-group only-reside">
+    <div class="fp-label">季節</div>
+    <div class="fp-row">
+      <button class="fp-btn active" data-filter="season" data-value="all">全部</button>
+      <button class="fp-btn" data-filter="season" data-value="summer">☀ 夏季</button>
+      <button class="fp-btn" data-filter="season" data-value="winter">❄ 冬季</button>
+      <button class="fp-btn" data-filter="season" data-value="year_round">🌿 四季</button>
+      <button class="fp-btn" data-filter="season" data-value="guangxi">✦ 廣西</button>
+      <button class="fp-btn" data-filter="season" data-value="overseas">✈ 境外</button>
+    </div>
+  </div>
+  <div class="fp-group only-travel">
+    <div class="fp-label">地區</div>
+    <div class="fp-row">
+      <button class="fp-btn active" data-filter="season" data-value="all">全部</button>
+      <button class="fp-btn" data-filter="season" data-value="yunnan">⛰ 雲南</button>
+      <button class="fp-btn" data-filter="season" data-value="sichuan">🌶 川渝</button>
+      <button class="fp-btn" data-filter="season" data-value="jiangnan">🌊 江南</button>
+      <button class="fp-btn" data-filter="season" data-value="guandu">🏯 關中古都</button>
+      <button class="fp-btn" data-filter="season" data-value="coast">🏝 東南沿海</button>
+      <button class="fp-btn" data-filter="season" data-value="huabei">🏛 華北</button>
+      <button class="fp-btn" data-filter="season" data-value="lingnan">🏞 嶺南</button>
+      <button class="fp-btn" data-filter="season" data-value="huazhong">🏔 華中</button>
+      <button class="fp-btn" data-filter="season" data-value="huadong">🏙 華東</button>
+      <button class="fp-btn" data-filter="season" data-value="xibei">🏜 西北</button>
+      <button class="fp-btn" data-filter="season" data-value="dongbei">❄ 東北</button>
+      <button class="fp-btn" data-filter="season" data-value="korea">🇰🇷 韓國</button>
+      <button class="fp-btn" data-filter="season" data-value="indonesia">🇮🇩 峇里·印尼</button>
+      <button class="fp-btn" data-filter="season" data-value="tohoku">🇯🇵 日本東北</button>
+    </div>
+  </div>
+  <div class="fp-sep"></div>
+  <div class="fp-group">
+    <div class="fp-label">推薦星數</div>
+    <div class="fp-row">
+      <button class="fp-btn active" data-filter="stars" data-value="all">全部</button>
+      <button class="fp-btn" data-filter="stars" data-value="3">★ 3+</button>
+      <button class="fp-btn" data-filter="stars" data-value="4">★ 4+</button>
+      <button class="fp-btn" data-filter="stars" data-value="4.5">★ 4.5</button>
+    </div>
+  </div>
+  <div class="fp-sep"></div>
+  <div class="fp-group only-reside">
+    <div class="fp-label">月均費用（CNY 等值）</div>
+    <div class="fp-row">
+      <button class="fp-btn active" data-filter="cost" data-value="all">全部</button>
+      <button class="fp-btn" data-filter="cost" data-value="low">＜ 5K</button>
+      <button class="fp-btn" data-filter="cost" data-value="mid">5–7.5K</button>
+      <button class="fp-btn" data-filter="cost" data-value="high">＞ 7.5K</button>
+    </div>
+  </div>
+  <div class="fp-group only-travel">
+    <div class="fp-label">每日花費（CNY）</div>
+    <div class="fp-row">
+      <button class="fp-btn active" data-filter="cost" data-value="all">全部</button>
+      <button class="fp-btn" data-filter="cost" data-value="low">＜ 450</button>
+      <button class="fp-btn" data-filter="cost" data-value="mid">450–650</button>
+      <button class="fp-btn" data-filter="cost" data-value="high">＞ 650</button>
+    </div>
+  </div>
+  <div class="fp-sep"></div>
+  <div class="fp-group only-reside">
+    <div class="fp-label">評分維度（≥ 4 分）</div>
+    <div class="fp-row">
+      <button class="fp-btn active" data-filter="rating" data-value="all">全部</button>
+      <button class="fp-btn" data-filter="rating" data-value="健行跑步">🏃 健行跑步</button>
+      <button class="fp-btn" data-filter="rating" data-value="健身房">💪 健身房</button>
+      <button class="fp-btn" data-filter="rating" data-value="美食">🍜 美食</button>
+      <button class="fp-btn" data-filter="rating" data-value="網路/VPN">🌐 網路/VPN</button>
+      <button class="fp-btn" data-filter="rating" data-value="CP值">💰 CP值</button>
+    </div>
+  </div>
+  <div class="fp-group only-travel">
+    <div class="fp-label">主軸維度（≥ 4 分）</div>
+    <div class="fp-row">
+      <button class="fp-btn active" data-filter="rating" data-value="all">全部</button>
+      <button class="fp-btn" data-filter="rating" data-value="美食">🍜 美食</button>
+      <button class="fp-btn" data-filter="rating" data-value="自然健行">🏃 自然健行</button>
+      <button class="fp-btn" data-filter="rating" data-value="歷史文化">🏯 歷史文化</button>
+      <button class="fp-btn" data-filter="rating" data-value="景點密度">📍 景點密度</button>
+      <button class="fp-btn" data-filter="rating" data-value="慢遊">🍵 慢遊</button>
+    </div>
+  </div>
+  <div class="fp-sep"></div>
+  <div class="fp-group">
+    <div class="fp-label">排序</div>
+    <div class="fp-row">
+      <button class="fp-btn active sort-btn" data-sort="default">預設</button>
+      <button class="fp-btn sort-btn" data-sort="stars">★ 推薦</button>
+      <button class="fp-btn sort-btn" data-sort="cost">💰 便宜優先</button>
+      <button class="fp-btn sort-btn" data-sort="健行跑步">🏃 健行</button>
+      <button class="fp-btn sort-btn" data-sort="健身房">💪 健身</button>
+      <button class="fp-btn sort-btn" data-sort="網路/VPN">🌐 網路</button>
+    </div>
+    <div id="sort-list" style="margin-top:10px;font-size:11px;color:#7AAA98;max-height:140px;overflow:auto;display:none;"></div>
+  </div>
+  </div>
+</div>
+
+<div id="legend">
+  <h3>圖例</h3>
+  <div class="only-reside">
+    <div class="legend-item"><div class="legend-dot" style="background:#E8825A"></div>夏季旅居推薦</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#5B9BD5"></div>冬季旅居推薦</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#5A8A72"></div>四季皆宜</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#C9A84C"></div>廣西城市</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#9B59B6"></div>境外（東南亞）</div>
+    <div style="margin-top:10px; font-size:10px; color:#555; border-top:1px solid #2D4A3E; padding-top:8px;">
+      圈內數字 = 綜合推薦評分<br>顏色深淺 = 月均費用高低
+    </div>
+  </div>
+  <div class="only-travel">
+    <div class="legend-item"><div class="legend-dot" style="background:#5A8A72"></div>雲南</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#E8825A"></div>川渝</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#5B9BD5"></div>江南</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#C9A84C"></div>關中古都</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#9B59B6"></div>東南沿海</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#C0504D"></div>華北</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#2E9E8F"></div>嶺南</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#B5764A"></div>華中</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#2E6DA4"></div>華東</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#B8862B"></div>西北</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#6C8EBF"></div>東北</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#D9506E"></div>韓國</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#00A6A6"></div>峇里·印尼</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#6D4C9F"></div>日本東北</div>
+    <div style="margin-top:10px; font-size:10px; color:#555; border-top:1px solid #2D4A3E; padding-top:8px;">
+      圈內數字 = 綜合推薦評分<br>顏色 = 所屬地區
+    </div>
+  </div>
+  <div id="legend-updated" style="margin-top:8px;font-size:10px;color:#3A5A4A;"></div>
+</div>
+
+<div id="route-panel" class="collapsed">
+  <div class="panel-head" onclick="this.parentElement.classList.toggle('collapsed')">
+    <span class="panel-title">🗺 路線方案</span>
+    <span class="panel-chevron">▾</span>
+  </div>
+  <div class="rp-body">
+  <div class="only-reside">
+    <button class="route-btn" data-plan="A">
+      <div class="rb-dot" style="background:#FF7675"></div>
+      <span>方案 A 西南慢遊</span>
+      <span class="rb-arrow">▶</span>
+    </button>
+    <button class="route-btn" data-plan="B">
+      <div class="rb-dot" style="background:#00CEC9"></div>
+      <span>方案 B 華中山水</span>
+      <span class="rb-arrow">▶</span>
+    </button>
+    <button class="route-btn" data-plan="C">
+      <div class="rb-dot" style="background:#FDCB6E"></div>
+      <span>方案 C 西北絲路</span>
+      <span class="rb-arrow">▶</span>
+    </button>
+    <button class="route-btn" data-plan="D">
+      <div class="rb-dot" style="background:#55EFC4"></div>
+      <span>方案 D 西南+Trial</span>
+      <span class="rb-arrow">▶</span>
+    </button>
+    <button class="route-btn" data-plan="E">
+      <div class="rb-dot" style="background:#A29BFE"></div>
+      <span>方案 E 分季兩趟</span>
+      <span class="rb-arrow">▶</span>
+    </button>
+  </div>
+  <div class="only-travel">
+    <button class="route-btn" data-plan="F">
+      <div class="rb-dot" style="background:#E8825A"></div>
+      <span>F 雲南滇西北線（30天）</span>
+      <span class="rb-arrow">▶</span>
+    </button>
+    <button class="route-btn" data-plan="G">
+      <div class="rb-dot" style="background:#00CEC9"></div>
+      <span>G 西安·川渝·雲南（34天）</span>
+      <span class="rb-arrow">▶</span>
+    </button>
+    <button class="route-btn" data-plan="I">
+      <div class="rb-dot" style="background:#C9A84C"></div>
+      <span>I 北方古都·河西絲路（9月·32天）</span>
+      <span class="rb-arrow">▶</span>
+    </button>
+    <button class="route-btn" data-plan="J">
+      <div class="rb-dot" style="background:#5B9BD5"></div>
+      <span>J 東部縱貫文化（10月·30天）</span>
+      <span class="rb-arrow">▶</span>
+    </button>
+    <button class="route-btn" data-plan="K">
+      <div class="rb-dot" style="background:#9B59B6"></div>
+      <span>K 川渝·華中嶺南暖秋（11月·30天）</span>
+      <span class="rb-arrow">▶</span>
+    </button>
+  </div>
+  <div class="route-panel-sep"></div>
+  <div class="route-panel-hint">點擊切換顯示路線<br>點擊路線可查看方案詳情</div>
+  </div>
+</div>
+
+<!-- ── Compare bar ───────────────────────────── -->
+<div id="compare-bar">
+  <div id="compare-cities"></div>
+  <button id="compare-go">比較 →</button>
+  <button id="compare-clear" title="清除">✕</button>
+</div>
+
+<!-- ── Compare overlay ──────────────────────── -->
+<div id="compare-overlay">
+  <div id="compare-panel">
+    <div class="cmp-panel-header">
+      <span class="cmp-panel-title">城市比較</span>
+      <button id="cmp-close">✕</button>
+    </div>
+    <div class="cmp-radar-wrap" id="cmp-radar-wrap">
+      <div class="cmp-radar-title">各項評分雷達圖</div>
+      <svg id="cmp-radar-svg" viewBox="0 0 300 260" style="width:100%;max-width:340px;"></svg>
+      <div class="cmp-radar-legend" id="cmp-radar-legend"></div>
+    </div>
+    <div class="cmp-table" id="cmp-table-body"></div>
+  </div>
+</div>
+
+<!-- ── Mobile elements ───────────────────────── -->
+<div id="mob-backdrop"></div>
+<button class="mob-fab" id="fab-filter" aria-label="篩選">⚙️</button>
+<button class="mob-fab" id="fab-route"  aria-label="路線">🗺️</button>
+
+<!-- Mobile filter bottom sheet -->
+<div class="mob-sheet" id="sheet-filter">
+  <div class="mob-sheet-handle"></div>
+  <div class="mob-sheet-title">篩選城市</div>
+  <div class="fp-group only-reside">
+    <div class="fp-label">季節</div>
+    <div class="fp-row">
+      <button class="fp-btn active" data-filter="season" data-value="all">全部</button>
+      <button class="fp-btn" data-filter="season" data-value="summer">☀ 夏季</button>
+      <button class="fp-btn" data-filter="season" data-value="winter">❄ 冬季</button>
+      <button class="fp-btn" data-filter="season" data-value="year_round">🌿 四季</button>
+      <button class="fp-btn" data-filter="season" data-value="guangxi">✦ 廣西</button>
+      <button class="fp-btn" data-filter="season" data-value="overseas">✈ 境外</button>
+    </div>
+  </div>
+  <div class="fp-group only-travel">
+    <div class="fp-label">地區</div>
+    <div class="fp-row">
+      <button class="fp-btn active" data-filter="season" data-value="all">全部</button>
+      <button class="fp-btn" data-filter="season" data-value="yunnan">⛰ 雲南</button>
+      <button class="fp-btn" data-filter="season" data-value="sichuan">🌶 川渝</button>
+      <button class="fp-btn" data-filter="season" data-value="jiangnan">🌊 江南</button>
+      <button class="fp-btn" data-filter="season" data-value="guandu">🏯 關中古都</button>
+      <button class="fp-btn" data-filter="season" data-value="coast">🏝 東南沿海</button>
+      <button class="fp-btn" data-filter="season" data-value="huabei">🏛 華北</button>
+      <button class="fp-btn" data-filter="season" data-value="lingnan">🏞 嶺南</button>
+      <button class="fp-btn" data-filter="season" data-value="huazhong">🏔 華中</button>
+      <button class="fp-btn" data-filter="season" data-value="huadong">🏙 華東</button>
+      <button class="fp-btn" data-filter="season" data-value="xibei">🏜 西北</button>
+      <button class="fp-btn" data-filter="season" data-value="dongbei">❄ 東北</button>
+      <button class="fp-btn" data-filter="season" data-value="korea">🇰🇷 韓國</button>
+      <button class="fp-btn" data-filter="season" data-value="indonesia">🇮🇩 峇里·印尼</button>
+      <button class="fp-btn" data-filter="season" data-value="tohoku">🇯🇵 日本東北</button>
+    </div>
+  </div>
+  <div class="fp-sep"></div>
+  <div class="fp-group">
+    <div class="fp-label">推薦星數</div>
+    <div class="fp-row">
+      <button class="fp-btn active" data-filter="stars" data-value="all">全部</button>
+      <button class="fp-btn" data-filter="stars" data-value="3">★ 3+</button>
+      <button class="fp-btn" data-filter="stars" data-value="4">★ 4+</button>
+      <button class="fp-btn" data-filter="stars" data-value="4.5">★ 4.5</button>
+    </div>
+  </div>
+  <div class="fp-sep"></div>
+  <div class="fp-group only-reside">
+    <div class="fp-label">月均費用（CNY 等值）</div>
+    <div class="fp-row">
+      <button class="fp-btn active" data-filter="cost" data-value="all">全部</button>
+      <button class="fp-btn" data-filter="cost" data-value="low">＜ 5K</button>
+      <button class="fp-btn" data-filter="cost" data-value="mid">5–7.5K</button>
+      <button class="fp-btn" data-filter="cost" data-value="high">＞ 7.5K</button>
+    </div>
+  </div>
+  <div class="fp-group only-travel">
+    <div class="fp-label">每日花費（CNY）</div>
+    <div class="fp-row">
+      <button class="fp-btn active" data-filter="cost" data-value="all">全部</button>
+      <button class="fp-btn" data-filter="cost" data-value="low">＜ 450</button>
+      <button class="fp-btn" data-filter="cost" data-value="mid">450–650</button>
+      <button class="fp-btn" data-filter="cost" data-value="high">＞ 650</button>
+    </div>
+  </div>
+  <div class="fp-sep"></div>
+  <div class="fp-group only-reside">
+    <div class="fp-label">評分維度（≥ 4 分）</div>
+    <div class="fp-row">
+      <button class="fp-btn active" data-filter="rating" data-value="all">全部</button>
+      <button class="fp-btn" data-filter="rating" data-value="健行跑步">🏃 健行</button>
+      <button class="fp-btn" data-filter="rating" data-value="健身房">💪 健身</button>
+      <button class="fp-btn" data-filter="rating" data-value="美食">🍜 美食</button>
+      <button class="fp-btn" data-filter="rating" data-value="網路/VPN">🌐 網路</button>
+      <button class="fp-btn" data-filter="rating" data-value="CP值">💰 CP</button>
+    </div>
+  </div>
+  <div class="fp-group only-travel">
+    <div class="fp-label">主軸維度（≥ 4 分）</div>
+    <div class="fp-row">
+      <button class="fp-btn active" data-filter="rating" data-value="all">全部</button>
+      <button class="fp-btn" data-filter="rating" data-value="美食">🍜 美食</button>
+      <button class="fp-btn" data-filter="rating" data-value="自然健行">🏃 自然</button>
+      <button class="fp-btn" data-filter="rating" data-value="歷史文化">🏯 歷史</button>
+      <button class="fp-btn" data-filter="rating" data-value="景點密度">📍 景點</button>
+      <button class="fp-btn" data-filter="rating" data-value="慢遊">🍵 慢遊</button>
+    </div>
+  </div>
+  <div class="fp-sep"></div>
+  <div class="fp-group">
+    <div class="fp-label">排序</div>
+    <div class="fp-row">
+      <button class="fp-btn active sort-btn" data-sort="default">預設</button>
+      <button class="fp-btn sort-btn" data-sort="stars">★ 推薦</button>
+      <button class="fp-btn sort-btn" data-sort="cost">💰 便宜</button>
+      <button class="fp-btn sort-btn" data-sort="健行跑步">🏃 健行</button>
+      <button class="fp-btn sort-btn" data-sort="網路/VPN">🌐 網路</button>
+    </div>
+  </div>
+  <div class="fp-sep"></div>
+  <div class="fp-group">
+    <div class="fp-label">圖例</div>
+    <div class="only-reside" style="display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:6px;">
+      <div class="legend-item"><div class="legend-dot" style="background:#E8825A"></div>夏季</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#5B9BD5"></div>冬季</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#5A8A72"></div>四季</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#C9A84C"></div>廣西</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#9B59B6"></div>境外</div>
+    </div>
+    <div class="only-travel" style="display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:6px;">
+      <div class="legend-item"><div class="legend-dot" style="background:#5A8A72"></div>雲南</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#E8825A"></div>川渝</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#5B9BD5"></div>江南</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#C9A84C"></div>關中古都</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#9B59B6"></div>東南沿海</div>
+    </div>
+    <div class="only-reside" style="margin-top:8px;font-size:11px;color:#555;">圈內數字 = 綜合推薦評分　顏色深淺 = 月均費用</div>
+    <div class="only-travel" style="margin-top:8px;font-size:11px;color:#555;">圈內數字 = 綜合推薦評分　顏色 = 所屬地區</div>
+    <div id="sheet-updated" style="margin-top:10px;font-size:11px;color:#3A5A4A;border-top:1px solid #2D4A3E;padding-top:8px;"></div>
+  </div>
+</div>
+
+<!-- Mobile route bottom sheet -->
+<div class="mob-sheet" id="sheet-route">
+  <div class="mob-sheet-handle"></div>
+  <div class="mob-sheet-title">🗺 路線方案</div>
+  <div class="only-reside">
+    <button class="route-btn" data-plan="A">
+      <div class="rb-dot" style="background:#FF7675"></div>
+      <span>方案 A 西南慢遊</span>
+      <span class="rb-arrow">▶</span>
+    </button>
+    <button class="route-btn" data-plan="B">
+      <div class="rb-dot" style="background:#00CEC9"></div>
+      <span>方案 B 華中山水</span>
+      <span class="rb-arrow">▶</span>
+    </button>
+    <button class="route-btn" data-plan="C">
+      <div class="rb-dot" style="background:#FDCB6E"></div>
+      <span>方案 C 西北絲路</span>
+      <span class="rb-arrow">▶</span>
+    </button>
+    <button class="route-btn" data-plan="D">
+      <div class="rb-dot" style="background:#55EFC4"></div>
+      <span>方案 D 西南+Trial</span>
+      <span class="rb-arrow">▶</span>
+    </button>
+    <button class="route-btn" data-plan="E">
+      <div class="rb-dot" style="background:#A29BFE"></div>
+      <span>方案 E 分季兩趟</span>
+      <span class="rb-arrow">▶</span>
+    </button>
+  </div>
+  <div class="only-travel">
+    <button class="route-btn" data-plan="F">
+      <div class="rb-dot" style="background:#E8825A"></div>
+      <span>F 雲南滇西北線（30天）</span>
+      <span class="rb-arrow">▶</span>
+    </button>
+    <button class="route-btn" data-plan="G">
+      <div class="rb-dot" style="background:#00CEC9"></div>
+      <span>G 西安·川渝·雲南（34天）</span>
+      <span class="rb-arrow">▶</span>
+    </button>
+    <button class="route-btn" data-plan="I">
+      <div class="rb-dot" style="background:#C9A84C"></div>
+      <span>I 北方古都·河西絲路（9月·32天）</span>
+      <span class="rb-arrow">▶</span>
+    </button>
+    <button class="route-btn" data-plan="J">
+      <div class="rb-dot" style="background:#5B9BD5"></div>
+      <span>J 東部縱貫文化（10月·30天）</span>
+      <span class="rb-arrow">▶</span>
+    </button>
+    <button class="route-btn" data-plan="K">
+      <div class="rb-dot" style="background:#9B59B6"></div>
+      <span>K 川渝·華中嶺南暖秋（11月·30天）</span>
+      <span class="rb-arrow">▶</span>
+    </button>
+  </div>
+  <div class="route-panel-sep"></div>
+  <div class="route-panel-hint">點擊切換顯示路線，再點擊關閉</div>
+</div>
+
+<!-- Mobile city/route popup bottom sheet -->
+<div class="mob-sheet" id="sheet-popup">
+  <div class="mob-sheet-handle"></div>
+  <div id="mob-popup-inner"></div>
+</div>
+
+<script>
+// ── 資料版本 ─────────────────────────────────────────────
+const DATA_UPDATED = '2026-04';
+
+// ── 模式（旅居 / 旅遊）──────────────────────────────────
+// 由 URL ?mode=travel 決定；切換 = 換 location.search 整頁重載，
+// 兩模式各自載入自己的城市與路線，路線絕不同圖。
+const MODE = new URLSearchParams(location.search).get('mode') === 'travel' ? 'travel' : 'reside';
+document.body.classList.add('mode-' + MODE);
+
+const SEASON_COLOR_RESIDE = {
+  summer: '#E8825A', winter: '#5B9BD5', year_round: '#5A8A72',
+  guangxi: '#C9A84C', overseas: '#9B59B6',
+};
+const SEASON_LABEL_RESIDE = {
+  summer: '☀ 夏季', winter: '❄ 冬季', year_round: '🌿 四季皆宜',
+  guangxi: '✦ 廣西', overseas: '✈ 境外',
+};
+// 旅遊：season 欄位存「地區」（region），複用同一條顯隱/上色管線
+const SEASON_COLOR_TRAVEL = {
+  yunnan: '#5A8A72',
+  sichuan: '#E8825A',
+  jiangnan: '#5B9BD5',
+  guandu: '#C9A84C',
+  coast: '#9B59B6',
+  huabei: '#C0504D',
+  lingnan: '#2E9E8F',
+  huazhong: '#B5764A',
+  huadong: '#2E6DA4',
+  xibei: '#B8862B',
+  dongbei: '#6C8EBF',
+  korea: '#D9506E',
+  indonesia: '#00A6A6',
+  tohoku: '#6D4C9F',
+};
+const SEASON_LABEL_TRAVEL = {
+  yunnan: '⛰ 雲南',
+  sichuan: '🌶 川渝',
+  jiangnan: '🌊 江南',
+  guandu: '🏯 關中古都',
+  coast: '🏝 東南沿海',
+  huabei: '🏛 華北',
+  lingnan: '🏞 嶺南',
+  huazhong: '🏔 華中',
+  huadong: '🏙 華東',
+  xibei: '🏜 西北',
+  dongbei: '❄ 東北',
+  korea: '🇰🇷 韓國',
+  indonesia: '🇮🇩 峇里·印尼',
+  tohoku: '🇯🇵 日本東北',
+};
+
+const SEASON_COLOR = MODE === 'travel' ? SEASON_COLOR_TRAVEL : SEASON_COLOR_RESIDE;
+const SEASON_LABEL = MODE === 'travel' ? SEASON_LABEL_TRAVEL : SEASON_LABEL_RESIDE;
+
+// ── 城市資料 ──────────────────────────────────────────
+// 評分說明：
+//   健身房   = 健身館資源豐富度（不限蹲舉架）
+//   網路/VPN = 家用光纖品質 + 翻牆難易度（不看 coworking）
+const CITIES_RESIDE = [
+  { name:'成都', slug:'chengdu', province:'四川省', lat:30.57, lng:104.07, season:'summer',
+    cost:'5,000–8,400', costMid:6700, stars:4.5,
+    ratings:{ 健行跑步:4, 健身房:5, 美食:5, '網路/VPN':4, CP值:5 },
+    desc:'美食之都，川菜火鍋，龍泉山、青城山健行',
+    months:[2,2,3,4,4,5,4,5,4,3,2,2],
+    runRoute:'錦江河濱跑步道（市區平坦）+ 龍泉山城市森林公園' },
+
+  { name:'大理', slug:'dali', province:'雲南省', lat:25.61, lng:100.27, season:'summer',
+    cost:'3,750–7,000', costMid:5375, stars:4.0,
+    ratings:{ 健行跑步:5, 健身房:3, 美食:4, '網路/VPN':3, CP值:5 },
+    desc:'蒼山洱海，台灣人社群活躍；古城區網路需租屋前實測',
+    months:[4,4,5,5,4,3,3,3,3,5,4,4],
+    runRoute:'洱海環湖路（全長約120km）+ 蒼山登山步道',
+    warning:'網路穩定性是最大風險，視訊會議需求高者需謹慎' },
+
+  { name:'麗江', slug:'lijiang', province:'雲南省', lat:26.87, lng:100.23, season:'summer',
+    cost:'3,800–6,600', costMid:5200, stars:3.5,
+    ratings:{ 健行跑步:5, 健身房:2, 美食:4, '網路/VPN':2, CP值:5 },
+    desc:'古城健行，玉龍雪山，泡湯資源豐富；網路不穩是硬傷',
+    months:[3,3,4,5,4,3,3,3,4,5,4,3],
+    runRoute:'束河古鎮外環路（平坦）+ 玉龍雪山登山步道（海拔3000m）',
+    warning:'網路不穩 + 健身設備缺乏，不適合長期遠端工作旅居' },
+
+  { name:'貴陽', slug:'guiyang', province:'貴州省', lat:26.65, lng:106.63, season:'summer',
+    cost:'3,000–5,700', costMid:4350, stars:3.0,
+    ratings:{ 健行跑步:4, 健身房:3, 美食:3, '網路/VPN':3, CP值:5 },
+    desc:'最涼爽夏都（24°C），物價最低；省會光纖覆蓋好，翻牆正常',
+    months:[2,2,3,3,4,5,5,5,4,3,2,2],
+    runRoute:'花溪河濱步道（10km）+ 觀山湖公園環湖跑',
+    warning:'遠端工作設施弱：coworking幾乎沒有，網路需提前確認' },
+
+  { name:'青島', slug:'qingdao', province:'山東省', lat:36.07, lng:120.38, season:'summer',
+    cost:'4,900–8,200', costMid:6550, stars:4.0,
+    ratings:{ 健行跑步:4, 健身房:4, 美食:5, '網路/VPN':4, CP值:4 },
+    desc:'海濱城市，啤酒海鮮，沿海跑步景觀絕佳',
+    months:[1,1,2,3,4,4,3,5,4,3,2,1],
+    runRoute:'棧橋—八大關—金沙灘海岸線（約18km）— 全國最美沿海跑道之一' },
+
+  { name:'西安', slug:'xian', province:'陝西省', lat:34.27, lng:108.93, season:'summer',
+    cost:'4,570–6,750', costMid:5660, stars:4.0,
+    ratings:{ 健行跑步:5, 健身房:5, 美食:5, '網路/VPN':3, CP值:4 },
+    desc:'城牆跑道13.7km，威力健身等大型連鎖，臨潼溫泉；7月悶熱',
+    months:[2,2,3,4,4,3,2,3,4,4,2,2],
+    runRoute:'古城牆跑道 13.7km（全球最特殊跑道）+ 環城公園護城河步道' },
+
+  { name:'西寧', slug:'xining', province:'青海省', lat:36.62, lng:101.78, season:'summer',
+    cost:'3,650–5,430', costMid:4540, stars:3.5,
+    ratings:{ 健行跑步:4, 健身房:3, 美食:3, '網路/VPN':3, CP值:5 },
+    desc:'夏季25°C高原涼爽，市區溫泉；千兆光纖覆蓋，翻牆標準',
+    months:[1,1,2,3,4,5,5,5,4,2,1,1],
+    runRoute:'湟水河濱公園步道 + 南山公園登山步道（海拔2275m，高原訓練絕佳）',
+    warning:'蹲舉架需落地確認，無 coworking 空間；冬季絕對不可旅居' },
+
+  { name:'廣州', slug:'guangzhou', province:'廣東省', lat:23.13, lng:113.26, season:'winter',
+    cost:'5,500–9,000', costMid:7250, stars:4.0,
+    ratings:{ 健行跑步:3, 健身房:5, 美食:5, '網路/VPN':5, CP值:3 },
+    desc:'粵菜美食，台灣直航，一線城市健身館與網路俱佳',
+    months:[4,3,3,3,3,2,2,2,3,4,5,5],
+    runRoute:'珠江新城海心沙公園環河跑（5km）+ 白雲山登山越野' },
+
+  { name:'深圳', slug:'shenzhen', province:'廣東省', lat:22.54, lng:114.06, season:'winter',
+    cost:'6,600–10,600', costMid:8600, stars:4.5,
+    ratings:{ 健行跑步:4, 健身房:5, 美食:4, '網路/VPN':5, CP值:3 },
+    desc:'科技之都，全國最頂尖網路與健身資源，台灣人社群活躍',
+    months:[4,3,3,3,2,2,2,2,3,4,5,5],
+    runRoute:'深圳灣公園沿海跑道（16km）+ 梧桐山登山步道' },
+
+  { name:'珠海', slug:'zhuhai', province:'廣東省', lat:22.27, lng:113.57, season:'winter',
+    cost:'4,550–7,700', costMid:6125, stars:3.5,
+    ratings:{ 健行跑步:4, 健身房:3, 美食:4, '網路/VPN':4, CP值:4 },
+    desc:'情侶路晨跑28km，澳門一日遊；光纖好，翻牆相對寬鬆',
+    months:[4,3,3,3,3,2,2,2,3,4,5,5],
+    runRoute:'情侶路海濱跑道 28km（全國最長海濱步道之一）' },
+
+  { name:'惠州', slug:'huizhou', province:'廣東省', lat:23.11, lng:114.42, season:'winter',
+    cost:'3,900–7,050', costMid:5475, stars:4.0,
+    ratings:{ 健行跑步:4, 健身房:4, 美食:4, '網路/VPN':4, CP值:5 },
+    desc:'西湖18km環湖跑，惠東溫泉，廣東物價窪地；100–300Mbps家用光纖',
+    months:[4,3,3,3,3,2,2,2,3,4,5,5],
+    runRoute:'惠州西湖環湖步道 18km（湖景絕美）+ 南崑山登山越野',
+    warning:'乐刻無蹲舉架，需找本地傳統館；七/八月不建議旅居' },
+
+  { name:'廈門', slug:'xiamen', province:'福建省', lat:24.48, lng:118.09, season:'winter',
+    cost:'5,000–8,400', costMid:6700, stars:3.5,
+    ratings:{ 健行跑步:3, 健身房:4, 美食:4, '網路/VPN':4, CP值:4 },
+    desc:'環島路晨跑，台灣人最親切，一線網路基建；颱風季需注意',
+    months:[4,4,4,4,3,3,3,3,3,4,5,5],
+    runRoute:'環島路海濱跑道（半馬賽道，景觀極佳）+ 鼓浪嶼步行探索' },
+
+  { name:'三亞', slug:'sanya', province:'海南省', lat:18.25, lng:109.51, season:'winter',
+    cost:'6,000–11,000', costMid:8500, stars:2.5,
+    ratings:{ 健行跑步:4, 健身房:3, 美食:4, '網路/VPN':3, CP值:2 },
+    desc:'海南熱帶海灘，度假式旅居；費用最高，純享受定位',
+    months:[5,5,4,4,3,2,2,2,2,3,4,5],
+    runRoute:'三亞灣椰夢長廊 22km（沿海椰林跑道）+ 亞龍灣海岸線',
+    warning:'數位遊牧設施極弱，費用最高；適合純享受短住，不適合工作旅居' },
+
+  { name:'昆明', slug:'kunming', province:'雲南省', lat:25.04, lng:102.71, season:'year_round',
+    cost:'3,750–7,000', costMid:5375, stars:3.5,
+    ratings:{ 健行跑步:4, 健身房:3, 美食:4, '網路/VPN':4, CP值:5 },
+    desc:'春城四季如春，翠湖晨跑，西山健行；省會光纖覆蓋完善',
+    months:[3,3,4,5,5,4,3,3,4,5,4,3],
+    runRoute:'翠湖公園環湖步道（2.2km，市中心）+ 滇池海埂大道沿岸跑' },
+
+  { name:'杭州', slug:'hangzhou', province:'浙江省', lat:30.25, lng:120.16, season:'year_round',
+    cost:'6,500–10,500', costMid:8500, stars:4.5,
+    ratings:{ 健行跑步:5, 健身房:5, 美食:4, '網路/VPN':5, CP值:3 },
+    desc:'西湖環湖跑，網路與健身資源全國頂尖；租金偏高',
+    months:[2,2,4,5,4,3,2,3,4,5,4,2],
+    runRoute:'西湖環湖跑道 15km（全國最美城市跑道）+ 錢塘江江濱步道' },
+
+  { name:'南京', slug:'nanjing', province:'江蘇省', lat:32.06, lng:118.79, season:'year_round',
+    cost:'5,400–8,700', costMid:7050, stars:4.0,
+    ratings:{ 健行跑步:5, 健身房:4, 美食:4, '網路/VPN':4, CP值:4 },
+    desc:'紫金山越野，湯山溫泉，歷史文化深厚，四季均衡',
+    months:[2,2,3,5,4,3,2,2,4,5,4,2],
+    runRoute:'紫金山越野步道（城市森林，馬拉松賽道）+ 明城牆環城步道 35km' },
+
+  { name:'大連', slug:'dalian', province:'遼寧省', lat:38.91, lng:121.62, season:'summer',
+    cost:'5,030–8,950', costMid:6990, stars:4.0,
+    ratings:{ 健行跑步:5, 健身房:4, 美食:5, '網路/VPN':4, CP值:4 },
+    desc:'夏季22–26°C，全中國最涼爽大城，頂級海鮮，星海灣海岸跑道',
+    months:[1,1,2,3,4,4,5,5,4,3,2,1],
+    runRoute:'星海灣海岸跑道（10km）+ 棒槌島沿海步道，全程海景' },
+
+  { name:'重慶', slug:'chongqing', province:'重慶市', lat:29.56, lng:106.55, season:'year_round',
+    cost:'4,780–8,400', costMid:6590, stars:3.5,
+    ratings:{ 健行跑步:4, 健身房:5, 美食:5, '網路/VPN':4, CP值:4 },
+    desc:'美食傳奇，南濱路江景跑道，春秋旅居；夏天40°C不可去',
+    months:[3,3,4,4,4,2,1,1,3,4,3,3],
+    runRoute:'南濱路江景跑道 14km（兩江夜景壯觀）— 注意夏季禁止',
+    warning:'夏季（6–9月）高溫38–40°C，台灣夏天出發不適合，春秋（3–5月、10–11月）才是最佳視窗' },
+
+  { name:'蘇州', slug:'suzhou', province:'江蘇省', lat:31.3, lng:120.62, season:'year_round',
+    cost:'6,030–11,000', costMid:8515, stars:4.5,
+    ratings:{ 健行跑步:5, 健身房:5, 美食:5, '網路/VPN':5, CP值:4 },
+    desc:'台商重鎮（10萬台灣人），網路最強，金雞湖14km環湖跑，環太湖路線',
+    months:[2,2,4,5,4,3,2,2,4,5,4,2],
+    runRoute:'金雞湖環湖跑道 14km（工業園區，跑道品質全國頂尖）+ 環太湖路 150km' },
+
+  { name:'騰衝', slug:'tengchong', province:'雲南省', lat:25.03, lng:98.49, season:'winter',
+    cost:'2,660–5,650', costMid:4155, stars:3.5,
+    ratings:{ 健行跑步:4, 健身房:2, 美食:4, '網路/VPN':3, CP值:5 },
+    desc:'全中國最佳火山溫泉，步行可達；健身房是短板，邊境VPN需雙備份',
+    months:[4,4,5,5,4,3,3,3,3,4,4,4],
+    runRoute:'火山地質公園步道（特殊地貌，海拔1650m）+ 北海濕地周邊小路',
+    warning:'健身房設備極差，重訓需求高者旅居不超過3週；邊境地區VPN需備多套方案' },
+
+  { name:'景洪', slug:'jinghong', province:'雲南省', lat:22.01, lng:100.8, season:'winter',
+    cost:'2,610–5,200', costMid:3905, stars:3.0,
+    ratings:{ 健行跑步:4, 健身房:2, 美食:4, '網路/VPN':3, CP值:5 },
+    desc:'台灣冬天的熱帶避難所，25°C椰子樹，傣族美食；健身房很差',
+    months:[5,5,4,4,3,3,3,3,3,4,5,5],
+    runRoute:'瀾滄江沿岸步道（熱帶雨林，早晨霧氣涼爽）+ 熱帶植物園步道',
+    warning:'健身房設備極差，無法重訓；適合「跑量大週+減量重訓」旅居安排' },
+
+  { name:'南寧', slug:'nanning', province:'廣西壯族自治區', lat:22.82, lng:108.37, season:'guangxi',
+    cost:'3,630–6,820', costMid:5225, stars:4.0,
+    ratings:{ 健行跑步:3, 健身房:4, 美食:5, '網路/VPN':4, CP值:4 },
+    desc:'廣西首選，東南亞門戶，老友粉螺螄粉；健身館與光纖齊備',
+    months:[4,4,4,4,3,3,2,2,3,4,5,4],
+    runRoute:'南湖公園環湖步道（3.5km）+ 邕江濱江步道（市區沿江跑道）' },
+
+  { name:'桂林', slug:'guilin', province:'廣西壯族自治區', lat:25.27, lng:110.29, season:'guangxi',
+    cost:'2,780–5,800', costMid:4290, stars:3.5,
+    ratings:{ 健行跑步:5, 健身房:3, 美食:4, '網路/VPN':4, CP值:4 },
+    desc:'山水甲天下，漓江跑步全國最美；市區光纖覆蓋，翻牆標準',
+    months:[3,3,3,4,4,3,3,3,4,5,4,3],
+    runRoute:'漓江濱江步道（峰叢倒影，全國公認最美跑步風景）+ 象鼻山環山路',
+    warning:'健身設備和遠端工作基礎設施不如南寧' },
+
+  { name:'北海', slug:'beihai', province:'廣西壯族自治區', lat:21.48, lng:109.12, season:'guangxi',
+    cost:'2,480–5,050', costMid:3765, stars:3.0,
+    ratings:{ 健行跑步:4, 健身房:3, 美食:4, '網路/VPN':4, CP值:5 },
+    desc:'銀灘24km沙灘跑，廣西最低物價；市區光纖可達，翻牆正常',
+    months:[4,4,4,4,3,2,2,2,3,4,5,5],
+    runRoute:'北海銀灘沙灘跑道 24km（白沙軟沙，訓練難度加倍）',
+    warning:'工作設施薄弱、溫泉資源幾乎沒有' },
+
+  { name:'陽朔', slug:'yangshuo', province:'廣西壯族自治區', lat:24.78, lng:110.49, season:'guangxi',
+    cost:'1,850–4,080', costMid:2965, stars:2.0,
+    ratings:{ 健行跑步:5, 健身房:1, 美食:4, '網路/VPN':1, CP值:5 },
+    desc:'喀斯特山水最美；⚠️ 網路僅10Mbps，在家上班幾乎不可行',
+    months:[3,3,3,4,4,3,3,3,4,5,4,3],
+    runRoute:'遇龍河沿岸鄉道（峰林田野，全球公認最美跑步風景之一）',
+    warning:'⚠️ 網路僅10 Mbps + 無蹲舉架 — 強烈不推薦旅居（適合純旅遊4–5天）' },
+
+  { name:'峴港', slug:'danang', province:'越南', lat:16.05, lng:108.21, season:'overseas',
+    cost:'USD 620–1,130', costMid:6300, stars:4.0,
+    ratings:{ 健行跑步:4, 健身房:4, 美食:5, '網路/VPN':4, CP值:5 },
+    desc:'直飛台灣2h，45天免簽，美溪海灘10km跑道，越南中部美食；VPN幾乎免煩惱',
+    months:[3,4,5,5,5,4,4,4,2,2,2,3],
+    runRoute:'美溪海灘沿岸跑道 10km + 五行山登山步道（短程爬坡訓練）' },
+
+  { name:'清邁', slug:'chiangmai', province:'泰國', lat:18.79, lng:98.98, season:'overseas',
+    cost:'USD 735–1,285', costMid:7272, stars:4.5,
+    ratings:{ 健行跑步:4, 健身房:4, 美食:5, '網路/VPN':5, CP值:5 },
+    desc:'全球數位遊牧第一城，護城河跑道，Doi Suthep爬坡；⚠️ 3–5月煙霾季不可去',
+    months:[5,4,2,2,2,3,3,3,3,4,5,5],
+    runRoute:'護城河環城跑道 7km（每晚人氣極旺）+ Doi Suthep 登山越野（海拔1676m）',
+    warning:'⚠️ 3–5月煙霾季 PM2.5達200–500，跑者旅居絕對限定11–2月' },
+
+  { name:'福岡', slug:'fukuoka', province:'日本九州', lat:33.59, lng:130.4, season:'overseas',
+    cost:'¥150,000–220,000', costMid:8880, stars:4.5,
+    ratings:{ 健行跑步:4, 健身房:4, 美食:5, '網路/VPN':5, CP值:3 },
+    desc:'台灣直飛1.5h，免簽90天，大濠公園晨跑，週末別府/由布院溫泉；VPN完全不需',
+    months:[3,3,4,5,4,3,2,2,3,5,4,3],
+    runRoute:'大濠公園環湖跑道 2km（市中心，人氣最旺）+ 海之中道沿海步道' },
+
+  { name:'札幌', slug:'sapporo', province:'日本北海道', lat:43.06, lng:141.35, season:'overseas',
+    cost:'¥125,000–210,000', costMid:8040, stars:4.0,
+    ratings:{ 健行跑步:5, 健身房:4, 美食:5, '網路/VPN':5, CP值:4 },
+    desc:'日本最舒適夏天（6–9月），北海道空氣最清潔，藻岩山健行+海鮮丼+定山溪溫泉',
+    months:[1,1,2,3,3,5,5,5,4,3,1,1],
+    runRoute:'大通公園—中島公園沿線（市區10km）+ 藻岩山越野步道，空氣全日本最清潔',
+    warning:'⚠️ 冬季（11–3月）積雪-15°C以下不可旅居；旅居限定6–9月夏季視窗' },
+
+  { name:'瓦倫西亞', slug:'valencia', province:'西班牙', lat:39.47, lng:-0.38, season:'overseas',
+    cost:'€1,150–2,040', costMid:12441, stars:4.5,
+    ratings:{ 健行跑步:5, 健身房:4, 美食:5, '網路/VPN':5, CP值:4 },
+    desc:'歐洲數位遊牧CP值冠軍，Turia河道公園9km晨跑，Paella發源地，比巴塞隆納便宜50%',
+    months:[3,3,4,5,5,5,4,4,5,4,3,3],
+    runRoute:'Turia河道公園跑道 9km（廢棄河道改建，市中心直線跑道）+ 地中海海岸線' },
+
+  { name:'塔林', slug:'tallinn', province:'愛沙尼亞', lat:59.44, lng:24.75, season:'overseas',
+    cost:'€880–1,600', costMid:9672, stars:4.0,
+    ratings:{ 健行跑步:4, 健身房:4, 美食:3, '網路/VPN':5, CP值:4 },
+    desc:'歐洲最高CP值數位遊牧城，全球最快光纖，煙燻三溫暖UNESCO遺產，e-Residency開歐盟公司',
+    months:[1,1,2,3,4,5,5,5,4,2,1,1],
+    runRoute:'塔林舊城牆外環步道 + Pirita海濱跑道（波羅的海沿岸，夏季白夜奔跑體驗）',
+    warning:'⚠️ 冬季（11–3月）每日日照僅6–7小時，極度灰暗寒冷；旅居限定5–9月' },
+
+  { name:'大阪', slug:'osaka', province:'日本關西', lat:34.69, lng:135.5, season:'overseas',
+    cost:'¥160,000–250,000', costMid:9840, stars:4.5,
+    ratings:{ 健行跑步:4, 健身房:5, 美食:5, '網路/VPN':5, CP值:3 },
+    desc:'關西美食首都，大阪城＋淀川河濱跑道，Gold\'s Gym 蹲舉架無虞；物價偏高',
+    months:[3,3,4,5,5,3,2,2,3,5,5,3],
+    runRoute:'大阪城公園環道 4km＋淀川河川敷單側 10km＋（市區平坦，夜跑安全）' },
+
+  { name:'神戶', slug:'kobe', province:'日本關西', lat:34.69, lng:135.2, season:'overseas',
+    cost:'¥150,000–230,000', costMid:9120, stars:4.5,
+    ratings:{ 健行跑步:5, 健身房:4, 美食:5, '網路/VPN':5, CP值:3 },
+    desc:'六甲全山縱走越野天堂＋有馬溫泉，神戶牛美食；物價偏高、健身房較大阪略少',
+    months:[3,3,4,5,5,3,2,2,3,5,5,3],
+    runRoute:'六甲全山縱走 56km 經典越野＋市區海岸線 HAT 神戶～Meriken 約 6km 平路' },
+
+  { name:'曼谷', slug:'bangkok', province:'泰國', lat:13.76, lng:100.5, season:'overseas',
+    cost:'USD 900–1,700', costMid:9360, stars:4.0,
+    ratings:{ 健行跑步:3, 健身房:5, 美食:5, '網路/VPN':5, CP值:4 },
+    desc:'東南亞數位遊牧基礎建設與健身房天花板，美食爆量；⚠️ 旱季 PM2.5 偏高、塞車',
+    months:[4,4,2,2,3,3,3,3,2,3,5,5],
+    runRoute:'倫披尼公園＋班嘉吉蒂森林公園串接跑道約 6–8km（市區唯一連續綠帶）',
+    warning:'⚠️ 2–4月旱季 PM2.5 常達 100–170 並伴隨酷熱，跑者旅居建議鎖定涼季 11–2月' },
+
+  { name:'普吉島', slug:'phuket', province:'泰國', lat:7.88, lng:98.39, season:'overseas',
+    cost:'USD 1,000–1,900', costMid:10440, stars:3.5,
+    ratings:{ 健行跑步:4, 健身房:5, 美食:4, '網路/VPN':4, CP值:3 },
+    desc:'健身觀光帶來大量 Power Rack 名店＋海灘叢林越野；⚠️ 5–10月雨季、觀光定價',
+    months:[5,5,5,4,2,2,2,2,2,2,4,5],
+    runRoute:'Saphan Hin 海濱公園跑道 + 西海岸海灘晨跑 + 島中央叢林越野',
+    warning:'⚠️ 5–10月西南季風雨季暴雨與離岸流，旅居建議乾季 11–4月；觀光定價偏高' },
+
+  { name:'胡志明市', slug:'hochiminh', province:'越南', lat:10.82, lng:106.63, season:'overseas',
+    cost:'USD 800–1,500', costMid:8280, stars:4.0,
+    ratings:{ 健行跑步:3, 健身房:4, 美食:5, '網路/VPN':3, CP值:4 },
+    desc:'越南最大城市，數位遊牧基建與健身房齊全，美食爆量；⚠️ 空汙＋交通＋VPN 不穩',
+    months:[4,4,4,3,3,3,3,3,2,2,3,4],
+    runRoute:'濱城公園／9月23日公園疊圈＋Thảo Điền（第二郡）河濱新跑道',
+    warning:'⚠️ VPN／網路審查不穩＋市中心空汙與機車交通混亂；簽證需事先辦 e-visa（最長 90 天）' },
+
+  { name:'大叻', slug:'dalat', province:'越南', lat:11.94, lng:108.44, season:'overseas',
+    cost:'USD 600–1,150', costMid:6300, stars:3.5,
+    ratings:{ 健行跑步:5, 健身房:2, 美食:4, '網路/VPN':4, CP值:5 },
+    desc:'高原涼城（15–24°C），松林越野與湖跑天堂，咖啡產地；⚠️ 無正規 Power Rack 是硬傷',
+    months:[5,5,5,4,3,3,3,3,3,3,4,5],
+    runRoute:'春香湖環湖跑道 約 7km（市區，海拔 1,500m 涼爽）＋周邊松林山徑越野',
+    warning:'⚠️ 無正規 Power Rack／重訓設施貧弱（重訓者致命傷）；越南 e-visa 須事先辦、VPN 偶不穩' },
+
+  { name:'宿霧', slug:'cebu', province:'菲律賓', lat:10.32, lng:123.9, season:'overseas',
+    cost:'USD 800–1,500', costMid:8280, stars:3.5,
+    ratings:{ 健行跑步:3, 健身房:4, 美食:4, '網路/VPN':3, CP值:4 },
+    desc:'菲律賓第二大都會＋潛水跳島基地，健身房連鎖齊全；⚠️ 網路不穩、颱風季、需簽證',
+    months:[5,5,5,4,4,3,3,3,2,2,2,4],
+    runRoute:'宿霧商業區（IT Park／Cebu Business Park）街跑＋SRP 濱海大道長跑',
+    warning:'⚠️ 網路為東南亞偏弱且偶斷線；6–11月颱風季；台灣護照需事先辦簽證（非免簽）' },
+
+  { name:'碧瑤', slug:'baguio', province:'菲律賓', lat:16.41, lng:120.6, season:'overseas',
+    cost:'USD 650–1,200', costMid:6660, stars:3.0,
+    ratings:{ 健行跑步:4, 健身房:2, 美食:3, '網路/VPN':3, CP值:4 },
+    desc:'菲律賓避暑高原城（15–24°C），松林步道與健行；⚠️ 健身房弱＋網路弱＋雨季坍方＋需簽證',
+    months:[5,5,5,4,3,2,1,1,2,3,4,5],
+    runRoute:'Burnham Park 環湖＋Wright Park 林蔭道＋Camp John Hay 松林步道',
+    warning:'⚠️ 健身房貧弱無 Power Rack＋網路偏弱＋6–9月坍方季；台灣護照需事先辦簽證（非免簽）' },
+
+  { name:'峇里島 Canggu', slug:'balicanggu', province:'印尼', lat:-8.65, lng:115.13, season:'overseas',
+    cost:'USD 1,000–1,900', costMid:10440, stars:4.0,
+    ratings:{ 健行跑步:4, 健身房:5, 美食:4, '網路/VPN':5, CP值:3 },
+    desc:'全球數位遊牧重鎮，硬派 Power Rack 健身房＋海灘稻田跑；⚠️ 雨季＋交通壅塞、觀光定價',
+    months:[2,2,3,4,5,5,5,5,5,4,3,2],
+    runRoute:'Berawa／Echo Beach 海灘硬沙跑＋稻田小徑（Shortcut／Tumbak Bayuh）',
+    warning:'⚠️ 交通壅塞惡化＋11–3月雨季強降雨＋觀光定價偏高；旅居建議乾季 4–10月' },
+
+  { name:'峇里島烏布', slug:'baliubud', province:'印尼', lat:-8.51, lng:115.26, season:'overseas',
+    cost:'USD 850–1,650', costMid:9000, stars:3.5,
+    ratings:{ 健行跑步:4, 健身房:3, 美食:4, '網路/VPN':5, CP值:4 },
+    desc:'峇里文化與自然核心，山脊稻田越野＋火山健行＋瑜伽養生；⚠️ 健身房中等＋雨季',
+    months:[2,2,3,4,5,5,5,5,5,4,3,2],
+    runRoute:'Campuhan Ridge Walk 山脊步道＋Tegallalang／Sayan 稻田梯田小徑越野',
+    warning:'⚠️ 正規 Power Rack／大重量片偏少（認真重訓須赴 Canggu）＋11–3月雨季；旅居建議乾季 4–10月' },
+
+  { name:'檳城', slug:'penang', province:'馬來西亞', lat:5.41, lng:100.33, season:'overseas',
+    cost:'USD 700–1,400', costMid:7560, stars:4.0,
+    ratings:{ 健行跑步:4, 健身房:3, 美食:5, '網路/VPN':4, CP值:5 },
+    desc:'馬來西亞美食之都，喬治市世界遺產＋升旗山健行；⚠️ 6–10月印尼霾害＋全年濕熱',
+    months:[5,5,4,4,4,3,3,2,2,3,4,5],
+    runRoute:'Gurney Drive 海濱步道＋植物園 Moon Gate 環圈，週末檳城國家公園海岸越野',
+    warning:'⚠️ 6–10月印尼跨境霾害＋雨季 AQI偶達150–200，全年濕熱；旅居建議12–3月' },
+
+  { name:'吉隆坡', slug:'kualalumpur', province:'馬來西亞', lat:3.14, lng:101.69, season:'overseas',
+    cost:'USD 900–1,800', costMid:9720, stars:4.0,
+    ratings:{ 健行跑步:3, 健身房:4, 美食:5, '網路/VPN':5, CP值:4 },
+    desc:'東南亞數位遊牧硬底子，千兆光纖＋DE Rantau 簽證，健身房強；⚠️ 6–10月霾害＋塞車空污',
+    months:[4,5,4,4,4,3,3,2,3,3,4,4],
+    runRoute:'KLCC 公園環圈＋Perdana 植物園，週末 Bukit Kiara／Broga Hill 越野',
+    warning:'⚠️ 6–10月印尼霾害＋市區塞車空污疊加；恆溫濕熱跑步限早晚' },
+
+  { name:'提比里斯', slug:'tbilisi', province:'喬治亞', lat:41.72, lng:44.79, season:'overseas',
+    cost:'USD 800–1,600', costMid:8640, stars:4.5,
+    ratings:{ 健行跑步:4, 健身房:4, 美食:5, '網路/VPN':4, CP值:5 },
+    desc:'外國人停留1年（待確認台灣護照）＋葡萄酒發源地，硫磺浴；⚠️ 冬季谷地空污＋夏熱',
+    months:[2,2,4,5,5,3,2,2,4,5,3,2],
+    runRoute:'Lisi 湖環圈越野＋Mtkvari 河濱，週末 Mtatsminda／Tbilisi 國家公園山徑',
+    warning:'⚠️ 台灣護照1年免簽適用性須行前再確認；冬季谷地PM2.5空污＋夏季7–8月酷熱' },
+
+  { name:'巴統', slug:'batumi', province:'喬治亞', lat:41.64, lng:41.64, season:'overseas',
+    cost:'USD 700–1,500', costMid:7920, stars:3.5,
+    ratings:{ 健行跑步:4, 健身房:3, 美食:4, '網路/VPN':4, CP值:5 },
+    desc:'黑海濱海城＋7km 海濱步道，物價極低；⚠️ 全喬最多雨（年雨量2400mm+）＋健身房弱',
+    months:[1,1,2,3,4,4,5,5,4,2,1,1],
+    runRoute:'Batumi Boulevard 海濱步道（約7km 平坦）＋週末 Mtirala 國家公園雨林越野',
+    warning:'⚠️ 全喬最多雨（年2400mm+），旅居限6–9月；健身房弱、Power Rack不保證' },
+
+  { name:'里斯本', slug:'lisbon', province:'葡萄牙', lat:38.72, lng:-9.14, season:'overseas',
+    cost:'€1,500–2,800', costMid:16770, stars:4.5,
+    ratings:{ 健行跑步:4, 健身房:5, 美食:5, '網路/VPN':5, CP值:3 },
+    desc:'歐洲數位遊牧之都，光纖＋D8簽，Tagus 河濱跑＋Monsanto 林道；⚠️ 房租飆漲＋扒手',
+    months:[3,3,4,5,5,4,3,3,5,5,4,3],
+    runRoute:'Tagus 河濱步道（Belém 方向平坦10km+）＋Monsanto 森林公園山徑',
+    warning:'⚠️ 房租飆漲 CP 值偏低＋觀光區扒手猖獗；夏季7–8月偶熱浪40°C' },
+
+  { name:'豐沙爾／馬德拉', slug:'funchal', province:'葡萄牙', lat:32.65, lng:-16.91, season:'overseas',
+    cost:'€1,100–2,200', costMid:12870, stars:4.0,
+    ratings:{ 健行跑步:5, 健身房:3, 美食:4, '網路/VPN':4, CP值:4 },
+    desc:'永恆之春大西洋島，levada 水道健行越野天堂，數位遊牧村發源；⚠️ 高山步道暴露＋健身房少',
+    months:[4,4,5,5,5,5,5,5,5,5,4,4],
+    runRoute:'Funchal 海濱步道＋全島 levada 水道步道網，高峰 Pico Areeiro→Pico Ruivo 越野',
+    warning:'⚠️ 高山levada步道暴露/落石/起霧風險；健身房館數少、Power Rack不普遍；島嶼航班皆轉機' },
+
+  { name:'墨西哥城', slug:'mexicocity', province:'墨西哥', lat:19.43, lng:-99.13, season:'overseas',
+    cost:'USD 1,100–2,200', costMid:11880, stars:4.0,
+    ratings:{ 健行跑步:3, 健身房:4, 美食:5, '網路/VPN':4, CP值:4 },
+    desc:'美洲數位遊牧重鎮，世界級街食，Chapultepec 巨型公園；⚠️ 空污＋2240m海拔＋地震＋簽證',
+    months:[5,5,3,3,3,3,3,3,4,4,5,5],
+    runRoute:'Bosque de Chapultepec 巨型公園＋Parque México 環圈，海拔2240m 需適應',
+    warning:'⚠️ 3–5月臭氧空污高峰＋2240m海拔＋地震帶＋快速綁架風險；台灣護照需墨簽或持美/申根等有效簽證' },
+
+  { name:'瓦哈卡', slug:'oaxaca', province:'墨西哥', lat:17.07, lng:-96.72, season:'overseas',
+    cost:'USD 800–1,600', costMid:8640, stars:3.5,
+    ratings:{ 健行跑步:3, 健身房:2, 美食:5, '網路/VPN':3, CP值:4 },
+    desc:'墨西哥美食之都＋梅斯卡爾，Sierra Norte 山徑；⚠️ 健身房弱＋教師工會封路＋網路較弱',
+    months:[5,5,4,3,3,3,3,3,4,4,5,5],
+    runRoute:'Cerro del Fortín 觀景丘爬坡＋市區 Andador，週末 Pueblos Mancomunados 山徑',
+    warning:'⚠️ 健身房弱、Power Rack不保證（重訓硬傷）＋教師工會封路週期性＋網路較弱；台灣護照需墨簽或持美/申根等簽證' },
+
+  { name:'伊斯坦堡', slug:'istanbul', province:'土耳其', lat:41.01, lng:28.98, season:'overseas',
+    cost:'USD 900–1,900', costMid:10080, stars:4.0,
+    ratings:{ 健行跑步:4, 健身房:4, 美食:5, '網路/VPN':3, CP值:4 },
+    desc:'歐亞跨洲大城，Belgrad 森林越野＋博斯普魯斯，美食驚人；⚠️ 大地震風險＋網路審查＋e-Visa',
+    months:[2,2,4,5,5,3,3,3,5,5,3,2],
+    runRoute:'Caddebostan/Moda 海濱（亞洲側平坦長路）＋北部 Belgrad 森林越野',
+    warning:'⚠️ 北安那托利亞斷層大地震高風險＋網路審查/VPN遭干擾＋台灣護照須事先辦e-Visa；里拉高通膨' },
+
+  { name:'安塔利亞', slug:'antalya', province:'土耳其', lat:36.9, lng:30.69, season:'overseas',
+    cost:'USD 800–1,600', costMid:8640, stars:3.5,
+    ratings:{ 健行跑步:4, 健身房:3, 美食:4, '網路/VPN':3, CP值:4 },
+    desc:'地中海濱海城＋利西亞古道越野，物價低於伊斯坦堡；⚠️ 7–8月酷熱40°C＋e-Visa＋網路審查',
+    months:[3,3,5,5,4,3,2,2,4,5,5,4],
+    runRoute:'Konyaaltı 海濱步道（平坦數公里）＋利西亞古道（Likya Yolu）山海越野',
+    warning:'⚠️ 7–8月酷熱40°C正午不可跑＋台灣護照須事先辦e-Visa＋網路審查需VPN；旅居建議春秋暖冬' }
+];
+
+// ── 旅遊城市資料（inline，由 scripts/sync_city_map.py 從 data/sightseeing_cities.json 重生）──
+const CITIES_TRAVEL = [
+  { slug:'chengdu', name:'成都', province:'四川省', season:'sichuan', lat:30.57, lng:104.07, cost:'400–700/日', costMid:550, stars:4.5, ratings:{'美食':5, '自然健行':4, '歷史文化':4, '景點密度':4, '慢遊':5}, desc:'西南慢城、美食之都，熊貓故鄉，周邊都江堰青城山' },
+  { slug:'xian', name:'西安', province:'陝西省', season:'guandu', lat:34.27, lng:108.93, cost:'400–700/日', costMid:550, stars:4.5, ratings:{'美食':4, '自然健行':4, '歷史文化':5, '景點密度':5, '慢遊':4}, desc:'兵馬俑、明城牆、回民街，一座城走完半部中國史' },
+  { slug:'chongqing', name:'重慶', province:'重慶市', season:'sichuan', lat:29.56, lng:106.55, cost:'400–700/日', costMid:550, stars:4, ratings:{'美食':5, '自然健行':3, '歷史文化':3, '景點密度':4, '慢遊':3}, desc:'洪崖洞、輕軌穿樓、過江纜車，地形魔幻超好拍' },
+  { slug:'hangzhou', name:'杭州', province:'浙江省', season:'jiangnan', lat:30.25, lng:120.16, cost:'500–850/日', costMid:675, stars:4.5, ratings:{'美食':4, '自然健行':5, '歷史文化':4, '景點密度':4, '慢遊':5}, desc:'西湖、龍井茶山、靈隱寺、西溪濕地，秀氣耐逛' },
+  { slug:'xiamen', name:'廈門', province:'福建省', season:'coast', lat:24.48, lng:118.09, cost:'450–800/日', costMid:625, stars:4, ratings:{'美食':4, '自然健行':3, '歷史文化':3, '景點密度':3, '慢遊':4}, desc:'鼓浪嶼、環島路、海鮮，講閩南語會通' },
+  { slug:'dali', name:'大理', province:'雲南省', season:'yunnan', lat:25.61, lng:100.27, cost:'400–700/日', costMid:550, stars:4.5, ratings:{'美食':4, '自然健行':5, '歷史文化':4, '景點密度':4, '慢遊':5}, desc:'洱海環湖騎跑、蒼山健行、白族古城' },
+  { slug:'kunming', name:'昆明', province:'雲南省', season:'yunnan', lat:25.04, lng:102.71, cost:'350–650/日', costMid:500, stars:3.5, ratings:{'美食':4, '自然健行':3, '歷史文化':3, '景點密度':3, '慢遊':3}, desc:'四季如春，石林、滇池，雲南線進出門戶' },
+  { slug:'shaxi', name:'沙溪古鎮', province:'雲南省', season:'yunnan', lat:26.32, lng:99.86, cost:'350–600/日', costMid:475, stars:4, ratings:{'美食':3, '自然健行':4, '歷史文化':5, '景點密度':3, '慢遊':5}, desc:'寺登街、石寶山，全雲南線最靜謐' },
+  { slug:'lijiang', name:'麗江', province:'雲南省', season:'yunnan', lat:26.87, lng:100.23, cost:'450–750/日', costMid:600, stars:4, ratings:{'美食':3, '自然健行':4, '歷史文化':4, '景點密度':4, '慢遊':3}, desc:'麗江古城、玉龍雪山、束河，雲南線人氣高點' },
+  { slug:'shangrila', name:'香格里拉', province:'雲南省（迪慶）', season:'yunnan', lat:27.83, lng:99.71, cost:'450–750/日', costMid:600, stars:4, ratings:{'美食':3, '自然健行':5, '歷史文化':4, '景點密度':4, '慢遊':3}, desc:'普達措、松贊林寺、虎跳峽（高海拔，勿急行）' },
+  { slug:'tengchong', name:'騰衝', province:'雲南省（保山）', season:'yunnan', lat:25.03, lng:98.49, cost:'400–700/日', costMid:550, stars:4, ratings:{'美食':4, '自然健行':4, '歷史文化':4, '景點密度':4, '慢遊':4}, desc:'和順古鎮、火山地熱、北海濕地、11月銀杏' },
+  { slug:'luguhu', name:'瀘沽湖', province:'滇川交界', season:'yunnan', lat:27.7, lng:100.79, cost:'400–650/日', costMid:525, stars:4, ratings:{'美食':3, '自然健行':4, '歷史文化':4, '景點密度':3, '慢遊':5}, desc:'環湖、走婚橋、裡務比島，看湖發呆' },
+  { slug:'beijing', name:'北京', province:'北京市', season:'huabei', lat:39.9, lng:116.4, cost:'500–900/日', costMid:700, stars:5, ratings:{'美食':4, '自然健行':3, '歷史文化':5, '景點密度':5, '慢遊':3}, desc:'故宮、長城、天壇、頤和園，一座城承載半部中國史，景點密度全國頂級' },
+  { slug:'guilin', name:'桂林·陽朔', province:'廣西壯族自治區', season:'lingnan', lat:25.27, lng:110.29, cost:'400–700/日', costMid:550, stars:4.5, ratings:{'美食':3, '自然健行':5, '歷史文化':3, '景點密度':4, '慢遊':4}, desc:'桂林山水甲天下、陽朔堪稱甲桂林，灕江峰林與田園騎行，親子長輩通殺' },
+  { slug:'zhangjiajie', name:'張家界', province:'湖南省', season:'huazhong', lat:29.13, lng:110.48, cost:'450–750/日', costMid:600, stars:4.5, ratings:{'美食':3, '自然健行':5, '歷史文化':2, '景點密度':4, '慢遊':3}, desc:'武陵源石英砂岩峰林、天門山玻璃棧道，奇景震撼，愛健行愛拍照者必訪' },
+  { slug:'suzhou', name:'蘇州', province:'江蘇省', season:'jiangnan', lat:31.3, lng:120.62, cost:'450–800/日', costMid:625, stars:4.5, ratings:{'美食':4, '自然健行':4, '歷史文化':5, '景點密度':5, '慢遊':5}, desc:'拙政園、平江路與周莊同里水鄉，園林甲天下，高鐵串上海杭州極方便' },
+  { slug:'huangshan', name:'黃山', province:'安徽省', season:'jiangnan', lat:30.13, lng:118.17, cost:'450–800/日', costMid:625, stars:4.5, ratings:{'美食':3, '自然健行':5, '歷史文化':4, '景點密度':4, '慢遊':3}, desc:'黃山奇松雲海日出，山下宏村西遞徽派古村（臥虎藏龍取景），山景古村一次滿足' },
+  { slug:'shanghai', name:'上海', province:'上海市', season:'huadong', lat:31.23, lng:121.47, cost:'600–1100/日', costMid:850, stars:4.5, ratings:{'美食':5, '自然健行':3, '歷史文化':4, '景點密度':5, '慢遊':3}, desc:'外灘、陸家嘴、豫園、武康路梧桐區，現代都會與老上海風情並存，江南線最佳門戶' },
+  { slug:'dunhuang', name:'敦煌', province:'甘肅省', season:'xibei', lat:40.14, lng:94.66, cost:'400–750/日', costMid:575, stars:4.5, ratings:{'美食':3, '自然健行':4, '歷史文化':5, '景點密度':3, '慢遊':3}, desc:'莫高窟石窟藝術、鳴沙山月牙泉、雅丹魔鬼城，大漠絲路風光與江南雲南完全不同調' },
+  { slug:'pingyao', name:'平遙古城', province:'山西省', season:'huabei', lat:37.2, lng:112.18, cost:'350–650/日', costMid:500, stars:4, ratings:{'美食':3, '自然健行':2, '歷史文化':5, '景點密度':4, '慢遊':4}, desc:'保存最完整的明清古城牆與晉商票號(日昇昌)，配王家/喬家大院，整城列世界遺產' },
+  { slug:'harbin', name:'哈爾濱', province:'黑龍江省', season:'dongbei', lat:45.8, lng:126.53, cost:'450–800/日', costMid:625, stars:4, ratings:{'美食':4, '自然健行':3, '歷史文化':4, '景點密度':3, '慢遊':3}, desc:'冰雪大世界、中央大街俄式建築、聖索菲亞教堂，12–2 月冰燈雪雕全國獨一份' },
+  { slug:'qingdao', name:'青島', province:'山東省', season:'huadong', lat:36.07, lng:120.38, cost:'400–750/日', costMid:575, stars:4, ratings:{'美食':4, '自然健行':4, '歷史文化':3, '景點密度':3, '慢遊':4}, desc:'棧橋、八大關德式老街、海濱木棧道與嶗山，海岸跑步散步一流＋海鮮啤酒' },
+  { slug:'busan', name:'釜山', province:'韓國', season:'korea', lat:35.18, lng:129.08, cost:'2800–4800/日', costMid:3800, stars:4.3, ratings:{'美食':5, '自然健行':4, '歷史文化':3, '景點密度':4, '慢遊':4}, desc:'海雲台海景、甘川洞彩色山城、札嘎其生猛海鮮，海岸步道跑者友善', itin:{file:'busan_itinerary_2026.html', title:'2026.09.12–21 · 9 天 8 夜圖文行程'} },
+  { slug:'bali', name:'巴里島', province:'印尼', season:'indonesia', lat:-8.51, lng:115.26, cost:'1800–4500/日', costMid:3150, stars:4.2, ratings:{'美食':4, '自然健行':4, '歷史文化':4, '景點密度':4, '慢遊':5}, desc:'烏布梯田與神廟、南部衝浪海灘、瀑布叢林，慢活與 SPA 天堂' },
+  { slug:'aomori', name:'青森', province:'日本東北', season:'tohoku', lat:40.82, lng:140.74, cost:'3000–5500/日', costMid:4250, stars:4.4, ratings:{'美食':4, '自然健行':5, '歷史文化':3, '景點密度':3, '慢遊':5}, desc:'奧入瀨溪流與十和田湖、酸湯溫泉、八甲田山健行，蘋果與海鮮，夏有睡魔祭' }
+];
+
+// 當前模式生效的城市集合與詳情頁目錄
+const CITIES = MODE === 'travel' ? CITIES_TRAVEL : CITIES_RESIDE;
+const DETAIL_DIR = MODE === 'travel' ? 'travel_pages' : 'city_pages';
+
+// ── 標題依模式 ──────────────────────────────────────────
+(function setHeaderByMode() {
+  const t = document.getElementById('map-title');
+  const s = document.getElementById('map-sub');
+  if (MODE === 'travel') {
+    if (t) t.textContent = '🗺️ 旅遊城市地圖';
+    if (s) s.textContent = `${CITIES.length} 個觀光城市 × 主軸評分 × 5 條路線方案`;
+  } else {
+    if (t) t.textContent = '🗺️ 旅居城市評估地圖';
+    if (s) s.textContent = `${CITIES.length} 個城市 × 月均費用 × 綜合推薦評分 × 5 條路線方案`;
+  }
+})();
+
+// ── 地圖初始化 ──────────────────────────────────────────
+const map = L.map('map', {
+  center: [35, 70],
+  zoom: 3,
+  zoomControl: true,
+  attributionControl: false,
+});
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  maxZoom: 18,
+}).addTo(map);
+
+// ── 路線專屬圖層 pane（蓋在城市圓點之上）──────────────────
+// markerPane=600, tooltipPane=650：路線線條/節點放在兩者之間，
+// 確保路線永遠畫在密集的城市圓點上方，不會被蓋住。
+map.createPane('routePane');
+map.getPane('routePane').style.zIndex = 620;
+map.createPane('routeMarkerPane');
+map.getPane('routeMarkerPane').style.zIndex = 630;
+// 啟用路線時，城市圓點/標籤整層淡出做「聚焦」，過場柔順
+map.getPane('markerPane').style.transition = 'opacity .25s ease';
+function setCityDim(dim) {
+  map.getPane('markerPane').style.opacity = dim ? 0.28 : 1;
+}
+
+// ── 星星 HTML ────────────────────────────────────────────
+function starsHtml(n) {
+  const full  = Math.floor(n);
+  const half  = n % 1 >= 0.5 ? 1 : 0;
+  const empty = 5 - full - half;
+  return '★'.repeat(full) + (half ? '½' : '') + `<span>${'☆'.repeat(empty)}</span>`;
+}
+
+// ── 評分條 ───────────────────────────────────────────────
+function ratingBar(score) {
+  const color = score >= 4 ? '#5A8A72' : score >= 3 ? '#C9A84C' : '#E8825A';
+  return `<div class="bar-wrap"><div class="bar-fill" style="width:${score/5*100}%;background:${color}"></div></div>`;
+}
+
+// ── Marker 建立 ──────────────────────────────────────────
+function costOpacity(mid) {
+  // 費用越高顏色越深（透明度越低），費用越低顏色越淡
+  // 旅居為月均（千元級），旅遊為每日（百元級），刻度不同
+  const min = MODE === 'travel' ? 350 : 2500;
+  const max = MODE === 'travel' ? 900 : 9000;
+  const t = Math.max(0, Math.min(1, (mid - min) / (max - min)));
+  return 0.55 + t * 0.45; // 0.55 ~ 1.0
+}
+
+// ── Label groups（文字標籤，按季節顯隱）─────────────────
+const labelGroups = {};
+Object.keys(SEASON_COLOR).forEach(s => { labelGroups[s] = L.layerGroup().addTo(map); });
+
+// ── City markers（獨立管理，支援多維度 filter）──────────
+const markers = [];
+
+CITIES.forEach(city => {
+  const color = SEASON_COLOR[city.season];
+  const opacity = costOpacity(city.costMid);
+
+  const iconHtml = `
+    <div class="city-marker">
+      <div class="marker-circle" style="background:${color};opacity:${opacity};">
+        ${city.stars}
+      </div>
+      <div class="marker-tail" style="border-top:7px solid ${color};opacity:${opacity};"></div>
+    </div>`;
+
+  const icon = L.divIcon({
+    html: iconHtml,
+    className: '',
+    iconSize: [36, 46],
+    iconAnchor: [18, 46],
+    popupAnchor: [0, -48],
+  });
+
+  const ratingsHtml = Object.entries(city.ratings).map(([k, v]) =>
+    `<div class="rating-row">
+      <span class="rating-label">${k}</span>
+      ${ratingBar(v)}
+    </div>`
+  ).join('');
+
+  const warningHtml = city.warning
+    ? `<div class="popup-warning">⚠️ ${city.warning}</div>` : '';
+
+  const MONTH_NAMES = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  const monthsHtml = city.months ? (() => {
+    const badges = city.months.map((s, i) =>
+      `<span class="month-badge score-${s}">${MONTH_NAMES[i]}</span>`
+    ).join('');
+    return `<div style="font-size:10px;color:#7AAA98;margin-top:8px;margin-bottom:3px;">最佳旅遊月份</div>
+            <div class="popup-months">${badges}</div>`;
+  })() : '';
+
+  const runRouteHtml = city.runRoute
+    ? `<div class="popup-run-route">🏃 ${city.runRoute}</div>` : '';
+
+  // 逐日行程頁：資料來自 sightseeing_cities.json 的 itinerary 欄位（由 sync_city_map.py 內嵌）
+  // 路徑對 city_map.html 同層的 itineraries/，本地與部署後都成立
+  const itinHtml = city.itin
+    ? `<a class="popup-itin-btn" href="itineraries/${city.itin.file}" target="_blank">
+         <span class="popup-itin-icon">🗺</span>
+         <span>
+           <span class="popup-itin-label">逐日行程</span>
+           <span class="popup-itin-title">${city.itin.title}</span>
+         </span>
+         <span class="popup-itin-arrow">→</span>
+       </a>` : '';
+
+  const popupContent = `
+    <div class="popup-inner">
+      <div class="popup-header">
+        <div class="popup-dot" style="background:${color}"></div>
+        <div>
+          <div class="popup-name">${city.name}</div>
+          <div class="popup-province">${city.province}</div>
+        </div>
+        <div class="popup-season-tag" style="background:${color}">${SEASON_LABEL[city.season]}</div>
+      </div>
+      <div class="popup-row">
+        <span class="popup-label">${MODE === 'travel' ? '每日花費（CNY）' : '月均費用（CNY）'}</span>
+        <span class="popup-cost">${city.cost}</span>
+      </div>
+      <div class="popup-row">
+        <span class="popup-label">綜合推薦</span>
+        <span class="popup-stars">${starsHtml(city.stars)}</span>
+      </div>
+      <div class="popup-divider"></div>
+      <div style="font-size:11px;color:#888;margin-bottom:6px;">${city.desc}</div>
+      <div class="popup-ratings">${ratingsHtml}</div>
+      ${runRouteHtml}
+      ${monthsHtml}
+      ${warningHtml}
+      <div style="font-size:10px;color:#3A5A4A;margin-top:8px;text-align:right;">📅 資料更新：${DATA_UPDATED}</div>
+      <button class="popup-compare-btn" data-slug="${city.slug}" data-name="${city.name}">＋ 加入比較</button>
+      <a class="popup-detail-btn" href="${DETAIL_DIR}/${city.slug}.html" target="_blank">查看完整詳情 →</a>
+      ${itinHtml}
+    </div>`;
+
+  const marker = L.marker([city.lat, city.lng], { icon })
+    .bindPopup(popupContent, { maxWidth: 300 });
+
+  marker._cityData = city;
+  marker.addTo(map); // 直接加到 map，由 applyFilters 控制顯隱
+  markers.push(marker);
+});
+
+// ── 城市名稱標籤（文字，依季節群組顯隱）──────────────────
+CITIES.forEach(city => {
+  L.marker([city.lat, city.lng], {
+    icon: L.divIcon({
+      html: `<div style="font-size:11px;font-weight:700;color:#fff;text-shadow:0 1px 3px #000,0 0 6px #000;white-space:nowrap;margin-top:4px;margin-left:-10px;">${city.name}</div>`,
+      className: '',
+      iconSize: [60, 16],
+      iconAnchor: [-6, 52],
+    }),
+    interactive: false,
+  }).addTo(labelGroups[city.season]);
+});
+
+// ── Filter state & logic ─────────────────────────────────
+const filterState = { season: 'all', stars: 'all', cost: 'all', rating: 'all' };
+
+const COST_CHECK = MODE === 'travel' ? {
+  low:  c => c.costMid < 450,
+  mid:  c => c.costMid >= 450 && c.costMid < 650,
+  high: c => c.costMid >= 650,
+} : {
+  low:  c => c.costMid < 5000,
+  mid:  c => c.costMid >= 5000 && c.costMid < 7500,
+  high: c => c.costMid >= 7500,
+};
+const STARS_CHECK = {
+  '3':   c => c.stars >= 3,
+  '4':   c => c.stars >= 4,
+  '4.5': c => c.stars >= 4.5,
+};
+
+function cityVisible(city) {
+  if (filterState.season !== 'all' && city.season !== filterState.season) return false;
+  if (filterState.stars !== 'all' && !STARS_CHECK[filterState.stars](city)) return false;
+  if (filterState.cost  !== 'all' && !COST_CHECK [filterState.cost ](city)) return false;
+  if (filterState.rating !== 'all' && (city.ratings[filterState.rating] || 0) < 4) return false;
+  return true;
+}
+
+function applyFilters() {
+  // City markers
+  markers.forEach(m => {
+    const city = m._cityData;
+    if (cityVisible(city)) {
+      if (!map.hasLayer(m)) m.addTo(map);
+    } else {
+      if (map.hasLayer(m)) map.removeLayer(m);
+    }
+  });
+  // Text label groups (follow season filter only)
+  Object.entries(labelGroups).forEach(([season, grp]) => {
+    const show = filterState.season === 'all' || filterState.season === season;
+    if (show) { if (!map.hasLayer(grp)) map.addLayer(grp); }
+    else       { if  (map.hasLayer(grp)) map.removeLayer(grp); }
+  });
+}
+
+// ── Filter button events ─────────────────────────────────
+document.querySelectorAll('.fp-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const type = btn.dataset.filter;
+    const val  = btn.dataset.value;
+    filterState[type] = val;
+    // Sync active state across ALL buttons (desktop + mobile sheet)
+    document.querySelectorAll(`.fp-btn[data-filter="${type}"]`).forEach(b => b.classList.remove('active'));
+    document.querySelectorAll(`.fp-btn[data-filter="${type}"][data-value="${val}"]`).forEach(b => b.classList.add('active'));
+    applyFilters();
+    updateFabBadge();
+  });
+});
+
+// ── 資料時效標示 ─────────────────────────────────────────
+const updatedText = `📅 資料更新：${DATA_UPDATED}`;
+const legendEl = document.getElementById('legend-updated');
+const sheetEl  = document.getElementById('sheet-updated');
+if (legendEl) legendEl.textContent = updatedText;
+if (sheetEl)  sheetEl.textContent  = updatedText;
+
+// ── 地圖邊界調整 ─────────────────────────────────────────
+map.fitBounds([[18, 99], [37, 122]], { padding: [20, 20] });
+
+// ── 路線方案資料 ─────────────────────────────────────────
+// PLAN_COLORS_* / WAYPOINT_COORDS / PLANS_RESIDE / PLANS_TRAVEL 由
+// scripts/sync_city_map.py 從 data/{proposals,sightseeing_proposals,waypoints}.json
+// 重生（source of truth 在 JSON），別手改。
+const PLAN_COLORS_RESIDE = {
+  A: '#FF7675', B: '#00CEC9', C: '#FDCB6E', D: '#55EFC4', E: '#A29BFE',
+};
+const PLAN_COLORS_TRAVEL = {
+  F: '#E8825A', G: '#00CEC9', I: '#C9A84C', J: '#5B9BD5', K: '#9B59B6',
+};
+const PLAN_COLORS = MODE === 'travel' ? PLAN_COLORS_TRAVEL : PLAN_COLORS_RESIDE;
+
+// 途經城市座標（路線經過但未收錄的城市；source of truth: data/waypoints.json）
+const WAYPOINT_COORDS = {
+  '重慶': [29.56, 106.55],
+  '武漢': [30.59, 114.3],
+  '長沙': [28.23, 112.94],
+  '張家界': [29.12, 110.48],
+  '鳳凰': [27.95, 109.6],
+  '蘭州': [36.06, 103.79],
+  '夏河': [35.2, 102.52],
+  '張掖': [38.93, 100.45],
+  '嘉峪關': [39.77, 98.29],
+  '敦煌': [40.14, 94.66],
+};
+// 收錄城市座標取自當前模式城市陣列；途經城市補 WAYPOINT_COORDS（收錄城市優先）
+const ALL_COORDS = Object.assign({}, WAYPOINT_COORDS,
+  Object.fromEntries(CITIES.map(c => [c.name, [c.lat, c.lng]])));
+
+const SURVEYED = new Set(CITIES.map(c => c.name));
+
+const PLANS_RESIDE = {
+  A: {
+    title: '專案 A：西南深度慢遊',
+    stops: ['成都','重慶','貴陽','桂林','昆明','大理'],
+    duration: '約 30 天',
+    season: '夏季（6–9月）/ 春秋',
+    page: 'proposal_pages/A.html',
+    desc: '成都→重慶→貴陽→桂林→昆明→大理，全程高鐵不走回頭路',
+  },
+  B: {
+    title: '專案 B：華中山水文化線',
+    stops: ['武漢','長沙','張家界','鳳凰','桂林'],
+    duration: '約 28 天',
+    season: '春秋最佳（3–5月、9–11月）',
+    page: 'proposal_pages/B.html',
+    desc: '武漢→長沙→張家界→鳳凰古城→桂林，健行密度最高路線',
+    warning: '桂林（KWL）無台北直飛航班，出境需轉機13–18小時，建議改從長沙（CSX）出境',
+  },
+  C: {
+    title: '專案 C：西北絲路探索（無新疆版）',
+    stops: ['西安','蘭州','夏河','張掖','嘉峪關','敦煌','西寧'],
+    duration: '約 28 天',
+    season: '夏季（6–9月）可行，9–10月最佳',
+    page: 'proposal_pages/C.html',
+    desc: '西安→蘭州→甘南草原→張掖丹霞→敦煌莫高窟→西寧青海湖',
+  },
+  D: {
+    title: '專案 D：西南慢遊 + 旅居 Trial',
+    stops: ['成都','重慶','貴陽','桂林','昆明','大理'],
+    duration: '約 35–38 天',
+    season: '春秋最佳（3–5月、9–11月）',
+    page: 'proposal_pages/D.html',
+    desc: '同方案A路線，但4城各插入3天旅居模式，評估長期居住可行性',
+    trialCities: ['成都','貴陽','昆明','大理'],
+  },
+  E: {
+    title: '專案 E：兩趟分季旅居 Trial',
+    stops: [
+      ['廣州','深圳','珠海','惠州','廈門','南京'],
+      ['成都','重慶','貴陽','桂林','昆明','大理','麗江'],
+    ],
+    duration: '冬趟30天 + 夏趟35天，共65天（分兩次出發）',
+    season: '冬趟：11月–1月 ｜ 夏趟：9–11月 或 3–5月',
+    page: 'proposal_pages/E.html',
+    desc: '分兩趟出發：冬趟廣東閩南沿海6城Trial，夏趟西南慢遊5城Trial',
+    trialCities: ['廣州','深圳','珠海','惠州','廈門','南京','成都','貴陽','昆明','大理','麗江'],
+  },
+};
+
+const PLANS_TRAVEL = {
+  F: {
+    title: '雲南滇西北線（觀光慢遊）',
+    stops: ['昆明','騰衝','大理','沙溪古鎮','麗江','瀘沽湖','香格里拉'],
+    duration: '約 30 天',
+    season: '8–12月（10–11月為黃金期）',
+    page: 'travel_proposal_pages/F.html',
+    desc: '昆明→騰衝→大理→沙溪→麗江→瀘沽湖→香格里拉，海拔由低到高漸進',
+    warning: '⚠️ 香格里拉(3300m)高海拔，先在大理/麗江適應；11月出發尾段12月嚴寒注意封路',
+  },
+  G: {
+    title: '西安・川渝・雲南線（觀光慢遊）',
+    stops: ['西安','重慶','昆明','大理','沙溪古鎮','麗江','香格里拉'],
+    duration: '約 34 天',
+    season: '9–11月（10月最佳）',
+    page: 'travel_proposal_pages/G.html',
+    desc: '西安進→重慶→昆明→大理→沙溪→麗江→香格里拉，昆明出',
+    warning: '⚠️ 香格里拉(3300m)高海拔，先在大理/麗江適應；末段可直飛昆明出境避免折返',
+  },
+  I: {
+    title: '北方古都・河西絲路線（觀光慢遊）',
+    stops: ['北京','平遙古城','西安','蘭州','張掖','嘉峪關','敦煌'],
+    duration: '約 32 天',
+    season: '9–10月（9月出發最佳）',
+    page: 'travel_proposal_pages/I.html',
+    desc: '北京→平遙→西安→蘭州→張掖丹霞→嘉峪關→敦煌，由東向西單向不折返',
+    warning: '⚠️ 莫高窟須官網提前預約；河西日夜溫差大、健身房弱，重訓掛北京/西安',
+  },
+  J: {
+    title: '東部縱貫文化線（觀光慢遊）',
+    stops: ['北京','青島','蘇州','杭州','黃山','廈門'],
+    duration: '約 30 天',
+    season: '10–11月（10月出發秋高氣爽）',
+    page: 'travel_proposal_pages/J.html',
+    desc: '北京→青島→蘇州→杭州→黃山宏村→廈門，全程高鐵由北而南',
+    warning: '⚠️ 上海已造訪僅作蘇杭轉乘不停留；黃山看日出住山上需早訂房',
+  },
+  K: {
+    title: '川渝・華中嶺南暖秋線（觀光慢遊）',
+    stops: ['成都','重慶','張家界','桂林·陽朔','廈門'],
+    duration: '約 30 天',
+    season: '11月（避北方寒、南方溫暖）',
+    page: 'travel_proposal_pages/K.html',
+    desc: '成都→重慶→張家界→桂林陽朔→廈門，西→中→南→東南單向',
+    warning: '⚠️ 張家界12月起山頂恐結冰停纜車；川渝冬濕冷帶薄羽絨',
+  },
+};
+
+const PLANS_DATA = MODE === 'travel' ? PLANS_TRAVEL : PLANS_RESIDE;
+
+// ── 路線圖層 ─────────────────────────────────────────────
+const routeLayers = {}; // plan → { lines: [], waypoints: [] }
+const activeRoutes = new Set();
+
+function makeRoutePopup(plan, color) {
+  const p = PLANS_DATA[plan];
+  const warnHtml = p.warning
+    ? `<div style="margin:8px 0;padding:6px 10px;background:#2D1A0E;border:1px solid #E8825A;border-radius:6px;font-size:11px;color:#E8825A;">${p.warning}</div>`
+    : '';
+  return `
+    <div class="route-popup-inner">
+      <div class="route-popup-title" style="color:${color}">${p.title}</div>
+      <div class="route-popup-sub">${p.desc}</div>
+      <div class="route-popup-meta">⏱ ${p.duration} &nbsp;|&nbsp; 🗓 ${p.season}</div>
+      ${warnHtml}
+      <a class="route-popup-detail" href="${p.page}" target="_blank"
+         style="background:${color}22;border:1.5px solid ${color};color:${color};">
+        查看完整方案詳情 →
+      </a>
+    </div>`;
+}
+
+function buildRoute(plan) {
+  const p = PLANS_DATA[plan];
+  const color = PLAN_COLORS[plan];
+  const lines = [];
+  const waypoints = [];
+
+  const renderSegment = (stops, dashed = false) => {
+    const coords = stops.map(s => ALL_COORDS[s]).filter(Boolean);
+
+    // 深色描邊（casing）：墊在彩色線下方、更寬，
+    // 讓路線在密集圓點背景上有對比、邊緣清楚。
+    const casing = L.polyline(coords, {
+      pane: 'routePane',
+      color: '#05140E',
+      weight: dashed ? 9 : 10,
+      opacity: 0.9,
+      dashArray: dashed ? '10,8' : null,
+      lineCap: 'round',
+      lineJoin: 'round',
+      interactive: false,
+    });
+    lines.push(casing);
+
+    // 主線：加粗、近乎不透明、發光，蓋過城市圓點
+    const line = L.polyline(coords, {
+      pane: 'routePane',
+      color,
+      weight: dashed ? 4.5 : 6,
+      opacity: 0.98,
+      dashArray: dashed ? '10,8' : null,
+      lineCap: 'round',
+      lineJoin: 'round',
+      interactive: true,
+    });
+    line.on('add', () => {
+      const el = line.getElement();
+      if (el) el.style.filter = `drop-shadow(0 0 5px ${color})`;
+    });
+    line.bindPopup(makeRoutePopup(plan, color), { maxWidth: 280 });
+    lines.push(line);
+
+    // 每個停留點都畫序號節點 + 常駐城市名標籤，讓重點城市與行程順序一目了然
+    stops.forEach((city, idx) => {
+      const coord = ALL_COORDS[city];
+      if (!coord) return;
+
+      const num = idx + 1;
+      const isStart = idx === 0;
+      const isEnd = idx === stops.length - 1;
+
+      // 序號圓節點（路線色 + 白邊 + 發光），疊在城市圓點之上標出停留點
+      const icon = L.divIcon({
+        html: `<div style="display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:${color};border:2px solid #fff;box-shadow:0 0 6px ${color},0 1px 3px #000;color:#fff;font-size:11px;font-weight:700;line-height:1;">${num}</div>`,
+        className: '',
+        iconSize: [22, 22],
+        iconAnchor: [11, 11],
+        popupAnchor: [0, -14],
+      });
+
+      const m = L.marker(coord, { icon, interactive: true, pane: 'routeMarkerPane' });
+      // 常駐城市名標籤（起點冠 ✈、終點冠 🏁）
+      const labelText = (isStart ? '✈ ' : isEnd ? '🏁 ' : '') + city;
+      m.bindTooltip(labelText, { permanent: true, direction: 'top', offset: [0, -13], className: 'waypoint-tooltip' });
+      m.bindPopup(makeRoutePopup(plan, color), { maxWidth: 280 });
+      waypoints.push(m);
+    });
+  };
+
+  // 巢狀 stops（如分兩趟出發的方案）：第一段實線、其後虛線
+  const segments = Array.isArray(p.stops[0]) ? p.stops : [p.stops];
+  segments.forEach((seg, i) => renderSegment(seg, i > 0));
+
+  routeLayers[plan] = { lines, waypoints };
+}
+
+function toggleRoute(plan) {
+  if (!routeLayers[plan]) buildRoute(plan);
+
+  const { lines, waypoints } = routeLayers[plan];
+  // Sync across ALL route buttons with this plan (desktop + mobile sheet)
+  const btns = document.querySelectorAll(`.route-btn[data-plan="${plan}"]`);
+
+  if (activeRoutes.has(plan)) {
+    lines.forEach(l => map.removeLayer(l));
+    waypoints.forEach(w => map.removeLayer(w));
+    activeRoutes.delete(plan);
+    btns.forEach(b => b.classList.remove('active'));
+  } else {
+    lines.forEach(l => l.addTo(map));
+    waypoints.forEach(w => w.addTo(map));
+    activeRoutes.add(plan);
+    btns.forEach(b => b.classList.add('active'));
+  }
+  // 有任何路線啟用 → 淡化城市圓點/標籤聚焦路線；全關才還原
+  setCityDim(activeRoutes.size > 0);
+}
+
+document.querySelectorAll('.route-btn').forEach(btn => {
+  btn.addEventListener('click', () => toggleRoute(btn.dataset.plan));
+});
+
+// ── Mobile sheet logic ───────────────────────────────────
+function isMobile() { return window.innerWidth <= 768; }
+
+function openMobSheet(id) {
+  // Close any open sheets first
+  document.querySelectorAll('.mob-sheet').forEach(s => s.classList.remove('open'));
+  document.getElementById(id).classList.add('open');
+  document.getElementById('mob-backdrop').classList.add('show');
+}
+
+function closeMobSheets() {
+  document.querySelectorAll('.mob-sheet').forEach(s => s.classList.remove('open'));
+  document.getElementById('mob-backdrop').classList.remove('show');
+}
+
+document.getElementById('fab-filter').addEventListener('click', () => {
+  const sheet = document.getElementById('sheet-filter');
+  if (sheet.classList.contains('open')) closeMobSheets();
+  else openMobSheet('sheet-filter');
+});
+
+document.getElementById('fab-route').addEventListener('click', () => {
+  const sheet = document.getElementById('sheet-route');
+  if (sheet.classList.contains('open')) closeMobSheets();
+  else openMobSheet('sheet-route');
+});
+
+document.getElementById('mob-backdrop').addEventListener('click', closeMobSheets);
+
+// Swipe down to close sheets
+document.querySelectorAll('.mob-sheet').forEach(sheet => {
+  let startY = 0;
+  sheet.addEventListener('touchstart', e => { startY = e.touches[0].clientY; }, { passive: true });
+  sheet.addEventListener('touchend', e => {
+    const dy = e.changedTouches[0].clientY - startY;
+    if (dy > 60) closeMobSheets();
+  }, { passive: true });
+});
+
+// 桌機：popup 開著時淡出圖例，避免右側城市（釜山／青森）的卡片被蓋住
+map.on('popupopen', () => document.getElementById('legend').classList.add('popup-open'));
+map.on('popupclose', () => document.getElementById('legend').classList.remove('popup-open'));
+
+// Mobile: intercept Leaflet popups → show in bottom sheet instead
+let _suppressPopup = false;
+map.on('popupopen', function(e) {
+  if (!isMobile() || _suppressPopup) return;
+  const html = e.popup.getContent();
+  document.getElementById('mob-popup-inner').innerHTML = html;
+  openMobSheet('sheet-popup');
+  _suppressPopup = true;
+  map.closePopup();
+  _suppressPopup = false;
+});
+
+// Marker popup: wider on mobile (set before markers are created — handled via CSS)
+// Also set maxWidth dynamically on resize for popup sheet
+map.on('resize', () => {
+  if (!isMobile()) closeMobSheets();
+});
+
+// FAB badge: highlight when any filter is active
+function updateFabBadge() {
+  const active = filterState.season !== 'all' || filterState.stars !== 'all' || filterState.cost !== 'all' || filterState.rating !== 'all';
+  document.getElementById('fab-filter').classList.toggle('has-active', active);
+}
+
+// ── 城市比較工具 ─────────────────────────────────────────
+const compareSet = []; // max 3, each = city object
+const MAX_COMPARE = 3;
+
+function getCompareCity(slug) {
+  return CITIES.find(c => c.slug === slug);
+}
+
+function renderCompareBar() {
+  const bar = document.getElementById('compare-bar');
+  const citiesEl = document.getElementById('compare-cities');
+  if (compareSet.length === 0) {
+    bar.classList.remove('visible');
+    return;
+  }
+  bar.classList.add('visible');
+  citiesEl.innerHTML = compareSet.map(c => `
+    <div class="cmp-pill">
+      <div class="cmp-pill-dot" style="background:${SEASON_COLOR[c.season]}"></div>
+      <span>${c.name}</span>
+      <button class="cmp-pill-rm" data-slug="${c.slug}" title="移除">×</button>
+    </div>`).join('');
+
+  // Remove button events
+  citiesEl.querySelectorAll('.cmp-pill-rm').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      removeFromCompare(btn.dataset.slug);
+    });
+  });
+}
+
+function addToCompare(slug) {
+  if (compareSet.find(c => c.slug === slug)) return; // already in
+  if (compareSet.length >= MAX_COMPARE) return;
+  const city = getCompareCity(slug);
+  if (!city) return;
+  compareSet.push(city);
+  renderCompareBar();
+  syncCompareButtons();
+}
+
+function removeFromCompare(slug) {
+  const idx = compareSet.findIndex(c => c.slug === slug);
+  if (idx !== -1) compareSet.splice(idx, 1);
+  renderCompareBar();
+  syncCompareButtons();
+}
+
+function syncCompareButtons() {
+  document.querySelectorAll('.popup-compare-btn').forEach(btn => {
+    const inSet = !!compareSet.find(c => c.slug === btn.dataset.slug);
+    btn.classList.toggle('added', inSet);
+    btn.textContent = inSet ? '✓ 已加入比較' : '＋ 加入比較';
+  });
+}
+
+// Event delegation for compare buttons (works in both desktop popup & mobile sheet)
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.popup-compare-btn');
+  if (!btn) return;
+  const slug = btn.dataset.slug;
+  if (compareSet.find(c => c.slug === slug)) {
+    removeFromCompare(slug);
+  } else {
+    addToCompare(slug);
+  }
+});
+
+document.getElementById('compare-clear').addEventListener('click', () => {
+  compareSet.length = 0;
+  renderCompareBar();
+  syncCompareButtons();
+});
+
+document.getElementById('compare-go').addEventListener('click', openCompareOverlay);
+
+// ── Compare Overlay ──────────────────────────────────────
+function openCompareOverlay() {
+  if (compareSet.length < 2) return;
+  renderRadarChart();
+  renderCompareTable();
+  document.getElementById('compare-overlay').classList.add('visible');
+}
+
+function closeCompareOverlay() {
+  document.getElementById('compare-overlay').classList.remove('visible');
+}
+
+document.getElementById('cmp-close').addEventListener('click', closeCompareOverlay);
+document.getElementById('compare-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('compare-overlay')) closeCompareOverlay();
+});
+
+const RADAR_COLORS = ['#5AE89A','#FF9F7A','#74C5F5','#FFD97A','#C49BFE'];
+
+function renderRadarChart() {
+  const keys = MODE === 'travel'
+    ? ['美食','自然健行','歷史文化','景點密度','慢遊']
+    : ['健行跑步','健身房','美食','網路/VPN','CP值'];
+  const n = keys.length;
+  const cx = 150, cy = 130, R = 90;
+  const svg = document.getElementById('cmp-radar-svg');
+
+  // grid lines (5 levels)
+  let gridSvg = '';
+  for (let lv = 1; lv <= 5; lv++) {
+    const r = R * lv / 5;
+    const pts = keys.map((_, i) => {
+      const a = (2 * Math.PI * i / n) - Math.PI / 2;
+      return `${cx + r * Math.cos(a)},${cy + r * Math.sin(a)}`;
+    }).join(' ');
+    gridSvg += `<polygon points="${pts}" fill="none" stroke="#2D4A3E" stroke-width="${lv === 5 ? 1.2 : 0.8}"/>`;
+  }
+
+  // axis lines + labels
+  let axesSvg = '';
+  keys.forEach((key, i) => {
+    const a = (2 * Math.PI * i / n) - Math.PI / 2;
+    const ex = cx + R * Math.cos(a), ey = cy + R * Math.sin(a);
+    axesSvg += `<line x1="${cx}" y1="${cy}" x2="${ex}" y2="${ey}" stroke="#2D4A3E" stroke-width="0.8"/>`;
+    const lx = cx + (R + 14) * Math.cos(a), ly = cy + (R + 14) * Math.sin(a);
+    const anchor = Math.abs(Math.cos(a)) < 0.1 ? 'middle' : Math.cos(a) > 0 ? 'start' : 'end';
+    axesSvg += `<text x="${lx}" y="${ly + 4}" text-anchor="${anchor}" font-size="10" fill="#7AAA98" font-family="Arial,sans-serif">${key}</text>`;
+  });
+
+  // data polygons per city
+  let polySvg = '';
+  compareSet.forEach((city, ci) => {
+    const color = RADAR_COLORS[ci % RADAR_COLORS.length];
+    const pts = keys.map((key, i) => {
+      const a = (2 * Math.PI * i / n) - Math.PI / 2;
+      const v = (city.ratings[key] || 0) / 5;
+      return `${cx + R * v * Math.cos(a)},${cy + R * v * Math.sin(a)}`;
+    }).join(' ');
+    polySvg += `<polygon points="${pts}" fill="${color}22" stroke="${color}" stroke-width="1.8" stroke-linejoin="round"/>`;
+    keys.forEach((key, i) => {
+      const a = (2 * Math.PI * i / n) - Math.PI / 2;
+      const v = (city.ratings[key] || 0) / 5;
+      polySvg += `<circle cx="${cx + R * v * Math.cos(a)}" cy="${cy + R * v * Math.sin(a)}" r="3" fill="${color}"/>`;
+    });
+  });
+
+  svg.innerHTML = gridSvg + axesSvg + polySvg;
+
+  // legend
+  const legend = document.getElementById('cmp-radar-legend');
+  legend.innerHTML = compareSet.map((city, ci) => {
+    const color = RADAR_COLORS[ci % RADAR_COLORS.length];
+    return `<div class="cmp-radar-legend-item">
+      <div class="cmp-radar-legend-dot" style="background:${color}"></div>${city.name}
+    </div>`;
+  }).join('');
+}
+
+function renderCompareTable() {
+  const cols = compareSet.length;
+  const gridCols = `120px ${'1fr '.repeat(cols).trim()}`;
+
+  const allRatingKeys = [...new Set(compareSet.flatMap(c => Object.keys(c.ratings)))];
+
+  // Helper: find best/worst value among cities for a numeric metric
+  function bestWorst(vals) {
+    const max = Math.max(...vals);
+    const min = Math.min(...vals);
+    return { max, min };
+  }
+
+  // City header row
+  const cityHeaderCells = compareSet.map(c => `
+    <div class="cmp-city-name-cell">
+      <div class="cmp-city-name">${c.name}</div>
+      <div class="cmp-city-sub">${c.province}</div>
+      <div class="cmp-season-badge" style="background:${SEASON_COLOR[c.season]}">${SEASON_LABEL[c.season]}</div>
+    </div>`).join('');
+
+  // Cost row
+  const costMids = compareSet.map(c => c.costMid);
+  const { min: minCost, max: maxCost } = bestWorst(costMids);
+  const costCells = compareSet.map(c => {
+    const cls = c.costMid === minCost ? 'best' : c.costMid === maxCost ? 'worst' : '';
+    return `<div class="cmp-cell"><div class="cmp-value ${cls}">${c.cost}</div></div>`;
+  }).join('');
+
+  // Stars row
+  const starsVals = compareSet.map(c => c.stars);
+  const { max: maxStars } = bestWorst(starsVals);
+  const starsCells = compareSet.map(c => {
+    const cls = c.stars === maxStars ? 'best' : '';
+    return `<div class="cmp-cell">
+      <div class="cmp-value ${cls}">${c.stars}</div>
+      <div class="cmp-stars">${'★'.repeat(Math.floor(c.stars))}${c.stars % 1 ? '½' : ''}</div>
+    </div>`;
+  }).join('');
+
+  // Rating rows
+  const ratingRows = allRatingKeys.map(key => {
+    const vals = compareSet.map(c => c.ratings[key] || 0);
+    const { max: maxV, min: minV } = bestWorst(vals);
+    const cells = compareSet.map((c, i) => {
+      const v = vals[i];
+      const cls = v === maxV && maxV !== minV ? 'best' : v === minV && maxV !== minV ? 'worst' : '';
+      const barColor = v >= 4 ? '#5A8A72' : v >= 3 ? '#C9A84C' : '#E8825A';
+      return `<div class="cmp-cell">
+        <div class="cmp-value ${cls}">${v}/5</div>
+        <div class="cmp-bar-wrap"><div class="cmp-bar-fill" style="width:${v/5*100}%;background:${barColor}"></div></div>
+      </div>`;
+    }).join('');
+    return `<div class="cmp-row" style="grid-template-columns:${gridCols}">
+      <div class="cmp-row-label">${key}</div>${cells}
+    </div>`;
+  }).join('');
+
+  // Warning row (if any city has warning)
+  const hasWarning = compareSet.some(c => c.warning);
+  const warningRow = hasWarning ? `<div class="cmp-row" style="grid-template-columns:${gridCols};align-items:start;">
+    <div class="cmp-row-label">注意</div>
+    ${compareSet.map(c => `<div class="cmp-cell" style="font-size:11px;color:#E8825A;text-align:center;line-height:1.4;">${c.warning || '—'}</div>`).join('')}
+  </div>` : '';
+
+  document.getElementById('cmp-table-body').innerHTML = `
+    <div class="cmp-city-header" style="grid-template-columns:${gridCols}">
+      <div></div>${cityHeaderCells}
+    </div>
+    <div class="cmp-row" style="grid-template-columns:${gridCols}">
+      <div class="cmp-row-label">月均費用</div>${costCells}
+    </div>
+    <div class="cmp-row" style="grid-template-columns:${gridCols}">
+      <div class="cmp-row-label">推薦評分</div>${starsCells}
+    </div>
+    ${ratingRows}
+    ${warningRow}
+    <div style="padding:14px 0 4px;display:grid;grid-template-columns:${gridCols};gap:8px;">
+      <div></div>
+      ${compareSet.map(c => `
+        <div style="text-align:center;">
+          <a href="${DETAIL_DIR}/${c.slug}.html" target="_blank" style="display:inline-block;padding:7px 14px;border-radius:20px;border:1.5px solid ${SEASON_COLOR[c.season]};color:${SEASON_COLOR[c.season]};font-size:12px;font-weight:700;text-decoration:none;">詳情 →</a>
+        </div>`).join('')}
+    </div>
+  `;
+}
+
+// ── Service Worker 註冊 ──────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .catch(err => console.warn('SW 註冊失敗：', err));
+  });
+}
+</script>
+</body>
+</html>

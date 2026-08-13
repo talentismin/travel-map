@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2D4A3E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>蘇州 — 旅居評估</title>
+<link rel="manifest" href="../manifest.json">
+<link rel="icon" href="../icons/icon.svg" type="image/svg+xml">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Arial', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+    background: #111820; color: #dde; min-height: 100vh;
+  }
+  .page-header {
+    background: linear-gradient(135deg, #1a2e26 0%, #0e1a14 100%);
+    border-bottom: 3px solid #5A8A72;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-inner {
+    max-width: 900px; margin: 0 auto;
+    padding: 16px 24px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .back-btn {
+    display: flex; align-items: center; gap: 6px;
+    color: #5A8A72; text-decoration: none;
+    font-size: 13px; font-weight: 600;
+    padding: 6px 14px; border-radius: 20px;
+    border: 1.5px solid #5A8A72;
+    transition: all .2s; white-space: nowrap;
+  }
+  .back-btn:hover { background: #5A8A7222; }
+  .header-title { font-size: 22px; font-weight: 800; color: #fff; }
+  .header-province { font-size: 12px; color: #7AAA98; margin-top: 2px; }
+  .season-tag {
+    margin-left: auto; padding: 4px 14px;
+    border-radius: 20px; font-size: 12px; font-weight: 700;
+    background: #5A8A72; color: #fff; white-space: nowrap;
+  }
+  .hero {
+    background: linear-gradient(180deg, #0e1a14 0%, #111820 100%);
+    padding: 32px 24px;
+    border-bottom: 1px solid #1e2d28;
+  }
+  .hero-inner { max-width: 900px; margin: 0 auto; }
+  .hero-tagline { font-size: 16px; color: #A8C5B8; margin-bottom: 20px; line-height: 1.6; }
+
+  .kpi-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+  .kpi-card {
+    background: #1a2a24; border: 1px solid #2D4A3E;
+    border-radius: 10px; padding: 14px 20px;
+    flex: 1; min-width: 160px;
+  }
+  .kpi-label { font-size: 11px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; }
+  .kpi-value { font-size: 20px; font-weight: 800; color: #C9A84C; margin-top: 4px; }
+  .kpi-sub { font-size: 11px; color: #5A7A6A; margin-top: 2px; }
+  .kpi-stars { font-size: 22px; font-weight: 800; color: #FFD700; margin-top: 4px; }
+  .kpi-stars .empty-star { color: #333; }
+  .kpi-stars .half-star { color: #FFD700; }
+
+  .ratings-block { background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 10px; padding: 16px 20px; }
+  .ratings-title { font-size: 12px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
+  .rating-row { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+  .rating-label { font-size: 13px; color: #ccc; width: 90px; flex-shrink: 0; }
+  .rating-score { font-size: 12px; color: #7AAA98; width: 28px; flex-shrink: 0; }
+  .bar-wrap { flex: 1; height: 8px; background: #1e3028; border-radius: 4px; overflow: hidden; }
+  .bar-fill  { height: 100%; border-radius: 4px; transition: width .3s; }
+
+  .content { max-width: 900px; margin: 0 auto; padding: 24px; }
+  .section { margin-bottom: 28px; }
+  .section-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #2D4A3E; display: flex; align-items: center; gap: 8px; }
+  .section-icon { font-size: 18px; }
+
+  ul { list-style: none; }
+  ul li { padding: 7px 0 7px 20px; position: relative; font-size: 14px; color: #ccc; line-height: 1.5; border-bottom: 1px solid #1a2a20; }
+  ul li:last-child { border-bottom: none; }
+  ul li::before { content: '›'; position: absolute; left: 0; color: #5A8A72; font-weight: 700; font-size: 16px; }
+
+  .climate-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .climate-table th { background: #1a2a24; color: #7AAA98; text-align: left; padding: 8px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #2D4A3E; }
+  .climate-table td { padding: 9px 12px; border-bottom: 1px solid #1a2a20; color: #ccc; }
+  .climate-table tr:last-child td { border-bottom: none; }
+  .climate-table tr:hover td { background: #1a2a2488; }
+
+  .warning-box { background: #2D1A0E; border: 1.5px solid #E8825A; border-radius: 8px; padding: 12px 16px; display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: #E8825A; line-height: 1.5; margin-bottom: 20px; }
+  .warning-icon { font-size: 18px; flex-shrink: 0; }
+
+  .trial-list li { font-size: 13px; color: #A8C5B8; }
+  .prose { font-size: 14px; color: #ccc; line-height: 1.7; background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 8px; padding: 14px 16px; }
+  .best-season { display: inline-block; background: #5A8A7222; border: 1px solid #5A8A7255; color: #5A8A72; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 16px; }
+
+  /* 即時天氣 / AQI */
+  .live-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+  .live-card { flex: 1; min-width: 140px; background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 10px; padding: 12px 14px; font-size: 13px; }
+  .live-label { font-size: 10px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
+  .live-value { font-size: 18px; font-weight: 800; color: #fff; }
+  .live-sub { font-size: 11px; color: #7AAA98; margin-top: 2px; }
+  .live-aqi-good   { color: #5AE89A; }
+  .live-aqi-fair   { color: #C9A84C; }
+  .live-aqi-poor   { color: #E8825A; }
+
+  /* 上下城市導航 */
+  .city-nav { display: flex; gap: 10px; padding: 0 24px; max-width: 900px; margin: 28px auto 0; }
+  .city-nav a {
+    flex: 1; padding: 12px 14px; text-decoration: none;
+    border: 1px solid #2D4A3E; border-radius: 10px;
+    background: #1a2a24; color: #A8C5B8;
+    font-size: 12px; transition: all .2s; min-width: 0;
+  }
+  .city-nav a:hover { border-color: #5A8A72; color: #fff; }
+  .city-nav a .nv-label { font-size: 10px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; }
+  .city-nav a .nv-name { font-size: 14px; font-weight: 700; color: #fff; margin-top: 3px; }
+  .city-nav a.nv-prev { text-align: left; }
+  .city-nav a.nv-next { text-align: right; }
+  .city-nav a.nv-back { flex: 0 1 auto; text-align: center; padding: 12px 18px; }
+
+  .page-footer { text-align: center; padding: 20px; font-size: 12px; color: #3a4a42; border-top: 1px solid #1e2d28; margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-inner">
+    <a class="back-btn" href="../city_map.html?focus=suzhou">← 返回地圖</a>
+    <div>
+      <div class="header-title">蘇州</div>
+      <div class="header-province">江蘇省</div>
+    </div>
+    <div class="season-tag">🌿 四季皆宜</div>
+    <div style="margin-left:auto;font-size:11px;color:#3A5A4A;padding-right:4px;">📅 2026-04</div>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-tagline">台商重鎮10萬台灣人，網路VPN最穩，金雞湖14km跑道，環太湖路線</div>
+
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-label">月均費用</div>
+        <div class="kpi-value">6,030–11,000 CNY</div>
+        <div class="kpi-sub" id="cost-twd">NT$1,327–2,420/月</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">綜合推薦</div>
+        <div class="kpi-stars">★★★★<span class="half-star">½</span><span class="empty-star"></span></div>
+        <div class="kpi-sub">4.5 / 5.0</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">最佳旅居季節</div>
+        <div style="font-size:14px;font-weight:700;color:#fff;margin-top:6px;">四季皆可，春（3–5月）秋（9–11月）最佳</div>
+      </div>
+    </div>
+
+    <div class="ratings-block">
+      <div class="ratings-title">各項評分</div>
+      
+          <div class="rating-row">
+            <span class="rating-label">健行跑步</span>
+            <span class="rating-score">5/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">健身房</span>
+            <span class="rating-score">5/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">美食</span>
+            <span class="rating-score">5/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">網路/VPN</span>
+            <span class="rating-score">5/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">CP值</span>
+            <span class="rating-score">4/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:80%;background:#5A8A72"></div></div>
+          </div>
+    </div>
+
+    <div class="live-row" id="live-row">
+      <div class="live-card"><div class="live-label">當前氣溫</div><div class="live-value" id="lv-temp">—</div><div class="live-sub" id="lv-temp-sub">載入中</div></div>
+      <div class="live-card"><div class="live-label">未來 3 日</div><div class="live-value" id="lv-forecast">—</div><div class="live-sub">最低 / 最高</div></div>
+      <div class="live-card"><div class="live-label">空氣品質 (歐盟 AQI)</div><div class="live-value" id="lv-aqi">—</div><div class="live-sub" id="lv-pm">PM2.5 載入中</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+  
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">🏃</span>跑步 / 健行路線</h2>
+    <ul><li>金雞湖環湖跑（工業園區核心，環湖約14km，跑道規劃完整，夜晚燈光美觀，市區首選）</li><li>獨墅湖環湖（約16–20km，科技園附近，適合長距離訓練，人較少）</li><li>環太湖路線（週末，太湖岸線可分段挑選20–30km精華段）</li><li>蘇州古城護城河跑（環古城牆一圈約15km，歷史感濃厚，路面平整）</li><li>天平山步道（西郊楓葉名山，秋季最美，爬坡步道5–8km）</li></ul>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">💪</span>健身房 / 蹲舉架</h2>
+    <div class="prose">工業園區連鎖健身密集：超越、威爾士、健身工廠。外籍用戶多，部分場館Power Rack設備比台灣更新，月費 CNY 200–450。蹲舉架完全不是問題。</div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">♨️</span>溫泉</h2>
+    <div class="prose">太湖西山有少數精品溫泉，需搭車40–60分鐘。非蘇州亮點，若愛泡湯建議結合南京湯山或騰衝行程。</div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">🍜</span>美食亮點</h2>
+    <ul><li>陽澄湖大閘蟹（9–11月季節，蘇州是原產地，在地吃最划算，CNY 50–150/隻）</li><li>松鼠鱖魚（蘇幫菜代表，酸甜魚皮，松鼠造型）</li><li>碧螺春蝦仁（茶香炒蝦仁，蘇州特有精緻料理）</li><li>奧灶面（崑山特色，昂刺魚面，30分鐘車程可到）</li><li>坐高鐵25分鐘到上海，日料/法餐/台式隨時取用</li></ul>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">🌤</span>氣候參考</h2>
+    <table class="climate-table">
+      <thead><tr><th>月份</th><th>氣溫</th><th>特點</th></tr></thead>
+      <tbody>
+          <tr>
+            <td>3–5月</td>
+            <td>12–26°C</td>
+            <td>春花，梅雨前最美，金雞湖晨跑無敵</td>
+          </tr>
+          <tr>
+            <td>6月</td>
+            <td>24–29°C</td>
+            <td>梅雨季，悶熱潮濕</td>
+          </tr>
+          <tr>
+            <td>7–8月</td>
+            <td>30–35°C</td>
+            <td>夏熱，但比重慶涼爽許多</td>
+          </tr>
+          <tr>
+            <td>9–11月</td>
+            <td>14–26°C</td>
+            <td>最佳旅居窗口，大閘蟹季節開跑</td>
+          </tr></tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">📝</span>注意事項</h2>
+    <ul><li>台商聚集重鎮：蘇州台商超過10萬人，有台灣商會、台灣超市、台灣學校</li><li>VPN友善：外資比例高，當地人習慣使用，穩定度最高的非一線城市</li><li>推薦旅居區域：蘇州工業園區（SIP）——網路最快、台商最多、設施最新</li><li>高鐵至上海25–35分鐘，入境從上海飛更方便</li></ul>
+  </div>
+
+  
+        <div class="section">
+          <h2 class="section-title"><span class="section-icon">🔬</span>旅居 Trial 建議（3天流程）</h2>
+          <ul class="trial-list">
+            <li>Day 1：入住工業園區、金雞湖環湖晨跑14km、下午環湖咖啡館測試網速+VPN</li><li>Day 2：在住所工作半天、走訪超越/威爾士確認蹲舉架、傍晚古城護城河跑</li><li>Day 3：週末環太湖段落長跑20km（需搭車至太湖邊）、晚上找大閘蟹（9–11月）</li>
+          </ul>
+        </div>
+
+</div>
+
+<nav class="city-nav">
+  <a class="nv-prev" href="shenzhen.html"><div class="nv-label">← 上一城</div><div class="nv-name">深圳</div></a>
+  <a class="nv-back" href="../city_map.html?focus=suzhou"><div class="nv-label">↑ 地圖</div><div class="nv-name">總覽</div></a>
+  <a class="nv-next" href="tallinn.html"><div class="nv-label">下一城 →</div><div class="nv-name">塔林</div></a>
+</nav>
+
+<div class="page-footer">旅居城市評估 — 43歲台灣軟體工程師視角 | 重訓・跑步・美食・數位遊牧</div>
+
+<script src="../lib/format.js"></script>
+<script src="../lib/fx.js"></script>
+<script src="../lib/weather.js"></script>
+<script>
+const CITY = {"slug":"suzhou","lat":31.3,"lng":120.62,"cost":{"currency":"CNY","min":6030,"max":11000}};
+const FX_SNAPSHOT = {"CNY":1,"USD":7.2,"EUR":7.8,"JPY":0.048,"TWD":0.22};
+
+// 動態 TWD 換算（以即時匯率，失敗時退回快照）
+if (window.CT_FX && window.CT_FORMAT) {
+  CT_FX.getRates().then(rates => {
+    const merged = Object.assign({}, FX_SNAPSHOT, rates || {});
+    const twd = CT_FORMAT.formatTWDFromCost(CITY.cost, merged);
+    const el = document.getElementById('cost-twd');
+    if (el && twd) el.textContent = twd + '/月';
+  }).catch(() => {});
+}
+
+// 天氣 + AQI
+if (window.CT_WEATHER) {
+  CT_WEATHER.fetchWeather(CITY.lat, CITY.lng).then(w => {
+    if (!w) return;
+    document.getElementById('lv-temp').textContent = w.current + '°C';
+    document.getElementById('lv-temp-sub').textContent = w.weather || '—';
+    document.getElementById('lv-forecast').textContent = w.forecastMin + '° / ' + w.forecastMax + '°';
+  }).catch(() => {});
+  CT_WEATHER.fetchAQI(CITY.lat, CITY.lng).then(a => {
+    if (!a) return;
+    const el = document.getElementById('lv-aqi');
+    el.textContent = a.aqi;
+    el.classList.add(a.aqi <= 40 ? 'live-aqi-good' : a.aqi <= 80 ? 'live-aqi-fair' : 'live-aqi-poor');
+    document.getElementById('lv-pm').textContent = 'PM2.5 ' + a.pm25 + ' µg/m³';
+  }).catch(() => {});
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('../sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>

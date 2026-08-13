@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2D4A3E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>胡志明市 — 旅居評估</title>
+<link rel="manifest" href="../manifest.json">
+<link rel="icon" href="../icons/icon.svg" type="image/svg+xml">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Arial', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+    background: #111820; color: #dde; min-height: 100vh;
+  }
+  .page-header {
+    background: linear-gradient(135deg, #1a2e26 0%, #0e1a14 100%);
+    border-bottom: 3px solid #9B59B6;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-inner {
+    max-width: 900px; margin: 0 auto;
+    padding: 16px 24px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .back-btn {
+    display: flex; align-items: center; gap: 6px;
+    color: #9B59B6; text-decoration: none;
+    font-size: 13px; font-weight: 600;
+    padding: 6px 14px; border-radius: 20px;
+    border: 1.5px solid #9B59B6;
+    transition: all .2s; white-space: nowrap;
+  }
+  .back-btn:hover { background: #9B59B622; }
+  .header-title { font-size: 22px; font-weight: 800; color: #fff; }
+  .header-province { font-size: 12px; color: #7AAA98; margin-top: 2px; }
+  .season-tag {
+    margin-left: auto; padding: 4px 14px;
+    border-radius: 20px; font-size: 12px; font-weight: 700;
+    background: #9B59B6; color: #fff; white-space: nowrap;
+  }
+  .hero {
+    background: linear-gradient(180deg, #0e1a14 0%, #111820 100%);
+    padding: 32px 24px;
+    border-bottom: 1px solid #1e2d28;
+  }
+  .hero-inner { max-width: 900px; margin: 0 auto; }
+  .hero-tagline { font-size: 16px; color: #A8C5B8; margin-bottom: 20px; line-height: 1.6; }
+
+  .kpi-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+  .kpi-card {
+    background: #1a2a24; border: 1px solid #2D4A3E;
+    border-radius: 10px; padding: 14px 20px;
+    flex: 1; min-width: 160px;
+  }
+  .kpi-label { font-size: 11px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; }
+  .kpi-value { font-size: 20px; font-weight: 800; color: #C9A84C; margin-top: 4px; }
+  .kpi-sub { font-size: 11px; color: #5A7A6A; margin-top: 2px; }
+  .kpi-stars { font-size: 22px; font-weight: 800; color: #FFD700; margin-top: 4px; }
+  .kpi-stars .empty-star { color: #333; }
+  .kpi-stars .half-star { color: #FFD700; }
+
+  .ratings-block { background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 10px; padding: 16px 20px; }
+  .ratings-title { font-size: 12px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
+  .rating-row { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+  .rating-label { font-size: 13px; color: #ccc; width: 90px; flex-shrink: 0; }
+  .rating-score { font-size: 12px; color: #7AAA98; width: 28px; flex-shrink: 0; }
+  .bar-wrap { flex: 1; height: 8px; background: #1e3028; border-radius: 4px; overflow: hidden; }
+  .bar-fill  { height: 100%; border-radius: 4px; transition: width .3s; }
+
+  .content { max-width: 900px; margin: 0 auto; padding: 24px; }
+  .section { margin-bottom: 28px; }
+  .section-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #2D4A3E; display: flex; align-items: center; gap: 8px; }
+  .section-icon { font-size: 18px; }
+
+  ul { list-style: none; }
+  ul li { padding: 7px 0 7px 20px; position: relative; font-size: 14px; color: #ccc; line-height: 1.5; border-bottom: 1px solid #1a2a20; }
+  ul li:last-child { border-bottom: none; }
+  ul li::before { content: '›'; position: absolute; left: 0; color: #9B59B6; font-weight: 700; font-size: 16px; }
+
+  .climate-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .climate-table th { background: #1a2a24; color: #7AAA98; text-align: left; padding: 8px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #2D4A3E; }
+  .climate-table td { padding: 9px 12px; border-bottom: 1px solid #1a2a20; color: #ccc; }
+  .climate-table tr:last-child td { border-bottom: none; }
+  .climate-table tr:hover td { background: #1a2a2488; }
+
+  .warning-box { background: #2D1A0E; border: 1.5px solid #E8825A; border-radius: 8px; padding: 12px 16px; display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: #E8825A; line-height: 1.5; margin-bottom: 20px; }
+  .warning-icon { font-size: 18px; flex-shrink: 0; }
+
+  .trial-list li { font-size: 13px; color: #A8C5B8; }
+  .prose { font-size: 14px; color: #ccc; line-height: 1.7; background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 8px; padding: 14px 16px; }
+  .best-season { display: inline-block; background: #9B59B622; border: 1px solid #9B59B655; color: #9B59B6; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 16px; }
+
+  /* 即時天氣 / AQI */
+  .live-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+  .live-card { flex: 1; min-width: 140px; background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 10px; padding: 12px 14px; font-size: 13px; }
+  .live-label { font-size: 10px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
+  .live-value { font-size: 18px; font-weight: 800; color: #fff; }
+  .live-sub { font-size: 11px; color: #7AAA98; margin-top: 2px; }
+  .live-aqi-good   { color: #5AE89A; }
+  .live-aqi-fair   { color: #C9A84C; }
+  .live-aqi-poor   { color: #E8825A; }
+
+  /* 上下城市導航 */
+  .city-nav { display: flex; gap: 10px; padding: 0 24px; max-width: 900px; margin: 28px auto 0; }
+  .city-nav a {
+    flex: 1; padding: 12px 14px; text-decoration: none;
+    border: 1px solid #2D4A3E; border-radius: 10px;
+    background: #1a2a24; color: #A8C5B8;
+    font-size: 12px; transition: all .2s; min-width: 0;
+  }
+  .city-nav a:hover { border-color: #9B59B6; color: #fff; }
+  .city-nav a .nv-label { font-size: 10px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; }
+  .city-nav a .nv-name { font-size: 14px; font-weight: 700; color: #fff; margin-top: 3px; }
+  .city-nav a.nv-prev { text-align: left; }
+  .city-nav a.nv-next { text-align: right; }
+  .city-nav a.nv-back { flex: 0 1 auto; text-align: center; padding: 12px 18px; }
+
+  .page-footer { text-align: center; padding: 20px; font-size: 12px; color: #3a4a42; border-top: 1px solid #1e2d28; margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-inner">
+    <a class="back-btn" href="../city_map.html?focus=hochiminh">← 返回地圖</a>
+    <div>
+      <div class="header-title">胡志明市</div>
+      <div class="header-province">越南</div>
+    </div>
+    <div class="season-tag">✈ 境外</div>
+    <div style="margin-left:auto;font-size:11px;color:#3A5A4A;padding-right:4px;">📅 2026-04</div>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-tagline">越南經濟引擎，咖啡與街頭美食天堂，重訓資源充足；跑步環境與網路審查是硬傷</div>
+
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-label">月均費用</div>
+        <div class="kpi-value">USD 800–1,500</div>
+        <div class="kpi-sub" id="cost-twd">NT$1,267–2,376/月</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">綜合推薦</div>
+        <div class="kpi-stars">★★★★<span class="empty-star">☆</span></div>
+        <div class="kpi-sub">4 / 5.0</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">最佳旅居季節</div>
+        <div style="font-size:14px;font-weight:700;color:#fff;margin-top:6px;">乾季（12–4月）最佳，均溫 24–34°C；5–11月雨季、全年悶熱</div>
+      </div>
+    </div>
+
+    <div class="ratings-block">
+      <div class="ratings-title">各項評分</div>
+      
+          <div class="rating-row">
+            <span class="rating-label">健行跑步</span>
+            <span class="rating-score">3/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:60%;background:#C9A84C"></div></div>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">健身房</span>
+            <span class="rating-score">4/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:80%;background:#5A8A72"></div></div>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">美食</span>
+            <span class="rating-score">5/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">網路/VPN</span>
+            <span class="rating-score">3/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:60%;background:#C9A84C"></div></div>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">CP值</span>
+            <span class="rating-score">4/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:80%;background:#5A8A72"></div></div>
+          </div>
+    </div>
+
+    <div class="live-row" id="live-row">
+      <div class="live-card"><div class="live-label">當前氣溫</div><div class="live-value" id="lv-temp">—</div><div class="live-sub" id="lv-temp-sub">載入中</div></div>
+      <div class="live-card"><div class="live-label">未來 3 日</div><div class="live-value" id="lv-forecast">—</div><div class="live-sub">最低 / 最高</div></div>
+      <div class="live-card"><div class="live-label">空氣品質 (歐盟 AQI)</div><div class="live-value" id="lv-aqi">—</div><div class="live-sub" id="lv-pm">PM2.5 載入中</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+  
+        <div class="warning-box">
+          <span class="warning-icon">⚠️</span>
+          <div>⚠️ VPN／網路審查不穩＋市中心空汙與機車交通混亂；簽證需事先辦 e-visa（最長 90 天）</div>
+        </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">🏃</span>跑步 / 健行路線</h2>
+    <ul><li>Tao Dan 公園與 9 月 23 日公園：市中心綠地疊圈跑 3–6km，清晨跑者多</li><li>Thảo Điền／Thủ Thiêm（第二郡）：高級住宅區新建河濱步道與較寬人行道，5–8km，空氣較市中心好</li><li>富美興（Phú Mỹ Hưng，第七郡）：規劃完整的新市鎮，綠帶與湖濱跑道 5–10km，數位遊牧友善</li><li>西貢河岸（Bạch Đằng 碼頭一帶）：濱河散步跑，景觀佳但不連續</li><li>註：市中心空汙＋機車海＋人行道被占用，長跑建議集中在第二／第七郡</li></ul>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">💪</span>健身房 / 蹲舉架</h2>
+    <div class="prose">California Fitness & Yoga（旗艦店多，Power Rack、深蹲架、槓鈴齊全）、Elite Fitness、CITIGYM、本地重訓專館；高級公寓多附健身房但器材有限。大型店蹲舉 140kg／臥推 100kg 可滿足，建議選第一／二／七郡的旗艦館，月費約 USD 30–60。</div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">♨️</span>溫泉</h2>
+    <div class="prose">市區無天然溫泉，僅泰式／日式 SPA 湯屋型設施。真正溫泉需遠赴平洲（Bình Châu，距市區約 150km）一日／二日遊，泡湯為弱項。</div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">🍜</span>美食亮點</h2>
+    <ul><li>越南河粉（Phở）、廣治牛肉粉、蝦麵：街邊現煮，CP 值極高</li><li>Bánh mì 越式法包：街頭速食天花板，每份約 NT$25–45</li><li>越南滴漏咖啡與椰子咖啡：specialty coffee 場景成熟，數位遊牧最愛</li><li>海鮮大排檔與螺料理（ốc）：宵夜文化，啤酒配螺</li><li>第五郡 Chợ Lớn 華人區：粵式燒臘、潮汕粥粉麵</li></ul>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">🌤</span>氣候參考</h2>
+    <table class="climate-table">
+      <thead><tr><th>月份</th><th>氣溫</th><th>特點</th></tr></thead>
+      <tbody>
+          <tr>
+            <td>12–2月</td>
+            <td>21–33°C</td>
+            <td>乾季最舒適，濕度較低，旅居最佳</td>
+          </tr>
+          <tr>
+            <td>3–4月</td>
+            <td>25–37°C</td>
+            <td>乾季尾，全年最熱，戶外跑改清晨</td>
+          </tr>
+          <tr>
+            <td>5–11月</td>
+            <td>24–34°C</td>
+            <td>雨季，午後短時強降雨，悶熱潮濕</td>
+          </tr></tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">📝</span>注意事項</h2>
+    <ul><li>⚠️ 越南對 Facebook／部分外網有節流與審查，需 VPN 但 VPN 偶被干擾，網路自由度為此清單弱項</li><li>⚠️ 機車交通混亂、市中心空汙偏高（旱季 AQI 100–160），跑步建議第二／七郡</li><li>台灣護照赴越南不免簽，需事先申請電子簽證 e-visa（單次最長 90 天，2023 起放寬）</li><li>光纖速度佳（100–300Mbps）但國際出口偶受海纜中斷影響，建議備手機熱點＋VPN</li><li>美食、咖啡、物價 CP 值極佳，數位遊牧基建齊全，弱在跑步環境與網路審查</li></ul>
+  </div>
+
+  
+        <div class="section">
+          <h2 class="section-title"><span class="section-icon">🔬</span>旅居 Trial 建議（3天流程）</h2>
+          <ul class="trial-list">
+            <li>Day 1：入住第二郡 Thảo Điền 月租公寓、河濱晨跑 6km、Bánh mì＋滴漏咖啡、測網速＋VPN</li><li>Day 2：上午 coworking 工作、下午 California Fitness 旗艦店確認 Power Rack、晚上海鮮螺攤</li><li>Day 3：富美興長跑 10km、Chợ Lớn 華人區美食、specialty coffee 收尾</li>
+          </ul>
+        </div>
+
+</div>
+
+<nav class="city-nav">
+  <a class="nv-prev" href="hangzhou.html"><div class="nv-label">← 上一城</div><div class="nv-name">杭州</div></a>
+  <a class="nv-back" href="../city_map.html?focus=hochiminh"><div class="nv-label">↑ 地圖</div><div class="nv-name">總覽</div></a>
+  <a class="nv-next" href="huizhou.html"><div class="nv-label">下一城 →</div><div class="nv-name">惠州</div></a>
+</nav>
+
+<div class="page-footer">旅居城市評估 — 43歲台灣軟體工程師視角 | 重訓・跑步・美食・數位遊牧</div>
+
+<script src="../lib/format.js"></script>
+<script src="../lib/fx.js"></script>
+<script src="../lib/weather.js"></script>
+<script>
+const CITY = {"slug":"hochiminh","lat":10.82,"lng":106.63,"cost":{"currency":"USD","min":800,"max":1500}};
+const FX_SNAPSHOT = {"CNY":1,"USD":7.2,"EUR":7.8,"JPY":0.048,"TWD":0.22};
+
+// 動態 TWD 換算（以即時匯率，失敗時退回快照）
+if (window.CT_FX && window.CT_FORMAT) {
+  CT_FX.getRates().then(rates => {
+    const merged = Object.assign({}, FX_SNAPSHOT, rates || {});
+    const twd = CT_FORMAT.formatTWDFromCost(CITY.cost, merged);
+    const el = document.getElementById('cost-twd');
+    if (el && twd) el.textContent = twd + '/月';
+  }).catch(() => {});
+}
+
+// 天氣 + AQI
+if (window.CT_WEATHER) {
+  CT_WEATHER.fetchWeather(CITY.lat, CITY.lng).then(w => {
+    if (!w) return;
+    document.getElementById('lv-temp').textContent = w.current + '°C';
+    document.getElementById('lv-temp-sub').textContent = w.weather || '—';
+    document.getElementById('lv-forecast').textContent = w.forecastMin + '° / ' + w.forecastMax + '°';
+  }).catch(() => {});
+  CT_WEATHER.fetchAQI(CITY.lat, CITY.lng).then(a => {
+    if (!a) return;
+    const el = document.getElementById('lv-aqi');
+    el.textContent = a.aqi;
+    el.classList.add(a.aqi <= 40 ? 'live-aqi-good' : a.aqi <= 80 ? 'live-aqi-fair' : 'live-aqi-poor');
+    document.getElementById('lv-pm').textContent = 'PM2.5 ' + a.pm25 + ' µg/m³';
+  }).catch(() => {});
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('../sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>

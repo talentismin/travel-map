@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>釜山 10 天 9 夜 · 2026.09.12–21</title>
+<style>
+  :root {
+    --sea-900: #0E1A24;
+    --sea-800: #13232F;
+    --sea-700: #1B3341;
+    --mist-050: #F3F5F4;
+    --mist-100: #E7ECEA;
+    --sand: #C9A25A;
+    --persimmon: #EF5B41;
+    --persimmon-soft: #F2795F;
+    --teal: #128C94;
+    --teal-soft: #37B0B4;
+
+    /* semantic tokens (light default) */
+    --bg: var(--mist-050);
+    --bg-panel: #FBFCFB;
+    --bg-inset: #EDF1EF;
+    --ink: #16232B;
+    --ink-soft: #4A5A62;
+    --ink-faint: #75858C;
+    --line: #D8E0DD;
+    --line-strong: #C2CECA;
+    --accent: var(--persimmon);
+    --accent-ink: #C0341C;
+    --accent-wash: #FCEAE4;
+    --sea: #0C6E76;
+    --sea-wash: #E0EEEE;
+    --gold: #9A7A2E;
+    --hero-bg: var(--sea-900);
+    --hero-ink: #EAF1F0;
+    --hero-faint: #8FA6AC;
+    --shadow: 0 1px 2px rgba(16,26,36,.06), 0 8px 24px -12px rgba(16,26,36,.18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: var(--sea-900);
+      --bg-panel: #142430;
+      --bg-inset: #10202B;
+      --ink: #E7EEEC;
+      --ink-soft: #A6B6BB;
+      --ink-faint: #74888E;
+      --line: #24384322;
+      --line: #274050;
+      --line-strong: #33505F;
+      --accent: var(--persimmon-soft);
+      --accent-ink: #F79178;
+      --accent-wash: #2A2320;
+      --sea: var(--teal-soft);
+      --sea-wash: #12303040;
+      --gold: var(--sand);
+      --hero-bg: #0A141C;
+      --hero-ink: #EAF1F0;
+      --hero-faint: #7E979D;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 30px -14px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: var(--mist-050); --bg-panel: #FBFCFB; --bg-inset: #EDF1EF;
+    --ink: #16232B; --ink-soft: #4A5A62; --ink-faint: #75858C;
+    --line: #D8E0DD; --line-strong: #C2CECA;
+    --accent: var(--persimmon); --accent-ink: #C0341C; --accent-wash: #FCEAE4;
+    --sea: #0C6E76; --sea-wash: #E0EEEE; --gold: #9A7A2E;
+    --hero-bg: var(--sea-900); --hero-ink: #EAF1F0; --hero-faint: #8FA6AC;
+    --shadow: 0 1px 2px rgba(16,26,36,.06), 0 8px 24px -12px rgba(16,26,36,.18);
+  }
+  :root[data-theme="dark"] {
+    --bg: var(--sea-900); --bg-panel: #142430; --bg-inset: #10202B;
+    --ink: #E7EEEC; --ink-soft: #A6B6BB; --ink-faint: #74888E;
+    --line: #274050; --line-strong: #33505F;
+    --accent: var(--persimmon-soft); --accent-ink: #F79178; --accent-wash: #2A2320;
+    --sea: var(--teal-soft); --sea-wash: #12303040; --gold: var(--sand);
+    --hero-bg: #0A141C; --hero-ink: #EAF1F0; --hero-faint: #7E979D;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 30px -14px rgba(0,0,0,.6);
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Helvetica Neue", "PingFang TC", "Noto Sans TC", system-ui, -apple-system, sans-serif;
+    line-height: 1.65;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 0 22px; }
+  h1, h2, h3 { text-wrap: balance; margin: 0; }
+  p { margin: 0; }
+  a { color: var(--accent-ink); text-decoration: none; border-bottom: 1px solid color-mix(in srgb, var(--accent-ink) 35%, transparent); }
+  a:hover { border-bottom-color: var(--accent-ink); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+
+  .eyebrow {
+    font-size: 12px; letter-spacing: .22em; text-transform: uppercase;
+    font-weight: 700; color: var(--sea);
+  }
+  .mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-variant-numeric: tabular-nums; }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    background: var(--hero-bg);
+    color: var(--hero-ink);
+    position: relative;
+    overflow: hidden;
+    border-bottom: 3px solid var(--accent);
+  }
+  .hero::before {
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(120% 80% at 82% -10%, color-mix(in srgb, var(--persimmon) 26%, transparent), transparent 55%),
+      radial-gradient(90% 70% at 8% 120%, color-mix(in srgb, var(--teal) 30%, transparent), transparent 60%),
+      linear-gradient(180deg, rgba(9,17,24,.86) 0%, rgba(9,17,24,.80) 45%, rgba(9,17,24,.93) 100%),
+      url("busan_itinerary_2026_img/gwangan-bridge.jpg") center 62% / cover no-repeat;
+    pointer-events: none;
+  }
+  .hero .credit {
+    position: absolute; right: 14px; bottom: 10px; z-index: 2;
+    font-size: 10.5px; letter-spacing: .04em; color: var(--hero-faint); opacity: .75;
+  }
+  .hero-inner { position: relative; padding: 66px 22px 52px; }
+  .hero .kicker { color: var(--hero-faint); letter-spacing: .3em; font-size: 12px; text-transform: uppercase; font-weight: 700; }
+  .hero h1 {
+    font-size: clamp(40px, 9vw, 82px);
+    line-height: .96; font-weight: 800; letter-spacing: -.02em;
+    margin: 14px 0 6px;
+  }
+  .hero h1 .en { display: block; font-size: clamp(13px, 2.6vw, 18px); letter-spacing: .42em; font-weight: 600; color: var(--persimmon-soft); margin-bottom: 12px; }
+  .hero .sub { color: var(--hero-faint); font-size: clamp(15px, 2.4vw, 18px); max-width: 42ch; margin-top: 12px; }
+  .hero .dates {
+    display: inline-flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+    margin-top: 26px; padding: 12px 20px;
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14);
+    border-radius: 12px; backdrop-filter: blur(4px);
+  }
+  .hero .dates b { font-size: 22px; font-weight: 700; letter-spacing: .02em; }
+  .hero .dates span { color: var(--hero-faint); font-size: 14px; }
+
+  /* facts strip */
+  .facts {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+    background: color-mix(in srgb, var(--hero-faint) 40%, transparent);
+    border: 1px solid color-mix(in srgb, var(--hero-faint) 40%, transparent);
+    border-radius: 12px; overflow: hidden; margin-top: 28px;
+  }
+  .facts div { background: var(--hero-bg); padding: 14px 16px; }
+  .facts .k { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--hero-faint); }
+  .facts .v { font-size: 15px; font-weight: 650; margin-top: 4px; color: var(--hero-ink); }
+  @media (max-width: 620px) { .facts { grid-template-columns: repeat(2, 1fr); } }
+
+  /* 旅伴 App 入口（產物頁 busan_itinerary_2026_app.html 的唯一入口） */
+  .appcta {
+    margin-top: 22px; display: flex; align-items: center; gap: 14px;
+    padding: 14px 18px; border-radius: 12px; text-decoration: none;
+    background: var(--accent); color: #fff;
+    box-shadow: 0 10px 26px -14px rgba(239,91,65,.9);
+  }
+  .appcta:hover { filter: brightness(1.06); }
+  .appcta-ico { font-size: 22px; flex: none; }
+  .appcta-txt { display: flex; flex-direction: column; line-height: 1.35; }
+  .appcta-txt b { font-size: 15px; font-weight: 750; }
+  .appcta-txt small { font-size: 12px; opacity: .88; }
+  .appcta-arrow { margin-left: auto; font-size: 18px; flex: none; }
+
+  /* ---------- SECTIONS ---------- */
+  section { padding: 52px 0; border-top: 1px solid var(--line); }
+  section:first-of-type { border-top: 0; }
+  .sec-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 26px; flex-wrap: wrap; }
+  .sec-head .num { font-family: ui-monospace, monospace; color: var(--accent); font-size: 14px; font-weight: 700; }
+  .sec-head h2 { font-size: clamp(24px, 4.4vw, 34px); font-weight: 780; letter-spacing: -.015em; }
+  .sec-head .note { color: var(--ink-faint); font-size: 14px; margin-left: auto; }
+  .lead { color: var(--ink-soft); max-width: 64ch; margin-bottom: 8px; }
+
+  /* cards */
+  .cards { display: grid; gap: 16px; }
+  .g2 { grid-template-columns: repeat(2, 1fr); }
+  .g3 { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 760px) { .g2, .g3 { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--bg-panel); border: 1px solid var(--line);
+    border-radius: 14px; padding: 20px; box-shadow: var(--shadow);
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .card h3 { font-size: 18px; font-weight: 720; display: flex; align-items: center; gap: 9px; }
+  .card h3 .tag { font-size: 11px; font-weight: 700; letter-spacing: .05em; padding: 2px 9px; border-radius: 999px; }
+  .tag.rec { background: var(--accent-wash); color: var(--accent-ink); }
+  .tag.sea { background: var(--sea-wash); color: var(--sea); }
+  .card .role { font-size: 12.5px; letter-spacing: .04em; color: var(--sea); font-weight: 650; text-transform: uppercase; }
+  .card p { font-size: 14.5px; color: var(--ink-soft); }
+  .card .nights { margin-top: auto; font-size: 13px; color: var(--ink-faint); padding-top: 8px; border-top: 1px dashed var(--line-strong); }
+  .card .nights b { color: var(--accent-ink); }
+
+  /* pill list of spots */
+  .spotgroup { margin-top: 22px; }
+  .spotgroup > h3 { font-size: 15px; font-weight: 720; color: var(--ink); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .spotgroup > h3::before { content: ""; width: 8px; height: 8px; border-radius: 2px; background: var(--accent); }
+  .spot { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: baseline; padding: 11px 2px; border-bottom: 1px solid var(--line); }
+  .spot:last-child { border-bottom: 0; }
+  .spot .name { font-weight: 650; font-size: 15px; }
+  .spot .desc { color: var(--ink-soft); font-size: 13.5px; }
+  .spot .meta { font-size: 12px; color: var(--ink-faint); white-space: nowrap; text-align: right; }
+  @media (max-width: 620px) {
+    .spot { grid-template-columns: 1fr; gap: 3px; }
+    .spot .meta { text-align: left; }
+  }
+
+  /* table */
+  .table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+  table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 14px; }
+  th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  thead th { background: var(--bg-inset); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-faint); font-weight: 700; }
+  tbody tr:last-child td { border-bottom: 0; }
+  td .pri { color: var(--accent-ink); font-weight: 700; font-size: 11px; letter-spacing: .04em; }
+
+  /* itinerary timeline */
+  .day { display: grid; grid-template-columns: 96px 1fr; gap: 18px; padding: 18px 0; border-bottom: 1px solid var(--line); }
+  .day:last-child { border-bottom: 0; }
+  .day .date { font-family: ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+  .day .date .d { font-size: 20px; font-weight: 700; }
+  .day .date .w { font-size: 12px; color: var(--ink-faint); }
+  .day .date .stay { margin-top: 8px; font-size: 11px; font-weight: 700; letter-spacing: .04em; color: var(--sea); border: 1px solid var(--sea); padding: 2px 7px; border-radius: 999px; display: inline-block; }
+  .day .body h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+  .day .body .pm { color: var(--ink-soft); font-size: 14px; }
+  .day .body .pm b { color: var(--ink); }
+  .intensity { font-size: 11px; font-weight: 700; letter-spacing: .03em; padding: 2px 9px; border-radius: 999px; white-space: nowrap; }
+  .i-low { background: color-mix(in srgb, #2E9E6B 16%, transparent); color: #1E8A57; }
+  .i-mid { background: color-mix(in srgb, var(--gold) 22%, transparent); color: var(--gold); }
+  .i-high { background: var(--accent-wash); color: var(--accent-ink); }
+  .wife { margin-top: 7px; font-size: 12.5px; color: var(--sea); display: flex; gap: 7px; align-items: baseline; }
+  .wife::before { content: "❤"; font-size: 11px; flex: none; }
+  @media (max-width: 560px) { .day { grid-template-columns: 1fr; gap: 8px; } }
+
+  .flex-note {
+    margin-top: 22px; padding: 16px 18px; border-left: 3px solid var(--accent);
+    background: var(--accent-wash); border-radius: 0 10px 10px 0; font-size: 14px; color: var(--ink-soft);
+  }
+  .flex-note b { color: var(--accent-ink); }
+
+  /* questions */
+  ol.q { list-style: none; counter-reset: q; padding: 0; margin: 0; display: grid; gap: 12px; }
+  ol.q li { counter-increment: q; display: grid; grid-template-columns: 34px 1fr; gap: 14px; align-items: baseline;
+    background: var(--bg-panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+  ol.q li::before { content: counter(q); font-family: ui-monospace, monospace; font-weight: 700; color: #fff; background: var(--accent);
+    width: 26px; height: 26px; border-radius: 999px; display: grid; place-items: center; font-size: 13px; }
+  ol.q li b { color: var(--ink); }
+  ol.q li span { color: var(--ink-soft); font-size: 14px; }
+
+  /* practical grid */
+  .prac { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; }
+  @media (max-width: 640px) { .prac { grid-template-columns: 1fr; } }
+  .prac .item { display: flex; gap: 12px; align-items: flex-start; }
+  .prac .item .dot { flex: none; width: 9px; height: 9px; border-radius: 999px; background: var(--sea); margin-top: 8px; }
+  .prac .item.warn .dot { background: var(--accent); }
+  .prac .item .t { font-weight: 650; font-size: 14.5px; }
+  .prac .item .d { color: var(--ink-soft); font-size: 13.5px; }
+
+  footer { border-top: 1px solid var(--line); padding: 30px 0 56px; color: var(--ink-faint); font-size: 12.5px; }
+  footer a { color: var(--ink-faint); }
+  footer .src { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 10px; }
+
+  .disclaim { color: var(--accent-ink); font-weight: 650; }
+
+  /* ---------- 圖片 ---------- */
+  img { max-width: 100%; display: block; }
+
+  /* 住宿卡頭圖 */
+  .card.haspic { padding: 0; overflow: hidden; }
+  .card.haspic .pic { aspect-ratio: 16/9; }
+  .card.haspic .cbody { padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 9px; flex: 1; }
+
+  .pic { position: relative; background: var(--bg-inset); overflow: hidden; }
+  .pic img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+  .pic::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .tile:hover .pic img, .card.haspic:hover .pic img, .trip:hover .pic img { transform: scale(1.04); }
+  }
+
+  /* 景點／美食圖磚 */
+  .tiles { display: grid; gap: 16px; grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 900px) { .tiles { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .tiles { grid-template-columns: 1fr; } }
+  .tile {
+    background: var(--bg-panel); border: 1px solid var(--line); border-radius: 13px;
+    overflow: hidden; box-shadow: var(--shadow); display: flex; flex-direction: column;
+  }
+  .tile .pic { aspect-ratio: 4/3; }
+  .tile .t-body { padding: 13px 15px 15px; display: flex; flex-direction: column; gap: 5px; flex: 1; }
+  .tile .t-name { font-size: 15px; font-weight: 700; line-height: 1.35; }
+  .tile .t-desc { font-size: 13px; color: var(--ink-soft); line-height: 1.55; }
+  .tile .t-meta {
+    margin-top: auto; padding-top: 9px; font-size: 11.5px; color: var(--ink-faint);
+    letter-spacing: .03em; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  }
+  .tile .t-meta .badge {
+    background: var(--bg-inset); border: 1px solid var(--line); border-radius: 999px;
+    padding: 2px 9px; font-weight: 650; color: var(--ink-soft);
+  }
+  .tile .t-meta .badge.hot { background: var(--accent-wash); border-color: transparent; color: var(--accent-ink); }
+
+  /* 一日遊卡 */
+  .trips { display: grid; gap: 18px; grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 780px) { .trips { grid-template-columns: 1fr; } }
+  .trip {
+    background: var(--bg-panel); border: 1px solid var(--line); border-radius: 14px;
+    overflow: hidden; box-shadow: var(--shadow); display: flex; flex-direction: column;
+  }
+  .trip.wide { grid-column: 1 / -1; }
+  .trip .pic { aspect-ratio: 21/9; }
+  .trip.wide .picstrip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+  .trip.wide .picstrip .pic { aspect-ratio: 3/2; }
+  @media (max-width: 560px) { .trip.wide .picstrip { grid-template-columns: 1fr 1fr; }
+    .trip.wide .picstrip .pic:last-child { display: none; } }
+  .trip .t-body { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .trip h3 { font-size: 17px; font-weight: 730; display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+  .trip .t-desc { font-size: 14px; color: var(--ink-soft); }
+  .trip .t-facts {
+    display: flex; gap: 6px 18px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-faint);
+    margin-top: auto; padding-top: 10px; border-top: 1px dashed var(--line-strong);
+  }
+  .trip .t-facts b { color: var(--ink-soft); font-weight: 650; }
+
+  /* 圖說 */
+  .caption { font-size: 11.5px; color: var(--ink-faint); margin-top: 6px; }
+
+  footer details { margin-top: 14px; }
+  footer details summary { cursor: pointer; color: var(--ink-soft); font-weight: 650; }
+  footer details ul { margin: 10px 0 0; padding-left: 18px; display: grid; gap: 4px; line-height: 1.5; }
+  footer details li { font-size: 11.5px; }
+  footer details b { color: var(--ink-soft); font-weight: 650; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap hero-inner">
+    <div class="kicker">South Korea · 導遊私房規劃</div>
+    <h1><span class="en">B U S A N&nbsp;&nbsp;釜山</span>海港九日<br>吃海鮮 · 追夕陽 · 走海崖</h1>
+    <p class="sub">明確時間點的旅遊行程。這份刻意「資訊多而雜」——先把住宿分區、景點、一日遊、必吃全攤開，你再收斂出真正要走的路線。</p>
+    <div class="dates">
+      <b class="mono">2026.09.12 – 09.21</b>
+      <span>10 天 9 夜 · 深玩一城</span>
+    </div>
+    <div class="facts">
+      <div><div class="k">季節</div><div class="v">夏末轉秋，白天 25–28°C</div></div>
+      <div><div class="k">入境</div><div class="v">免 K-ETA · 填電子入境卡</div></div>
+      <div><div class="k">直飛</div><div class="v">台北 ↔ 金海 約 2.5 hr</div></div>
+      <div><div class="k">每日估算</div><div class="v">NT$ 4,000–6,000 中高檔</div></div>
+    </div>
+    <a class="appcta" href="./busan_itinerary_2026_app.html">
+      <span class="appcta-ico">🧭</span>
+      <span class="appcta-txt">
+        <b>開啟旅伴 App</b>
+        <small>逐日時間軸 · 注意事項 · Naver 一鍵導航（旅途中用這個）</small>
+      </span>
+      <span class="appcta-arrow">→</span>
+    </a>
+  </div>
+  <div class="credit">封面：廣安大橋 · Wikimedia Commons</div>
+</header>
+
+<main class="wrap">
+
+  <!-- 行程骨架 -->
+  <section>
+    <div class="sec-head">
+      <span class="num">01</span>
+      <h2>定版行程 · chill 動靜交錯</h2>
+      <span class="note">廣安里 4 晚 ＋ 南浦洞 5 晚 · 動一天緩一天</span>
+    </div>
+    <p class="lead">依你的條件量身：海景／老城平均分、慢節奏、帶老婆走「動一天、緩一天」。每個會走路的點都附 <b style="color:var(--sea)">❤ 老婆友善配套</b>（坐車看海／纜車／遊園車代替爬階梯）。硬日子後面一定接一個休息日。</p>
+    <p class="lead" style="margin-top:-6px"><b style="color:var(--sea)">三條鎖死不動的：</b>9/19 醫美＋購物、9/20 老城購物耍廢收尾、9/16 搬家（訂房決定）。慶州（9/13）走<b>跟團</b>、大邱（9/18）走<b>自由行 KTX</b>，兩個硬日子中間隔了三天。</p>
+    <p class="lead" style="margin-top:-6px"><b style="color:var(--sea)">釜山 PASS BIG5 校對（2 紫＋3 藍・₩65,000／人）：</b><b>9/14（一）海岸列車＋ClubD Oasis＋X the SKY 三格一次刷</b>（₩16,000＋₩33,000＋₩27,000，前兩者在同一棟 LCT）、<b>9/16（三）ARTE MUSEUM</b>（₩22,000）、<b>9/17（四）松島海上纜車</b>（₩19,000）。原價合計約 ₩117,000，<b>每人省 ₩52,000</b>、兩人約 NT$2,390。<b>五格全部落在平日</b>——天空膠囊、纜車這種限流景點週末客流是平日 2–3 倍，把它們從週日移開是這次最大的品質改善。原本方案 B 的觀光巴士格換成海岸列車（你本來就要坐、也本來就要付錢）。<b>天空膠囊 PASS 不含</b>，只訂單程自費，回程刷海岸列車自由券。</p>
+
+    <div class="day"><div class="date"><div class="d">09.12</div><div class="w">六 · 落地</div><div class="stay">廣安里</div></div>
+      <div class="body"><h3>海邊第一夜 <span class="intensity i-low">🟢 緩</span></h3><p class="pm">下午到，金海機場 → 廣安里 check-in，海灘散步。晚上<b>廣安大橋點燈</b>＋民樂洞海鮮晚餐。</p><div class="wife">零強度暖身，拉車／時差後純放鬆。</div></div></div>
+
+    <div class="day"><div class="date"><div class="d">09.13</div><div class="w">日 · 跟團</div><div class="stay">廣安里</div></div>
+      <div class="body"><h3>慶州古都（跟團一日遊） <span class="intensity i-high">🔴 動 · 主力日</span></h3><p class="pm"><b>行程由旅行社安排</b>，這邊不另外排點位。你只要顧三件事：準時到集合點（多在西面／釜山站，從廣安里抓 40–50 分）、跟上導遊、問清楚回程放在哪一站。</p><div class="wife">跟團全程有車、點與點之間都在坐著，實際走路只在各景區內，比自由行版本省腿很多。<b>訂團前先問</b>：團費含不含門票／午餐／石窟庵（最常另收），以及行程有沒有含<b>雁鴨池夜景</b>——多數一日團傍晚就返程看不到。排在週日是刻意的：跟團由導遊處理排隊，是這幾天最吃得下人潮的行程。</div></div></div>
+
+    <div class="day"><div class="date"><div class="d">09.14</div><div class="w">一</div><div class="stay">廣安里</div></div>
+      <div class="body"><h3>藍線公園 → 海雲台 LCT（PASS 三格全收） <span class="intensity i-high">🔴 動 · 最長的一天</span></h3><p class="pm"><b>天空膠囊</b>尾浦→青沙浦（單程・自費・需預約）→ 青沙浦踏石展望台 → <b>海岸列車自由券〔PASS 藍 1〕</b>沿線跳站回尾浦 → 走 2 公里到 LCT：<b>ClubD Oasis 泡 3 小時〔PASS 紫 1〕</b> → 100 樓 <b>X the SKY 日落〔PASS 紫 2〕</b> → 冬柏島 <b>The Bay 101</b> 夜景晚餐。</p><div class="wife">最長但最不費腿的一天：坐膠囊、坐列車、泡湯、搭電梯，真正走路只有尾浦到 LCT 那 2 公里（不想走打車 5 分）。<b>從週日移到週一就是為了這天</b>——膠囊一台限 4 人、班次固定，週末客流是平日 2–3 倍，現場排 1–2 小時很常見，熱門時段線上也會提早售罄。踏石展望台公休是每月第一個週一（9/7），9/14 正常開放。記得帶泳衣泳帽。</div></div></div>
+
+    <div class="day"><div class="date"><div class="d">09.15</div><div class="w">二</div><div class="stay">廣安里</div></div>
+      <div class="body"><h3>機張 · 龍宮寺＋招牌蟹＋Outlet <span class="intensity i-mid">🟡 中</span></h3><p class="pm">海東龍宮寺 → <b>機張手長蟹午餐</b>（這趟最好的一餐蟹）→ <b>樂天 Premium Outlet 東釜山</b> → Waveon 海景咖啡。傍晚回廣安里，<b>黃嶺山夜景</b>看心情加。</p><div class="wife">接在 9/14 那個長日之後刻意排鬆：真正要走的只有龍宮寺，其餘都是吃與室內逛。龍宮寺、蟹市場、Outlet、Waveon 全在機張同一帶，彼此十幾分鐘車程。</div></div></div>
+
+    <div class="day"><div class="date"><div class="d">09.16</div><div class="w">三 · 移動</div><div class="stay">南浦洞</div></div>
+      <div class="body"><h3>搬家南浦 ＋ 影島 ARTE MUSEUM <span class="intensity i-mid">🟡 中</span></h3><p class="pm">上午轉住南浦洞，行李一放 → 札嘎其市場（<b>代客料理海鮮午餐</b>）→ 過影島大橋：<b>ARTE MUSEUM〔PASS 藍 3〕</b>（東岸・全室內）→ <b>白淺灘文化村</b>小白屋咖啡卡夕陽（西岸）→ 三進魚糕本店買伴手 → 南浦晚餐。</p><div class="wife">搬家日刻意只排影島：行李放好後全天都在吃、看展、喝咖啡，沒有爬坡也沒有長途拉車。<b>先 ARTE 再白淺灘</b>——ARTE 全室內不看天色，白淺灘朝西要留給 18:40 的夕陽，順序反過來就錯過了。</div></div></div>
+
+    <div class="day"><div class="date"><div class="d">09.17</div><div class="w">四</div><div class="stay">南浦洞</div></div>
+      <div class="body"><h3>甘川洞 ＋ 松島纜車 <span class="intensity i-mid">🟡 中</span></h3><p class="pm">甘川洞文化村（搭社區小巴上高處一路往下走）→ 午餐 → 計程車 15 分轉松島：天空步道＋海灘散步 → <b>海上纜車〔PASS 藍 2〕</b>東站→西站，下車走<b>龍宮雲橋＋岩南公園</b>，再搭回東站 → 松島夕陽＋海鮮晚餐。</p><div class="wife">甘川洞坐小巴上去幾乎不爬坡；下午主力是坐纜車看海。PASS 給 Air Cruise 來回（原價 ₩19,000／人），想坐透明地板的 Crystal 現場補 ₩5,000。<b>雲橋約 18:00 收、強風會停駛</b>，當天先查。</div></div></div>
+
+    <div class="day"><div class="date"><div class="d">09.18</div><div class="w">五 · 自由行</div><div class="stay">南浦洞</div></div>
+      <div class="body"><h3>大邱一日遊（自由行） <span class="intensity i-high">🔴 動 · 主力日</span></h3><p class="pm">自己搭 KTX 約 50 分到東大邱：<b>近代文化胡同</b>（青蘿坡道、藥令市）→ 大邱在地午餐（扁餃子／烤腸）→ <b>金光石街</b> → <b>西門市場</b>逛到夜市開攤 → KTX 回釜山。</p><div class="wife">南浦到釜山站地鐵 1 號線只有 3 站，比 9/13 的集合點近很多。市區點之間都有地鐵，腳酸就直接打車，大邱計程車便宜。週五晚上的西門市場夜市攤位開得最齊。<b>隔天上午是醫美，回程班次抓 19:45 前後別玩太晚。</b></div></div></div>
+
+    <div class="day"><div class="date"><div class="d">09.19</div><div class="w">六 · 定版</div><div class="stay">南浦洞</div></div>
+      <div class="body"><h3>醫美 ＋ 購物 <span class="intensity i-low">🟢 緩</span></h3><p class="pm">上午<b>醫美療程</b>（診所待定，先抓半天）→ 西面午餐 → 下午<b>西面商圈</b>血拚（樂天百貨、地下街、藥妝）→ 田浦咖啡街 → 西面豬肉湯飯收尾。</p><div class="wife">整天室內與地下街，下雨完全不受影響。西面地鐵 1／2 號線交會，逛累了 15 分鐘回南浦。<b>診所確定後要回填時間地點</b>；若不在西面，購物就改就近。</div></div></div>
+
+    <div class="day"><div class="date"><div class="d">09.20</div><div class="w">日 · 定版</div><div class="stay">南浦洞</div></div>
+      <div class="body"><h3>老城購物 ＋ 光復店收尾 <span class="intensity i-low">🟢 緩</span></h3><p class="pm">不設鬧鐘 → <b>國際市場 × BIFF 廣場</b>（堅果糖餅＋市場小吃午餐）→ 龍頭山公園／釜山塔看港灣 → <b>樂天 Mall 光復店</b>（屋頂花園・退稅）→ 南浦地下街補伴手 → <b>最後一晚烤肉</b>。</p><div class="wife">全部景點都在南浦洞走路 5–10 分鐘內，<b>全程零交通</b>，腳酸隨時回飯店躺。原本排在 9/16 的國際市場／BIFF／釜山塔移到今天，把搬家日空出來收影島。釜山塔原價 ₩12,000 要自費（PASS 三個藍格已用完），只想看港灣的話龍頭山公園本身免費。</div></div></div>
+
+    <div class="day"><div class="date"><div class="d">09.21</div><div class="w">一 · 返台</div><div class="stay" style="border-color:var(--ink-faint);color:var(--ink-faint)">賦歸</div></div>
+      <div class="body"><h3>返程</h3><p class="pm">依航班：早班機直接去機場；午後班機可再逛西面／南浦。</p></div></div>
+
+    <div class="flex-note"><b>節奏檢查：</b>🟢落地 → 🔴慶州跟團 → 🔴藍線＋LCT → 🟡機張 → 🟡搬家影島 → 🟡甘川洞松島 → 🔴大邱 → 🟢醫美 → 🟢老城購物——<b>三個 🔴 裡有兩個連在一起（9/13、9/14）</b>，這是「兩趟一日遊都留＋膠囊要挪到平日」換來的代價。緩衝在於：9/13 跟團全程有車、9/14 有一半時間在泡湯與搭電梯，兩天都不是走路量大的日子；接著 9/15–9/17 三個 🟡 遞減，最後兩天鎖死為緩日。下雨天把 🔴/🟡 和 🟢 對調即可。</div>
+  </section>
+
+  <!-- 住宿 -->
+  <section>
+    <div class="sec-head">
+      <span class="num">02</span>
+      <h2>住哪一區</h2>
+      <span class="note">住宿＝每天的動線起點，比選飯店本身更關鍵</span>
+    </div>
+    <p class="lead">釜山海岸線長、景點分東西兩頭。先懂每區個性，再決定住哪、住幾晚。</p>
+    <div class="cards g2">
+      <div class="card haspic">
+        <div class="pic"><img src="busan_itinerary_2026_img/haeundae-beach.jpg" alt="海雲台海灘與海岸高樓群" loading="lazy"></div>
+        <div class="cbody">
+          <div class="role">度假海景</div>
+          <h3>海雲台 Haeundae</h3>
+          <p>最有名的海灘＋高級飯店＋The Bay 101 夜景＋冬柏島步道＋水族館。海景第一排，適合放鬆與晨跑。</p>
+          <p style="font-size:13px;color:var(--ink-faint)">✕ 房價最高，離老城／札嘎其市場最遠。</p>
+          <div class="nights">建議 <b>3–4 晚</b>，當東部海岸與機張近郊的基地</div>
+        </div>
+      </div>
+      <div class="card haspic">
+        <div class="pic"><img src="busan_itinerary_2026_img/gwangalli.jpg" alt="廣安里海灘，遠處為廣安大橋" loading="lazy"></div>
+        <div class="cbody">
+          <div class="role">CP 值 · 夜景</div>
+          <h3>廣安里 Gwangalli <span class="tag rec">導遊私心</span></h3>
+          <p>正對廣安大橋，海灘＋咖啡酒吧＋餐廳整排，夜景一流、氛圍年輕，房價比海雲台省。</p>
+          <p style="font-size:13px;color:var(--ink-faint)">最均衡的海景住處，可完全取代海雲台。</p>
+          <div class="nights">建議 <b>3–4 晚</b>，海景段首選基地</div>
+        </div>
+      </div>
+      <div class="card haspic">
+        <div class="pic"><img src="busan_itinerary_2026_img/seomyeon.jpg" alt="西面商圈夜晚的招牌街景" loading="lazy"></div>
+        <div class="cbody">
+          <div class="role">交通樞紐</div>
+          <h3>西面 Seomyeon</h3>
+          <p>地鐵 1／2 號線交會的市中心，購物、夜市、豬肉湯飯一條街、田浦咖啡街就在旁。機動性最高。</p>
+          <p style="font-size:13px;color:var(--ink-faint)">✕ 沒有海，是都會城中心。</p>
+          <div class="nights">建議 <b>3–4 晚</b>，往慶州／大邱一日遊的樞紐</div>
+        </div>
+      </div>
+      <div class="card haspic">
+        <div class="pic"><img src="busan_itinerary_2026_img/nampo.jpg" alt="南浦洞 BIFF 廣場入口拱門與小吃攤" loading="lazy"></div>
+        <div class="cbody">
+          <div class="role">老城美食</div>
+          <h3>南浦洞 Nampo</h3>
+          <p>老城心臟——札嘎其市場、國際市場、BIFF 廣場、甘川洞、龍頭山、影島太宗台都在這頭。</p>
+          <p style="font-size:13px;color:var(--ink-faint)">✕ 偏舊城、住宿以平價旅館為主。</p>
+          <div class="nights">建議 <b>2–3 晚</b>，深挖庶民市場美食</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spotgroup">
+      <h3>三種「9 晚」分配策略，挑一種</h3>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>策略</th><th>分配</th><th>適合誰</th></tr></thead>
+          <tbody>
+            <tr><td><span class="pri">最推 ★</span><br>海景 × 老城 雙基地</td><td>廣安里／海雲台 <b>4 晚</b> ＋ 南浦洞 <b>4 晚</b></td><td>同時要海景放鬆＋老城美食，只換一次飯店，東西各顧一頭</td></tr>
+            <tr><td>機動樞紐派</td><td>西面 <b>9 晚</b> 不換房</td><td>懶得拖行李、天天往不同方向、以吃＋一日遊為主</td></tr>
+            <tr><td>三段慢玩</td><td>海雲台 3 ＋ 西面 2 ＋ 南浦 3</td><td>每區都想住看看、不介意換 2 次飯店</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 景點 -->
+  <section>
+    <div class="sec-head">
+      <span class="num">03</span>
+      <h2>市區景點大全</h2>
+      <span class="note">🚶 輕鬆 · 🥾 中等（有山路／階梯）</span>
+    </div>
+
+    <div class="spotgroup">
+      <h3>海雲台 × 廣安里（東部海岸）</h3>
+      <div class="tiles">
+        <div class="tile">
+          <div class="pic"><img src="busan_itinerary_2026_img/nurimaru.jpg" alt="冬柏島海岸與 Nurimaru APEC House" loading="lazy"></div>
+          <div class="t-body">
+            <div class="t-name">海雲台海灘 × 冬柏島步道</div>
+            <div class="t-desc">沙灘＋環島木棧道，晨跑一流，可看 The Bay 101 與 APEC House。</div>
+            <div class="t-meta"><span class="badge">🚶 半天</span></div>
+          </div>
+        </div>
+        <div class="tile">
+          <div class="pic"><img src="busan_itinerary_2026_img/thebay101.jpg" alt="海雲台高樓群夜景" loading="lazy"></div>
+          <div class="t-body">
+            <div class="t-name">The Bay 101</div>
+            <div class="t-desc">對著高樓群的招牌夜景倒影，炸魚薯條配啤酒的網美點。</div>
+            <div class="t-meta"><span class="badge">🚶 傍晚–夜</span><span class="badge hot">必拍</span></div>
+          </div>
+        </div>
+        <div class="tile">
+          <div class="pic"><img src="busan_itinerary_2026_img/cheongsapo.jpg" alt="青沙浦港與紅色燈塔" loading="lazy"></div>
+          <div class="t-body">
+            <div class="t-name">青沙浦踏石展望台</div>
+            <div class="t-desc">玻璃地板海崖展望台＋紅白雙燈塔，超上鏡。</div>
+            <div class="t-meta"><span class="badge">🥾 半天</span></div>
+          </div>
+        </div>
+        <div class="tile">
+          <div class="pic"><img src="busan_itinerary_2026_img/skycapsule.jpg" alt="海雲台藍線公園的黃色天空膠囊車" loading="lazy"></div>
+          <div class="t-body">
+            <div class="t-name">海雲台藍線公園</div>
+            <div class="t-desc">海岸觀光小火車＋彩色天空膠囊車，坐著就能看整片海。</div>
+            <div class="t-meta"><span class="badge">🚶 半天</span><span class="badge hot">膠囊要預約</span></div>
+          </div>
+        </div>
+        <div class="tile">
+          <div class="pic"><img src="busan_itinerary_2026_img/hwangnyeongsan.jpg" alt="夜晚點燈的廣安大橋與海面倒影" loading="lazy"></div>
+          <div class="t-body">
+            <div class="t-name">廣安里海灘 × 廣安大橋</div>
+            <div class="t-desc">整排海景咖啡酒吧，夜景王者；秋天有煙火節（日期臨行查）。</div>
+            <div class="t-meta"><span class="badge">🚶 夜</span></div>
+          </div>
+        </div>
+        <div class="tile">
+          <div class="pic"><img src="busan_itinerary_2026_img/hoe.jpg" alt="韓式生魚片與滿桌小菜" loading="lazy"></div>
+          <div class="t-body">
+            <div class="t-name">民樂洞生魚片／烤貝街</div>
+            <div class="t-desc">在地人吃海鮮的地方，比市場觀光價實惠。</div>
+            <div class="t-meta"><span class="badge">🚶 晚餐</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spotgroup">
+      <h3>南浦洞 × 影島（西部老城）</h3>
+      <div class="tiles">
+        <div class="tile">
+          <div class="pic"><img src="busan_itinerary_2026_img/jagalchi.jpg" alt="札嘎其市場臨海的市場大樓" loading="lazy"></div>
+          <div class="t-body">
+            <div class="t-name">札嘎其市場</div>
+            <div class="t-desc">最大海鮮市場，一樓挑活海鮮、二樓代客料理，先談好價與秤重。</div>
+            <div class="t-meta"><span class="badge">🚶 半天</span><span class="badge hot">先講價</span></div>
+          </div>
+        </div>
+        <div class="tile">
+          <div class="pic"><img src="busan_itinerary_2026_img/gukje-market.jpg" alt="國際市場夜晚的攤販街" loading="lazy"></div>
+          <div class="t-body">
+            <div class="t-name">國際市場 × BIFF 廣場</div>
+            <div class="t-desc">庶民小吃＋雜貨老街，堅果糖餅是名物。</div>
+            <div class="t-meta"><span class="badge">🚶 半天</span></div>
+          </div>
+        </div>
+        <div class="tile">
+          <div class="pic"><img src="busan_itinerary_2026_img/busan-tower.jpg" alt="龍頭山公園與釜山塔" loading="lazy"></div>
+          <div class="t-body">
+            <div class="t-name">龍頭山公園 · 釜山塔</div>
+            <div class="t-desc">南浦洞地標，登塔俯瞰港灣，走幾步就到國際市場。</div>
+            <div class="t-meta"><span class="badge">🚶 1–2 小時</span></div>
+          </div>
+        </div>
+        <div class="tile">
+          <div class="pic"><img src="busan_itinerary_2026_img/gamcheon.jpg" alt="甘川洞文化村的彩色階梯山城" loading="lazy"></div>
+          <div class="t-body">
+            <div class="t-name">甘川洞文化村</div>
+            <div class="t-desc">彩色階梯山城、小王子打卡，很多階梯，傍晚夕陽最美。</div>
+            <div class="t-meta"><span class="badge">🥾 半天</span><span class="badge hot">階梯多</span></div>
+          </div>
+        </div>
+        <div class="tile">
+          <div class="pic"><img src="busan_itinerary_2026_img/taejongdae.jpg" alt="太宗台的海崖與海景" loading="lazy"></div>
+          <div class="t-body">
+            <div class="t-name">影島 × 太宗台</div>
+            <div class="t-desc">海崖懸壁＋燈塔＋環島遊園車，海景健行經典。</div>
+            <div class="t-meta"><span class="badge">🥾 半天</span><span class="badge">有遊園車</span></div>
+          </div>
+        </div>
+        <div class="tile">
+          <div class="pic"><img src="busan_itinerary_2026_img/huinnyeoul.jpg" alt="白淺灘文化村的小白屋巷弄與階梯" loading="lazy"></div>
+          <div class="t-body">
+            <div class="t-name">白淺灘文化村</div>
+            <div class="t-desc">影島海邊小白屋聚落，《辯護人》取景地，海景咖啡。</div>
+            <div class="t-meta"><span class="badge">🚶 半天</span></div>
+          </div>
+        </div>
+        <div class="tile">
+          <div class="pic"><img src="busan_itinerary_2026_img/songdo-cablecar.jpg" alt="松島天空步道與跨海纜車" loading="lazy"></div>
+          <div class="t-body">
+            <div class="t-name">松島海上纜車 × 天空步道</div>
+            <div class="t-desc">跨海纜車與海岸棧道，比太宗台輕鬆，坐著也有絕景。</div>
+            <div class="t-meta"><span class="badge">🚶 半天</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spotgroup">
+      <h3>市中心 × 健行制高點</h3>
+      <div class="tiles">
+        <div class="tile">
+          <div class="pic"><img src="busan_itinerary_2026_img/jeonpo.jpg" alt="從田浦一帶望向釜山市區" loading="lazy"></div>
+          <div class="t-body">
+            <div class="t-name">田浦咖啡街</div>
+            <div class="t-desc">西面隔壁的文青咖啡＋選物街，午後散步喝咖啡。</div>
+            <div class="t-meta"><span class="badge">🚶 半天</span></div>
+          </div>
+        </div>
+        <div class="tile">
+          <div class="pic"><img src="busan_itinerary_2026_img/citizens-park.jpg" alt="釜山市民公園的水池與步道" loading="lazy"></div>
+          <div class="t-body">
+            <div class="t-name">釜山市民公園</div>
+            <div class="t-desc">市中心大型綠地，慢跑散步用，離西面很近。</div>
+            <div class="t-meta"><span class="badge">🚶 半天</span></div>
+          </div>
+        </div>
+        <div class="tile">
+          <div class="pic"><img src="busan_itinerary_2026_img/beomeosa.jpg" alt="秋色中的梵魚寺伽藍" loading="lazy"></div>
+          <div class="t-body">
+            <div class="t-name">梵魚寺</div>
+            <div class="t-desc">金井山腰的千年古剎，可與金井山城健行串成一天。</div>
+            <div class="t-meta"><span class="badge">🥾 半天</span></div>
+          </div>
+        </div>
+        <div class="tile">
+          <div class="pic"><img src="busan_itinerary_2026_img/geumjeong.jpg" alt="金井山城的城門與城牆" loading="lazy"></div>
+          <div class="t-body">
+            <div class="t-name">金井山城</div>
+            <div class="t-desc">登高俯瞰釜山的長城步道，健行控必收。</div>
+            <div class="t-meta"><span class="badge">🥾 半天–一天</span></div>
+          </div>
+        </div>
+        <div class="tile">
+          <div class="pic"><img src="busan_itinerary_2026_img/oryukdo.jpg" alt="五六島列嶼" loading="lazy"></div>
+          <div class="t-body">
+            <div class="t-name">五六島 Skywalk</div>
+            <div class="t-desc">南區海崖玻璃棧道，正對五六島，海風強、景壯。</div>
+            <div class="t-meta"><span class="badge">🥾 半天</span></div>
+          </div>
+        </div>
+        <div class="tile">
+          <div class="pic"><img src="busan_itinerary_2026_img/igidae.jpg" alt="二妓台海岸步道" loading="lazy"></div>
+          <div class="t-body">
+            <div class="t-name">二妓台海岸步道</div>
+            <div class="t-desc">五六島延伸的海崖步道，健行＋海景，可一路走到廣安里方向。</div>
+            <div class="t-meta"><span class="badge">🥾 半天</span></div>
+          </div>
+        </div>
+      </div>
+      <p class="caption">黃嶺山展望台（🥾 夜景）沒有單列圖：它就是上面那張廣安大橋夜景的拍攝制高點，可直接打車上去。</p>
+    </div>
+  </section>
+
+  <!-- 一日遊 -->
+  <section>
+    <div class="sec-head">
+      <span class="num">04</span>
+      <h2>近郊一日遊</h2>
+      <span class="note">9 天塞得下 2–3 個</span>
+    </div>
+    <p class="lead">交通時間由釜山市區估算，臨行查班次。導遊排序：慶州幾乎必去 → 海東龍宮寺＋機張半天 → 第三個看偏好。</p>
+    <div class="trips">
+      <div class="trip wide">
+        <div class="picstrip">
+          <div class="pic"><img src="busan_itinerary_2026_img/bulguksa.jpg" alt="慶州佛國寺的青雲橋白雲橋" loading="lazy"></div>
+          <div class="pic"><img src="busan_itinerary_2026_img/cheomseongdae.jpg" alt="慶州瞻星台" loading="lazy"></div>
+          <div class="pic"><img src="busan_itinerary_2026_img/donggung.jpg" alt="雁鴨池（東宮月池）夜間倒影" loading="lazy"></div>
+        </div>
+        <div class="t-body">
+          <h3>慶州 Gyeongju <span class="tag rec">必去 ★</span></h3>
+          <p class="t-desc">佛國寺、石窟庵、大陵苑古墳群、瞻星台、<b>雁鴨池夜景</b>、皇理團路老街。這趟唯一的「深度古都」，補釜山歷史的短板——雁鴨池值得留到傍晚點燈再回釜山。</p>
+          <div class="t-facts"><span><b>交通</b> KTX 約 30 分／巴士 1 hr</span><span><b>時長</b> 整天</span><span><b>適合</b> 歷史文化控</span></div>
+        </div>
+      </div>
+      <div class="trip">
+        <div class="pic"><img src="busan_itinerary_2026_img/yonggungsa.jpg" alt="建在海崖上的海東龍宮寺" loading="lazy"></div>
+        <div class="t-body">
+          <h3>海東龍宮寺 × 機張 <span class="tag sea">排 Day 8</span></h3>
+          <p class="t-desc">建在海崖上的海景寺廟（釜山最上鏡）＋機張手長蟹一條街＋Lotte Outlet＋松亭海灘＋Waveon 海景咖啡。半天就能收東部海岸。</p>
+          <div class="t-facts"><span><b>交通</b> 地鐵＋公車／計程車</span><span><b>時長</b> 半天–一天</span><span><b>適合</b> 海景＋拍照＋吃蟹</span></div>
+        </div>
+      </div>
+      <div class="trip">
+        <div class="pic"><img src="busan_itinerary_2026_img/daegu.jpg" alt="大邱西門市場入口" loading="lazy"></div>
+        <div class="t-body">
+          <h3>大邱 Daegu</h3>
+          <p class="t-desc">西門市場夜市、金光石街、近代文化胡同、藥令市、83 塔。<b>已排進 9/17 定版</b>。</p>
+          <div class="t-facts"><span><b>交通</b> KTX 約 50 分</span><span><b>時長</b> 一天</span><span><b>適合</b> 逛市場、踩城</span></div>
+        </div>
+      </div>
+      <div class="trip">
+        <div class="pic"><img src="busan_itinerary_2026_img/geoje.jpg" alt="巨濟島海金剛的海上巨岩" loading="lazy"></div>
+        <div class="t-body">
+          <h3>巨濟島 Geoje</h3>
+          <p class="t-desc">外島海金剛遊船、風之丘、莊承浦、海岸兜風。自駕最好玩，遊船遇風浪會停。</p>
+          <div class="t-facts"><span><b>交通</b> 市外巴士約 1 hr</span><span><b>時長</b> 一天</span><span><b>適合</b> 海島自然</span></div>
+        </div>
+      </div>
+      <div class="trip">
+        <div class="pic"><img src="busan_itinerary_2026_img/tongyeong.jpg" alt="統營東皮郎壁畫村的彩繪巷弄" loading="lazy"></div>
+        <div class="t-body">
+          <h3>統營 Tongyeong</h3>
+          <p class="t-desc">東皮郎壁畫村、閒麗水道海纜車展望、忠武飯捲。港灣小城慢遊。</p>
+          <div class="t-facts"><span><b>交通</b> 市外巴士約 1.5 hr</span><span><b>時長</b> 一天</span><span><b>適合</b> 壁畫村、慢步調</span></div>
+        </div>
+      </div>
+      <div class="trip">
+        <div class="pic"><img src="busan_itinerary_2026_img/tongdosa.jpg" alt="梁山通度寺的石塔與殿宇" loading="lazy"></div>
+        <div class="t-body">
+          <h3>梁山通度寺</h3>
+          <p class="t-desc">韓國三寶寺之一的佛教聖地，秋天銀杏楓紅特別美，半天可回。</p>
+          <div class="t-facts"><span><b>交通</b> 地鐵＋公車</span><span><b>時長</b> 半天</span><span><b>適合</b> 佛寺／禪意／秋色</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spotgroup" style="margin-top:26px">
+      <h3>Outlet 血拚（室內好走，最適合帶伴侶的緩衝購物日）</h3>
+      <div class="pic" style="aspect-ratio:21/8;border-radius:12px;border:1px solid var(--line);margin-bottom:14px">
+        <img src="busan_itinerary_2026_img/outlet.jpg" alt="樂天 Mall 光復店外觀" loading="lazy">
+      </div>
+      <p class="caption" style="margin:-8px 0 14px">圖為市區的樂天 Mall 光復店（南浦），機張兩間 premium outlet 腹地更大。</p>
+      <div class="spot"><span class="name">樂天 Mall 光復店 <span class="tag rec" style="margin-left:4px">已排</span></span><span class="desc">南浦市區都會型，有屋頂花園觀景與退稅櫃檯，住南浦走路 5–10 分鐘就到，零交通</span><span class="meta">南浦 · 9/20 傍晚</span></div>
+      <div class="spot"><span class="name">樂天 Premium Outlet 東釜山 <span class="tag rec" style="margin-left:4px">已排</span></span><span class="desc">機張海岸邊，約 400+ 店、腹地大，離龍宮寺最近，與龍宮寺、蟹市場同一天順路收掉</span><span class="meta">機張 · 9/15 下午</span></div>
+      <div class="spot"><span class="name">新世界 Premium Outlet 釜山</span><span class="desc">機張長安邑（稍內陸），韓國第一家 premium outlet、名牌精品更齊，272 店</span><span class="meta">機張 · 不排</span></div>
+      <p style="font-size:13px;color:var(--ink-faint);margin-top:12px">Outlet 恆溫、有座位與美食街，退稅櫃檯與行李寄放都有。<b>取捨說明：</b>ClubD Oasis 與 X the SKY 在同一棟 LCT，只有 9/15（還住廣安里、離海雲台 15 分）這一天串得起來；機張 Outlet 則隨時可換成走路可到的光復店。真的想要 premium outlet 的貨色，就把 ClubD Oasis 移到 9/20 下午，但那天要南浦↔海雲台兩頭跑、還要塞 ARTE MUSEUM，會很趕。</p>
+    </div>
+  </section>
+
+  <!-- 美食 -->
+  <section>
+    <div class="sec-head">
+      <span class="num">05</span>
+      <h2>必吃美食</h2>
+      <span class="note">怕辣先說「안 맵게」不辣 / 「덜 맵게」少辣</span>
+    </div>
+    <div class="spotgroup" style="margin-top:0">
+      <h3>釜山名物（來了沒吃＝沒來）</h3>
+      <div class="tiles">
+        <div class="tile">
+          <div class="pic"><img src="busan_itinerary_2026_img/dwaeji-gukbap.jpg" alt="豬肉湯飯" loading="lazy"></div>
+          <div class="t-body">
+            <div class="t-name">豬肉湯飯 돼지국밥</div>
+            <div class="t-desc">頭號名物。豚骨白湯泡飯，加蝦醬／韭菜自調，<b>不辣、暖胃、便宜</b>，最合台灣人。</div>
+            <div class="t-meta"><span class="badge hot">必吃 ★</span><span class="badge">西面有一條街</span></div>
+          </div>
+        </div>
+        <div class="tile">
+          <div class="pic"><img src="busan_itinerary_2026_img/milmyeon.jpg" alt="密麵冷麵" loading="lazy"></div>
+          <div class="t-body">
+            <div class="t-name">密麵 밀면</div>
+            <div class="t-desc">釜山限定的小麥冷麵，由咸興冷麵演變，湯冷麵／拌麵兩種，夏末吃透心涼。</div>
+            <div class="t-meta"><span class="badge hot">釜山限定</span><span class="badge">開琴密麵</span></div>
+          </div>
+        </div>
+        <div class="tile">
+          <div class="pic"><img src="busan_itinerary_2026_img/eomuk.jpg" alt="魚糕串與熱湯" loading="lazy"></div>
+          <div class="t-body">
+            <div class="t-name">釜山魚糕 어묵</div>
+            <div class="t-desc">魚糕界的百年老店三進魚糕本店在影島，街邊一串配熱湯，也可當伴手。</div>
+            <div class="t-meta"><span class="badge">伴手首選</span></div>
+          </div>
+        </div>
+        <div class="tile">
+          <div class="pic"><img src="busan_itinerary_2026_img/daege.jpg" alt="蒸手長蟹拼盤" loading="lazy"></div>
+          <div class="t-body">
+            <div class="t-name">機張手長蟹 대게</div>
+            <div class="t-desc">機張蟹市場一條街，秤重代蒸、蟹膏拌飯。<b>先秤重寫總價</b>再下單。</div>
+            <div class="t-meta"><span class="badge hot">Day 8 午餐</span><span class="badge">避雷：確認去水重</span></div>
+          </div>
+        </div>
+        <div class="tile">
+          <div class="pic"><img src="busan_itinerary_2026_img/hoe.jpg" alt="生魚片與小菜" loading="lazy"></div>
+          <div class="t-body">
+            <div class="t-name">生魚片／烤貝 회 · 조개구이</div>
+            <div class="t-desc">民樂洞在地生魚片街、札嘎其二樓代客料理，現撈生魚片＋烤貝＋辣炒章魚。</div>
+            <div class="t-meta"><span class="badge">民樂洞較實惠</span></div>
+          </div>
+        </div>
+        <div class="tile">
+          <div class="pic"><img src="busan_itinerary_2026_img/hotteok.jpg" alt="糖餅" loading="lazy"></div>
+          <div class="t-body">
+            <div class="t-name">씨앗호떡 堅果糖餅</div>
+            <div class="t-desc">BIFF 廣場名物，糖餅裡塞滿堅果，邊走邊吃的老城代表小吃。</div>
+            <div class="t-meta"><span class="badge">BIFF 廣場</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spotgroup">
+      <h3>韓式必吃 × 宵夜 × 咖啡</h3>
+      <div class="tiles">
+        <div class="tile">
+          <div class="pic"><img src="busan_itinerary_2026_img/gogi.jpg" alt="韓式烤五花肉" loading="lazy"></div>
+          <div class="t-body">
+            <div class="t-name">韓式烤肉 · 烤腸</div>
+            <div class="t-desc">五花／牛肉烤肉、곱창烤腸、部隊鍋、蔘雞湯（夏末補一下）。最後一晚的壓軸首選。</div>
+            <div class="t-meta"><span class="badge">Day 9 壓軸</span></div>
+          </div>
+        </div>
+        <div class="tile">
+          <div class="pic"><img src="busan_itinerary_2026_img/chimaek.jpg" alt="韓式炸雞配啤酒" loading="lazy"></div>
+          <div class="t-body">
+            <div class="t-name">炸雞＋啤酒 치맥</div>
+            <div class="t-desc">宵夜首選，飯店叫外送也行。辣炒年糕／血腸／魚糕串是市場小吃三寶。</div>
+            <div class="t-meta"><span class="badge">宵夜</span></div>
+          </div>
+        </div>
+        <div class="tile">
+          <div class="pic"><img src="busan_itinerary_2026_img/thebay101.jpg" alt="海雲台海岸夜景" loading="lazy"></div>
+          <div class="t-body">
+            <div class="t-name">海景咖啡 <span class="tag sea" style="font-size:10px">釜山限定</span></div>
+            <div class="t-desc">The Bay 101（海雲台夜景）、青沙浦、<b>Waveon</b>（機張超大片海景玻璃）、廣安里整排 café、田浦文青手沖。</div>
+            <div class="t-meta"><span class="badge hot">值得花</span></div>
+          </div>
+        </div>
+      </div>
+      <p class="caption">怕辣先說「안 맵게（不辣）／덜 맵게（少辣）」；湯飯與多數海鮮本來就不辣。</p>
+    </div>
+  </section>
+
+  <!-- 花錢不當盤子 -->
+  <section>
+    <div class="sec-head">
+      <span class="num">06</span>
+      <h2>花錢但不當盤子</h2>
+      <span class="note">中高預算的聰明花法</span>
+    </div>
+    <p class="lead">你要「高於平均一點、能花錢但不想當盤子」——原則是<b>錢花在體驗與品質、避開觀光價陷阱</b>。</p>
+    <div class="cards g2">
+      <div class="card">
+        <h3>值得花 <span class="tag sea">花了有感</span></h3>
+        <p><b>一餐好蟹</b>—機張手長蟹／帝王蟹秤重代蒸，蟹膏拌飯。<br>
+        <b>一餐好生魚片</b>—去<b>民樂洞</b>在地生魚片街。<br>
+        <b>海景飯店升一階</b>—廣安里訂海景房（看得到大橋那面）。<br>
+        <b>海景咖啡</b>—Waveon、The Bay 101，為那片海值得。<br>
+        <b>汗蒸幕／SPA、慶州 KTX</b>—省時省腿，帶伴侶特別值。</p>
+      </div>
+      <div class="card">
+        <h3>別當盤子 <span class="tag rec">避雷</span></h3>
+        <p><b>代客料理／秤重海鮮</b>—先「秤重＋白紙寫總價」再下單，確認<b>去水重</b>、代客費、小菜是否另收，可拍照存證，別接受口頭「時價」。<br>
+        <b>帝王蟹</b>—看活蟹現秤、別被「換蟹」。<br>
+        <b>叫車</b>—一律 Kakao T 跳表，不上喊價黑車。<br>
+        <b>換錢</b>—去南浦／西面民間換錢所，機場只換應急。<br>
+        <b>選餐廳</b>—用 <b>Naver Map</b> 看在地評價，避開飯店高抽成推薦。</p>
+      </div>
+    </div>
+    <p class="flex-note"><b>花費概念（中高檔含住宿，估算）：</b>約 <b>NT$4,000–6,000／人／天</b>，比平均高一階但靠上面避雷不會被當盤子。海景房與吃蟹那幾天往上、休息咖啡日往下平衡。</p>
+  </section>
+
+  <!-- 實務 -->
+  <section>
+    <div class="sec-head">
+      <span class="num">07</span>
+      <h2>實務提醒</h2>
+      <span class="note">導遊一定交代的事</span>
+    </div>
+    <div class="prac">
+      <div class="item"><span class="dot"></span><div><div class="t">入境</div><div class="d">免 K-ETA（到 2026-12-31）但要填<b>電子入境卡 e-Arrival</b>，起飛前 72 小時內線上填、截圖備查。護照效期建議 6 個月以上。</div></div></div>
+      <div class="item"><span class="dot"></span><div><div class="t">地圖 App</div><div class="d">韓國用 <b>Naver Map／Kakao Map</b>，Google Map 路線導航不完整。叫車用 Kakao T。</div></div></div>
+      <div class="item"><span class="dot"></span><div><div class="t">交通卡</div><div class="d">一落地買 <b>T-money／Cashbee</b>，地鐵＋公車＋部分計程車＋超商小額通用。</div></div></div>
+      <div class="item"><span class="dot"></span><div><div class="t">上網 · 支付</div><div class="d">Google／Line／IG／FB 全部正常免翻牆。信用卡普及，但市場、湯飯老店、路邊攤常<b>只收現金</b>。</div></div></div>
+      <div class="item warn"><span class="dot"></span><div><div class="t">秋颱</div><div class="d">9 月仍是颱風季尾，出發前查有無颱風影響班機與海上行程（遊船、纜車會停）。</div></div></div>
+      <div class="item warn"><span class="dot"></span><div><div class="t">海水浴場</div><div class="d">9 月中可下水但官方泳季多已結束、救生員可能撤場，量力而為。</div></div></div>
+      <div class="item warn"><span class="dot"></span><div><div class="t">煙火節房價</div><div class="d">廣安里秋天有釜山煙火節，若碰上人潮與房價會飆，日期臨行查、早訂房。</div></div></div>
+      <div class="item"><span class="dot"></span><div><div class="t">口味</div><div class="d">湯飯、海鮮多不辣可安心；辣物先說少辣。生食腸胃敏感者挑現撈熱門攤。</div></div></div>
+    </div>
+    <p class="flex-note" style="border-color:var(--sea);background:var(--sea-wash)"><b class="disclaim">花費與班次皆為估算值，票價／班次／政策臨行務必再確認。</b> 中高檔含住宿約 NT$4,000–6,000／人／天（詳見上一段花錢原則）。</p>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  <div>釜山 10 天 9 夜規劃 · 資深導遊視角 · 為 <b>2026.09.12–21</b> 量身。搭配城市總評見專案 <span class="mono">busan.md</span>。</div>
+  <div class="src">
+    <span>資料來源（政策／天氣，臨行再確認）：</span>
+    <a href="https://tw.trip.com/blog/korea-entry-policy/">2026 韓國入境 · trip.com</a>
+    <a href="https://ggeng.blog/how-to-fill-korea-e-arrival-card/">免 K-ETA 至年底 · ggeng</a>
+    <a href="https://www.yuriselfmedia.tw/busanseptember/">釜山 9 月天氣</a>
+  </div>
+  <details>
+    <summary>圖片來源與授權（全部取自 Wikimedia Commons，共 40 張）</summary>
+    <ul>
+      <li><b>梵魚寺</b> — <a href="https://commons.wikimedia.org/wiki/File:298-1_%EC%B5%9C%EC%88%98%EC%A7%84_%EB%B2%94%EC%96%B4%EC%82%AC%EC%9D%98_%EA%B0%80%EC%9D%84.jpg">298-1 최수진 범어사의 가을.jpg</a> · 부산광역시, 부산관광공사 · KOGL Type 1</li>
+      <li><b>佛國寺</b> — <a href="https://commons.wikimedia.org/wiki/File:Lotus_Flower_Bridge_and_Seven_Treasure_Bridge_at_Bulguksa_in_Gyeongju,_Korea.jpg">Lotus Flower Bridge and Seven Treasure Bridge at Bulguk</a> · Unknown authorUnknown author · Public domain</li>
+      <li><b>龍頭山公園 · 釜山塔</b> — <a href="https://commons.wikimedia.org/wiki/File:Busan_Tower_and_Yongdusan_Park_20200522_003.jpg">Busan Tower and Yongdusan Park 20200522 003.jpg</a> · Mobius6 · CC BY-SA 4.0</li>
+      <li><b>瞻星台 · 大陵苑</b> — <a href="https://commons.wikimedia.org/wiki/File:Cheomseongdae_Observatory_under_blue_sky_in_Gyeongju_South_Korea.jpg">Cheomseongdae Observatory under blue sky in Gyeongju So</a> · Basile Morin · CC BY-SA 4.0</li>
+      <li><b>青沙浦踏石展望台</b> — <a href="https://commons.wikimedia.org/wiki/File:Cheongsapo.jpg">Cheongsapo.jpg</a> · Andrewssi2 · CC BY-SA 3.0</li>
+      <li><b>炸雞啤酒 치맥</b> — <a href="https://commons.wikimedia.org/wiki/File:Iksan_City_48_Korean_Style_Fried_chicken.jpg">Iksan City 48 Korean Style Fried chicken.jpg</a> · KOREA.NET · CC BY-SA 2.0</li>
+      <li><b>釜山市民公園</b> — <a href="https://commons.wikimedia.org/wiki/File:Busan_Citizens_Park_%22mirror_pond%22.jpg">Busan Citizens Park "mirror pond".jpg</a> · Vichycombo · CC BY-SA 4.0</li>
+      <li><b>機張手長蟹</b> — <a href="https://commons.wikimedia.org/wiki/File:Daegae-jjim_2.jpg">Daegae-jjim 2.jpg</a> · donchili · CC BY-SA 2.0</li>
+      <li><b>大邱 · 西門市場</b> — <a href="https://commons.wikimedia.org/wiki/File:10%EA%B2%BD_%EC%84%9C%EB%AC%B8%EC%8B%9C%EC%9E%A5.jpg">10경 서문시장.jpg</a> · 대구광역시 · CC BY-SA 4.0</li>
+      <li><b>雁鴨池夜景</b> — <a href="https://commons.wikimedia.org/wiki/File:Water_reflection_of_Donggung_Palace_in_Wolji_Pond_at_blue_hour_in_Gyeongju_South_Korea.jpg">Water reflection of Donggung Palace in Wolji Pond at bl</a> · Basile Morin · CC BY-SA 4.0</li>
+      <li><b>豬肉湯飯</b> — <a href="https://commons.wikimedia.org/wiki/File:Dwaeji-gukbap.jpg">Dwaeji-gukbap.jpg</a> · http://blog.daum.net/wjlee4284 사이팔사] · CC BY 2.0 kr</li>
+      <li><b>釜山魚糕</b> — <a href="https://commons.wikimedia.org/wiki/File:Kkochi-eomuk.jpg">Kkochi-eomuk.jpg</a> · anokarina · CC BY-SA 2.0</li>
+      <li><b>甘川洞文化村</b> — <a href="https://commons.wikimedia.org/wiki/File:Gamcheon_Houses,_2024.jpg">Gamcheon Houses, 2024.jpg</a> · Bl00dnFl4mes · CC BY-SA 4.0</li>
+      <li><b>巨濟島 · 海金剛</b> — <a href="https://commons.wikimedia.org/wiki/File:Haegeumgang_taken_near_Haegeumgang_Ferry_Terminal.jpg">Haegeumgang taken near Haegeumgang Ferry Terminal.jpg</a> · Choi2451 · CC BY-SA 4.0</li>
+      <li><b>金井山城</b> — <a href="https://commons.wikimedia.org/wiki/File:Geumjeong_Fortress_North_Gate.jpg">Geumjeong Fortress North Gate.jpg</a> · Christophe95 · CC BY-SA 4.0</li>
+      <li><b>韓式烤肉</b> — <a href="https://commons.wikimedia.org/wiki/File:Samgyeopsal-gui.jpg">Samgyeopsal-gui.jpg</a> · jinsoo jang · CC0</li>
+      <li><b>國際市場 × BIFF</b> — <a href="https://commons.wikimedia.org/wiki/File:Gukje_Market,_October_2019_03.jpg">Gukje Market, October 2019 03.jpg</a> · Ahmed · CC BY-SA 4.0</li>
+      <li><b>廣安里海灘</b> — <a href="https://commons.wikimedia.org/wiki/File:Gwangalli_Beach.jpg">Gwangalli Beach.jpg</a> · Chelsea Hicks · CC BY 2.0</li>
+      <li><b>廣安大橋</b> — <a href="https://commons.wikimedia.org/wiki/File:Gwangan_Bridge1.jpg">Gwangan Bridge1.jpg</a> · Glabb · Public domain</li>
+      <li><b>海雲台海灘</b> — <a href="https://commons.wikimedia.org/wiki/File:Haeundae_Beach_May_2024.jpg">Haeundae Beach May 2024.jpg</a> · Brit in Seoul · CC BY-SA 4.0</li>
+      <li><b>生魚片 × 烤貝</b> — <a href="https://commons.wikimedia.org/wiki/File:Hoe_(raw_fish).jpg">Hoe (raw fish).jpg</a> · littlepepper · CC0</li>
+      <li><b>씨앗호떡 堅果糖餅</b> — <a href="https://commons.wikimedia.org/wiki/File:Hotteok.jpg">Hotteok.jpg</a> · Korea.net / Korean Culture and Information Service · CC BY-SA 2.0</li>
+      <li><b>白淺灘文化村</b> — <a href="https://commons.wikimedia.org/wiki/File:Huinnyeoul_Culture_Village.jpg">Huinnyeoul Culture Village.jpg</a> · Yeoncong323 · CC BY-SA 4.0</li>
+      <li><b>黃嶺山夜景</b> — <a href="https://commons.wikimedia.org/wiki/File:Korea-Busan-Gwangan_Bridge-03.jpg">Korea-Busan-Gwangan Bridge-03.jpg</a> · Doo-ho Kim from Seoul, Republic of Korea · Public domain</li>
+      <li><b>二妓台海岸步道</b> — <a href="https://commons.wikimedia.org/wiki/File:Igidae_Coastal_Trail.jpg">Igidae Coastal Trail.jpg</a> · dom brassey draws comics · CC BY-SA 2.0</li>
+      <li><b>札嘎其市場</b> — <a href="https://commons.wikimedia.org/wiki/File:Jagalchi_Market_20200523_019.jpg">Jagalchi Market 20200523 019.jpg</a> · Mobius6 · CC BY-SA 4.0</li>
+      <li><b>田浦咖啡街</b> — <a href="https://commons.wikimedia.org/wiki/File:View_of_Busan_from_Jeonpo_Samgeori_bus_stop.jpg">View of Busan from Jeonpo Samgeori bus stop.jpg</a> · Christian Bolz · CC BY-SA 4.0</li>
+      <li><b>密麵</b> — <a href="https://commons.wikimedia.org/wiki/File:Korean_cold_noodle_soup-Milmyeon-01.jpg">Korean cold noodle soup-Milmyeon-01.jpg</a> · by shizu k (shezzz) at Flickr · CC BY-SA 2.0</li>
+      <li><b>南浦洞 · BIFF 廣場</b> — <a href="https://commons.wikimedia.org/wiki/File:BIFF_Square_in_2018.jpg">BIFF Square in 2018.jpg</a> · Christophe95 · CC BY-SA 4.0</li>
+      <li><b>冬柏島 · Nurimaru</b> — <a href="https://commons.wikimedia.org/wiki/File:Dongbaekseom,_Busan_(2).jpg">Dongbaekseom, Busan (2).jpg</a> · Brit in Seoul · CC BY-SA 4.0</li>
+      <li><b>五六島 Skywalk</b> — <a href="https://commons.wikimedia.org/wiki/File:Oryukdo_in_2018.jpg">Oryukdo in 2018.jpg</a> · Garam · Attribution</li>
+      <li><b>Outlet 血拚</b> — <a href="https://commons.wikimedia.org/wiki/File:Lotte_Mall_Busan_Gwangbok_Store.jpg">Lotte Mall Busan Gwangbok Store.jpg</a> · Minseong Kim · CC BY-SA 4.0</li>
+      <li><b>西面商圈</b> — <a href="https://commons.wikimedia.org/wiki/File:%EC%84%9C%EB%A9%B4_%E8%A5%BF%E9%9D%A2_Seomyeon,_Busan_(5452865868).jpg">서면 西面 Seomyeon, Busan (5452865868).jpg</a> · InSapphoWeTrust from Los Angeles, California, USA · CC BY-SA 2.0</li>
+      <li><b>藍線公園天空膠囊</b> — <a href="https://commons.wikimedia.org/wiki/File:Sky_Capsule_train_at_Haeundae_Blueline_Park,_Busan.jpg">Sky Capsule train at Haeundae Blueline Park, Busan.jpg</a> · VN.NguyenDucDuy · CC BY-SA 4.0</li>
+      <li><b>松島海上纜車</b> — <a href="https://commons.wikimedia.org/wiki/File:Songdo_Cloud_Trails_Skywalk_Songdo_Beach_Busan_(45749115681).jpg">Songdo Cloud Trails Skywalk Songdo Beach Busan (4574911</a> · bryan... · CC BY-SA 2.0</li>
+      <li><b>太宗台</b> — <a href="https://commons.wikimedia.org/wiki/File:Korea-Busan-Taejongdae-03.jpg">Korea-Busan-Taejongdae-03.jpg</a> · *intacto · CC BY 2.0</li>
+      <li><b>海雲台夜景</b> — <a href="https://commons.wikimedia.org/wiki/File:Busan_Haeundae-gu_Night_View.jpg">Busan Haeundae-gu Night View.jpg</a> · 최경이(자유이용저작물) · KOGL Type 1</li>
+      <li><b>梁山通度寺</b> — <a href="https://commons.wikimedia.org/wiki/File:Tongdosa_Temple_02.jpg">Tongdosa Temple 02.jpg</a> · Bernard Gagnon · CC0</li>
+      <li><b>統營 · 東皮郎</b> — <a href="https://commons.wikimedia.org/wiki/File:Korea-Tongyeong-Dongpirang_Village-10.jpg">Korea-Tongyeong-Dongpirang Village-10.jpg</a> · by Junho Jung at Flickr from South Korea · CC BY-SA 3.0</li>
+      <li><b>海東龍宮寺</b> — <a href="https://commons.wikimedia.org/wiki/File:%ED%95%B4%EB%8F%99%EC%9A%A9%EA%B6%81%EC%82%AC_%EC%82%AC%EC%B0%B0_%EC%A0%84%EA%B2%BD.jpg">해동용궁사 사찰 전경.jpg</a> · 박혜민 · CC BY-SA 3.0</li>
+    </ul>
+  </details>
+</footer>
+
+</body>
+</html>

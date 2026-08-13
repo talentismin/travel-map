@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2D4A3E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>清邁 — 旅居評估</title>
+<link rel="manifest" href="../manifest.json">
+<link rel="icon" href="../icons/icon.svg" type="image/svg+xml">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Arial', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+    background: #111820; color: #dde; min-height: 100vh;
+  }
+  .page-header {
+    background: linear-gradient(135deg, #1a2e26 0%, #0e1a14 100%);
+    border-bottom: 3px solid #9B59B6;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-inner {
+    max-width: 900px; margin: 0 auto;
+    padding: 16px 24px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .back-btn {
+    display: flex; align-items: center; gap: 6px;
+    color: #9B59B6; text-decoration: none;
+    font-size: 13px; font-weight: 600;
+    padding: 6px 14px; border-radius: 20px;
+    border: 1.5px solid #9B59B6;
+    transition: all .2s; white-space: nowrap;
+  }
+  .back-btn:hover { background: #9B59B622; }
+  .header-title { font-size: 22px; font-weight: 800; color: #fff; }
+  .header-province { font-size: 12px; color: #7AAA98; margin-top: 2px; }
+  .season-tag {
+    margin-left: auto; padding: 4px 14px;
+    border-radius: 20px; font-size: 12px; font-weight: 700;
+    background: #9B59B6; color: #fff; white-space: nowrap;
+  }
+  .hero {
+    background: linear-gradient(180deg, #0e1a14 0%, #111820 100%);
+    padding: 32px 24px;
+    border-bottom: 1px solid #1e2d28;
+  }
+  .hero-inner { max-width: 900px; margin: 0 auto; }
+  .hero-tagline { font-size: 16px; color: #A8C5B8; margin-bottom: 20px; line-height: 1.6; }
+
+  .kpi-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+  .kpi-card {
+    background: #1a2a24; border: 1px solid #2D4A3E;
+    border-radius: 10px; padding: 14px 20px;
+    flex: 1; min-width: 160px;
+  }
+  .kpi-label { font-size: 11px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; }
+  .kpi-value { font-size: 20px; font-weight: 800; color: #C9A84C; margin-top: 4px; }
+  .kpi-sub { font-size: 11px; color: #5A7A6A; margin-top: 2px; }
+  .kpi-stars { font-size: 22px; font-weight: 800; color: #FFD700; margin-top: 4px; }
+  .kpi-stars .empty-star { color: #333; }
+  .kpi-stars .half-star { color: #FFD700; }
+
+  .ratings-block { background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 10px; padding: 16px 20px; }
+  .ratings-title { font-size: 12px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
+  .rating-row { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+  .rating-label { font-size: 13px; color: #ccc; width: 90px; flex-shrink: 0; }
+  .rating-score { font-size: 12px; color: #7AAA98; width: 28px; flex-shrink: 0; }
+  .bar-wrap { flex: 1; height: 8px; background: #1e3028; border-radius: 4px; overflow: hidden; }
+  .bar-fill  { height: 100%; border-radius: 4px; transition: width .3s; }
+
+  .content { max-width: 900px; margin: 0 auto; padding: 24px; }
+  .section { margin-bottom: 28px; }
+  .section-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #2D4A3E; display: flex; align-items: center; gap: 8px; }
+  .section-icon { font-size: 18px; }
+
+  ul { list-style: none; }
+  ul li { padding: 7px 0 7px 20px; position: relative; font-size: 14px; color: #ccc; line-height: 1.5; border-bottom: 1px solid #1a2a20; }
+  ul li:last-child { border-bottom: none; }
+  ul li::before { content: '›'; position: absolute; left: 0; color: #9B59B6; font-weight: 700; font-size: 16px; }
+
+  .climate-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .climate-table th { background: #1a2a24; color: #7AAA98; text-align: left; padding: 8px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #2D4A3E; }
+  .climate-table td { padding: 9px 12px; border-bottom: 1px solid #1a2a20; color: #ccc; }
+  .climate-table tr:last-child td { border-bottom: none; }
+  .climate-table tr:hover td { background: #1a2a2488; }
+
+  .warning-box { background: #2D1A0E; border: 1.5px solid #E8825A; border-radius: 8px; padding: 12px 16px; display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: #E8825A; line-height: 1.5; margin-bottom: 20px; }
+  .warning-icon { font-size: 18px; flex-shrink: 0; }
+
+  .trial-list li { font-size: 13px; color: #A8C5B8; }
+  .prose { font-size: 14px; color: #ccc; line-height: 1.7; background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 8px; padding: 14px 16px; }
+  .best-season { display: inline-block; background: #9B59B622; border: 1px solid #9B59B655; color: #9B59B6; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 16px; }
+
+  /* 即時天氣 / AQI */
+  .live-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+  .live-card { flex: 1; min-width: 140px; background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 10px; padding: 12px 14px; font-size: 13px; }
+  .live-label { font-size: 10px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
+  .live-value { font-size: 18px; font-weight: 800; color: #fff; }
+  .live-sub { font-size: 11px; color: #7AAA98; margin-top: 2px; }
+  .live-aqi-good   { color: #5AE89A; }
+  .live-aqi-fair   { color: #C9A84C; }
+  .live-aqi-poor   { color: #E8825A; }
+
+  /* 上下城市導航 */
+  .city-nav { display: flex; gap: 10px; padding: 0 24px; max-width: 900px; margin: 28px auto 0; }
+  .city-nav a {
+    flex: 1; padding: 12px 14px; text-decoration: none;
+    border: 1px solid #2D4A3E; border-radius: 10px;
+    background: #1a2a24; color: #A8C5B8;
+    font-size: 12px; transition: all .2s; min-width: 0;
+  }
+  .city-nav a:hover { border-color: #9B59B6; color: #fff; }
+  .city-nav a .nv-label { font-size: 10px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; }
+  .city-nav a .nv-name { font-size: 14px; font-weight: 700; color: #fff; margin-top: 3px; }
+  .city-nav a.nv-prev { text-align: left; }
+  .city-nav a.nv-next { text-align: right; }
+  .city-nav a.nv-back { flex: 0 1 auto; text-align: center; padding: 12px 18px; }
+
+  .page-footer { text-align: center; padding: 20px; font-size: 12px; color: #3a4a42; border-top: 1px solid #1e2d28; margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-inner">
+    <a class="back-btn" href="../city_map.html?focus=chiangmai">← 返回地圖</a>
+    <div>
+      <div class="header-title">清邁</div>
+      <div class="header-province">泰國</div>
+    </div>
+    <div class="season-tag">✈ 境外</div>
+    <div style="margin-left:auto;font-size:11px;color:#3A5A4A;padding-right:4px;">📅 2026-04</div>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-tagline">全球數位遊牧評比第一城，護城河跑道，泰北料理天堂，台灣人社群萬人</div>
+
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-label">月均費用</div>
+        <div class="kpi-value">USD 735–1,285</div>
+        <div class="kpi-sub" id="cost-twd">NT$1,164–2,035/月</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">綜合推薦</div>
+        <div class="kpi-stars">★★★★<span class="half-star">½</span><span class="empty-star"></span></div>
+        <div class="kpi-sub">4.5 / 5.0</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">最佳旅居季節</div>
+        <div style="font-size:14px;font-weight:700;color:#fff;margin-top:6px;">涼季（11–2月），均溫18–28°C；3–5月煙霾季絕對迴避</div>
+      </div>
+    </div>
+
+    <div class="ratings-block">
+      <div class="ratings-title">各項評分</div>
+      
+          <div class="rating-row">
+            <span class="rating-label">健行跑步</span>
+            <span class="rating-score">4/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:80%;background:#5A8A72"></div></div>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">健身房</span>
+            <span class="rating-score">4/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:80%;background:#5A8A72"></div></div>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">美食</span>
+            <span class="rating-score">5/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">網路/VPN</span>
+            <span class="rating-score">5/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">CP值</span>
+            <span class="rating-score">5/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+          </div>
+    </div>
+
+    <div class="live-row" id="live-row">
+      <div class="live-card"><div class="live-label">當前氣溫</div><div class="live-value" id="lv-temp">—</div><div class="live-sub" id="lv-temp-sub">載入中</div></div>
+      <div class="live-card"><div class="live-label">未來 3 日</div><div class="live-value" id="lv-forecast">—</div><div class="live-sub">最低 / 最高</div></div>
+      <div class="live-card"><div class="live-label">空氣品質 (歐盟 AQI)</div><div class="live-value" id="lv-aqi">—</div><div class="live-sub" id="lv-pm">PM2.5 載入中</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+  
+        <div class="warning-box">
+          <span class="warning-icon">⚠️</span>
+          <div>⚠️ 3–5月煙霾季 PM2.5達200–500，跑者旅居絕對限定11–2月</div>
+        </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">🏃</span>跑步 / 健行路線</h2>
+    <ul><li>護城河跑道（Moat Run）：古城四方護城河，一圈7.5km，平坦柏油路，全天均有跑者，全球最有氛圍的城市跑步路線之一</li><li>Doi Suthep 爬坡：從市區沿山路爬升至素帖山寺，單程11km，爬升1,000m，清邁跑者最愛爬坡訓練</li><li>Doi Inthanon 越野（週末，距市區80km）：泰國最高峰2,565m，國家公園步道10–20km，涼季氣溫10–15°C</li><li>Mae Sa 谷地越野（距市區20km）：溪谷旁叢林步道，5–15km，適合週末越野</li></ul>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">💪</span>健身房 / 蹲舉架</h2>
+    <div class="prose">清邁數位遊牧社群龐大，健身需求帶動高密度連鎖館。推薦：Muscle Factory（重訓導向，Power Rack充足，月費THB 600–1,200）、Fitness First（連鎖，設備齊）、Jetts Fitness（24h）。蹲舉架完全不是問題。</div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">♨️</span>溫泉</h2>
+    <div class="prose">三甘坡溫泉（San Kamphaeng Hot Springs，距市區36km，40分鐘車程）：硫酸鹽溫泉，泡腳區可免費，私人湯屋THB 100–200。配合山地跑步的絕佳收尾。Fang溫泉（距市區150km）更原始，需安排一日遊。</div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">🍜</span>美食亮點</h2>
+    <ul><li>卡哦索伊（Khao Soi）：泰北代表料理，椰奶咖哩湯底寬麵+炸麵皮，清邁必吃第一名（THB 60–100，約NT$55–90）</li><li>清邁香腸（Sai Ua）：泰北豬肉香腸，薑黃+香茅醃漬，直接烤或煎，下酒菜</li><li>泰北燒雞（Gai Yang Chiang Mai）：特殊醃料碳烤，配糯米飯</li><li>週日夜市/週六夜市：街頭小吃密度全球頂尖，100–200 THB吃到撐</li><li>台式料理：清邁有台灣人開的滷肉飯、台式火鍋、珍奶——思鄉時不缺選項</li></ul>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">🌤</span>氣候參考</h2>
+    <table class="climate-table">
+      <thead><tr><th>月份</th><th>氣溫</th><th>特點</th></tr></thead>
+      <tbody>
+          <tr>
+            <td>11–1月</td>
+            <td>16–28°C</td>
+            <td>涼季，全年最舒適，早晨需薄外套，跑步天堂</td>
+          </tr>
+          <tr>
+            <td>2月</td>
+            <td>20–31°C</td>
+            <td>涼季尾段，月底煙霾預警開始</td>
+          </tr>
+          <tr>
+            <td>3–5月</td>
+            <td>28–38°C</td>
+            <td>⚠️ 煙霾季，PM2.5達200–500，絕對不可旅居</td>
+          </tr>
+          <tr>
+            <td>6–10月</td>
+            <td>24–32°C</td>
+            <td>雨季，午後暴雨，但空氣清洗乾淨，AQI改善</td>
+          </tr></tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">📝</span>注意事項</h2>
+    <ul><li>⚠️ 煙霾是最大硬傷：3–5月在戶外超過30分鐘等同吸煙，旅居視窗嚴格限定11–2月</li><li>台灣護照泰國免簽30天，可延簽30天；長期選項Thailand LTR Visa（10年）</li><li>清邁無大眾運輸，租機車（THB 2,500–3,500/月）是最有效率移動方式</li><li>Facebook「台灣人在清邁」超過萬名成員，找房/找醫生/找健身館都可發問</li><li>Nimmanhaemin路段coworking 10+個選項，是全球coworking密度最高城市之一</li></ul>
+  </div>
+
+  
+        <div class="section">
+          <h2 class="section-title"><span class="section-icon">🔬</span>旅居 Trial 建議（3天流程）</h2>
+          <ul class="trial-list">
+            <li>Day 1：入住Nimman附近服務公寓、護城河晨跑7.5km（感受氛圍）、下午咖啡廳測試Wifi+VPN</li><li>Day 2：在住所工作半天、下午Doi Suthep爬坡（11km爬升1,000m）、晚上夜市美食探索</li><li>Day 3：走訪Muscle Factory確認蹲舉架、三甘坡溫泉日遊（泡湯+景觀）、晚上Khao Soi大餐</li>
+          </ul>
+        </div>
+
+</div>
+
+<nav class="city-nav">
+  <a class="nv-prev" href="chengdu.html"><div class="nv-label">← 上一城</div><div class="nv-name">成都</div></a>
+  <a class="nv-back" href="../city_map.html?focus=chiangmai"><div class="nv-label">↑ 地圖</div><div class="nv-name">總覽</div></a>
+  <a class="nv-next" href="chongqing.html"><div class="nv-label">下一城 →</div><div class="nv-name">重慶</div></a>
+</nav>
+
+<div class="page-footer">旅居城市評估 — 43歲台灣軟體工程師視角 | 重訓・跑步・美食・數位遊牧</div>
+
+<script src="../lib/format.js"></script>
+<script src="../lib/fx.js"></script>
+<script src="../lib/weather.js"></script>
+<script>
+const CITY = {"slug":"chiangmai","lat":18.79,"lng":98.98,"cost":{"currency":"USD","min":735,"max":1285}};
+const FX_SNAPSHOT = {"CNY":1,"USD":7.2,"EUR":7.8,"JPY":0.048,"TWD":0.22};
+
+// 動態 TWD 換算（以即時匯率，失敗時退回快照）
+if (window.CT_FX && window.CT_FORMAT) {
+  CT_FX.getRates().then(rates => {
+    const merged = Object.assign({}, FX_SNAPSHOT, rates || {});
+    const twd = CT_FORMAT.formatTWDFromCost(CITY.cost, merged);
+    const el = document.getElementById('cost-twd');
+    if (el && twd) el.textContent = twd + '/月';
+  }).catch(() => {});
+}
+
+// 天氣 + AQI
+if (window.CT_WEATHER) {
+  CT_WEATHER.fetchWeather(CITY.lat, CITY.lng).then(w => {
+    if (!w) return;
+    document.getElementById('lv-temp').textContent = w.current + '°C';
+    document.getElementById('lv-temp-sub').textContent = w.weather || '—';
+    document.getElementById('lv-forecast').textContent = w.forecastMin + '° / ' + w.forecastMax + '°';
+  }).catch(() => {});
+  CT_WEATHER.fetchAQI(CITY.lat, CITY.lng).then(a => {
+    if (!a) return;
+    const el = document.getElementById('lv-aqi');
+    el.textContent = a.aqi;
+    el.classList.add(a.aqi <= 40 ? 'live-aqi-good' : a.aqi <= 80 ? 'live-aqi-fair' : 'live-aqi-poor');
+    document.getElementById('lv-pm').textContent = 'PM2.5 ' + a.pm25 + ' µg/m³';
+  }).catch(() => {});
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('../sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>

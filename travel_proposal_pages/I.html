@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>北方古都・河西絲路線（觀光慢遊） — 旅遊行程</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Arial', 'PingFang TC', 'Microsoft JhengHei', sans-serif; background: #111820; color: #dde; min-height: 100vh; }
+  .page-header { background: linear-gradient(135deg, #1a2e26 0%, #0e1a14 100%); border-bottom: 3px solid #C9A84C; position: sticky; top: 0; z-index: 100; }
+  .header-inner { max-width: 960px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back-btn { display: flex; align-items: center; gap: 6px; color: #C9A84C; text-decoration: none; font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 20px; border: 1.5px solid #C9A84C; transition: all .2s; white-space: nowrap; }
+  .back-btn:hover { background: #C9A84C22; }
+  .plan-badge { background: #C9A84C; color: #111; font-weight: 900; font-size: 22px; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .header-text .title { font-size: 18px; font-weight: 800; color: #fff; }
+  .header-text .subtitle { font-size: 12px; color: #7AAA98; margin-top: 3px; }
+  .duration-badge { margin-left: auto; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; border: 1.5px solid #C9A84C; color: #C9A84C; white-space: nowrap; }
+  .hero { background: #0e1a14; border-bottom: 1px solid #1e2d28; padding: 28px 24px; }
+  .hero-inner { max-width: 960px; margin: 0 auto; }
+  .kpi-row { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
+  .kpi-card { background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 10px; padding: 14px 18px; flex: 1; min-width: 150px; }
+  .kpi-label { font-size: 10px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; }
+  .kpi-value { font-size: 14px; font-weight: 700; color: #fff; margin-top: 5px; line-height: 1.4; }
+  .kpi-value.gold { color: #C9A84C; }
+  .ratings-block { background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 10px; padding: 16px 20px; }
+  .ratings-title { font-size: 11px; color: #7AAA98; text-transform: uppercase; margin-bottom: 12px; }
+  .rating-row { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+  .rating-label { font-size: 13px; color: #ccc; width: 100px; flex-shrink: 0; }
+  .rating-score { font-size: 12px; color: #7AAA98; width: 28px; }
+  .bar-wrap { flex: 1; height: 8px; background: #1e3028; border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; }
+  .content { max-width: 960px; margin: 0 auto; padding: 24px; }
+  .section { margin-bottom: 28px; }
+  .section-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #2D4A3E; display: flex; align-items: center; gap: 8px; }
+  .section-title span { font-size: 18px; }
+  .stop-card { display: flex; gap: 14px; padding: 12px 16px; background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 8px; margin-bottom: 10px; }
+  .stop-num { width: 28px; height: 28px; border-radius: 50%; background: #C9A84C22; border: 2px solid #C9A84C; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #C9A84C; flex-shrink: 0; margin-top: 2px; }
+  .stop-header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 5px; }
+  .stop-city { font-size: 15px; font-weight: 700; color: #fff; }
+  .stop-days { font-size: 12px; color: #7AAA98; margin-left: auto; white-space: nowrap; }
+  .stop-notes { font-size: 12px; color: #888; line-height: 1.5; }
+  ul { list-style: none; }
+  ul li { padding: 7px 0 7px 20px; position: relative; font-size: 13px; color: #ccc; line-height: 1.5; border-bottom: 1px solid #1a2a20; }
+  ul li:last-child { border-bottom: none; }
+  ul li::before { content: '›'; position: absolute; left: 0; color: #C9A84C; font-weight: 700; font-size: 16px; }
+  ul li.warn-item { color: #E8A57A; } ul li.warn-item::before { color: #E8A57A; }
+  .cost-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .cost-table td { padding: 9px 12px; border-bottom: 1px solid #1a2a20; color: #ccc; }
+  .cost-table .cost-val { color: #C9A84C; font-weight: 700; text-align: right; }
+  .cost-table tr:last-child td { border-bottom: none; font-size: 14px; }
+  .luggage-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .luggage-table th { background: #1a2a24; color: #7AAA98; text-align: left; padding: 8px 12px; font-size: 11px; text-transform: uppercase; border-bottom: 1px solid #2D4A3E; }
+  .luggage-table td { padding: 9px 12px; border-bottom: 1px solid #1a2a20; color: #ccc; }
+  .luggage-table tr:last-child td { border-bottom: none; }
+  .ok-cell { color: #5A8A72; font-weight: 600; } .warn-cell { color: #E8825A; font-weight: 600; }
+  .page-footer { text-align: center; padding: 20px; font-size: 12px; color: #3a4a42; border-top: 1px solid #1e2d28; margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-inner">
+    <a class="back-btn" href="../city_map.html?mode=travel">← 返回旅遊地圖</a>
+    <div class="plan-badge">I</div>
+    <div class="header-text">
+      <div class="title">北方古都・河西絲路線（觀光慢遊）</div>
+      <div class="subtitle">北京 → 平遙 → 西安 → 蘭州 → 張掖 → 嘉峪關 → 敦煌</div>
+    </div>
+    <div class="duration-badge">約 32 天</div>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="kpi-row">
+      <div class="kpi-card"><div class="kpi-label">建議出發</div><div class="kpi-value">9 月上旬出發（避敦煌盛夏酷熱與秋末寒）</div></div>
+      <div class="kpi-card"><div class="kpi-label">入境</div><div class="kpi-value">TPE → PEK（北京，直航或經轉）</div></div>
+      <div class="kpi-card"><div class="kpi-label">出境</div><div class="kpi-value">敦煌 DNH 經西安/蘭州轉機回台</div></div>
+      <div class="kpi-card"><div class="kpi-label">機票（來回）</div><div class="kpi-value gold">北京直航＋境內段，臨行查詢</div></div>
+    </div>
+    <div class="ratings-block">
+      <div class="ratings-title">路線評分（觀光主軸）</div>
+      
+        <div class="rating-row">
+          <span class="rating-label">美食</span>
+          <span class="rating-score">4/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:80%;background:#5A8A72"></div></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-label">自然健行</span>
+          <span class="rating-score">3/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:60%;background:#C9A84C"></div></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-label">歷史文化</span>
+          <span class="rating-score">5/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-label">慢遊</span>
+          <span class="rating-score">4/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:80%;background:#5A8A72"></div></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-label">不走回頭路</span>
+          <span class="rating-score">5/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+        </div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div class="section">
+    <h2 class="section-title"><span>🗺</span>行程停靠城市</h2>
+    
+        <div class="stop-card">
+          <div class="stop-num">1</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">北京</span>
+              <span class="stop-days">5天</span>
+            </div>
+            <div class="stop-notes">故宮、慕田峪長城、天壇頤和園、奧森綠道跑步</div>
+          </div>
+        </div>
+        <div class="stop-card">
+          <div class="stop-num">2</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">平遙古城</span>
+              <span class="stop-days">3天</span>
+            </div>
+            <div class="stop-notes">明清古城牆夜遊、晉商票號、王家/喬家大院</div>
+          </div>
+        </div>
+        <div class="stop-card">
+          <div class="stop-num">3</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">西安</span>
+              <span class="stop-days">6天</span>
+            </div>
+            <div class="stop-notes">兵馬俑、城牆繞圈跑(13.7km)、回民街、華山一日（本段基地）</div>
+          </div>
+        </div>
+        <div class="stop-card">
+          <div class="stop-num">4</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">蘭州</span>
+              <span class="stop-days">2天</span>
+            </div>
+            <div class="stop-notes">轉乘點，牛肉麵、黃河鐵橋、白塔山</div>
+          </div>
+        </div>
+        <div class="stop-card">
+          <div class="stop-num">5</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">張掖</span>
+              <span class="stop-days">3天</span>
+            </div>
+            <div class="stop-notes">七彩丹霞、馬蹄寺（名單外經典 waypoint）</div>
+          </div>
+        </div>
+        <div class="stop-card">
+          <div class="stop-num">6</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">嘉峪關</span>
+              <span class="stop-days">2天</span>
+            </div>
+            <div class="stop-notes">天下第一雄關、長城西端、懸壁長城</div>
+          </div>
+        </div>
+        <div class="stop-card">
+          <div class="stop-num">7</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">敦煌</span>
+              <span class="stop-days">5天</span>
+            </div>
+            <div class="stop-notes">莫高窟、鳴沙山月牙泉、雅丹魔鬼城、陽關玉門關</div>
+          </div>
+        </div>
+  </div>
+  <div class="section">
+    <h2 class="section-title"><span>🚄</span>交通方式</h2>
+    <ul><li class="">入境：飛北京（直航）</li><li class="">北京 → 平遙：大西高鐵約 3h</li><li class="">平遙 → 西安：高鐵約 3h</li><li class="">西安 → 蘭州：高鐵約 3h</li><li class="">蘭州 → 張掖：蘭新高鐵約 3h</li><li class="">張掖 → 嘉峪關：高鐵約 1.5h</li><li class="">嘉峪關 → 敦煌：約 2h（敦煌支線班次少，先訂位）</li><li class="">回程：敦煌經蘭州/西安轉機出境（單向不折返）</li></ul>
+  </div>
+  <div class="section">
+    <h2 class="section-title"><span>💰</span>費用概估（每日，未含機票）</h2>
+    <table class="cost-table"><tr><td>住宿（連鎖/民宿）</td><td class="cost-val">150–350 CNY</td></tr><tr><td>餐飲</td><td class="cost-val">80–150 CNY</td></tr><tr><td>交通＋景點</td><td class="cost-val">100–180 CNY</td></tr><tr><td>每日合計（未含機票）</td><td class="cost-val">約 400–750 CNY</td></tr></table>
+  </div>
+  <div class="section">
+    <h2 class="section-title"><span>🧳</span>行李建議</h2>
+    <table class="luggage-table">
+      <thead><tr><th>城市段</th><th>行李箱適用</th><th>說明</th></tr></thead>
+      <tbody>
+      <tr><td>北京/西安/蘭州</td><td class="ok-cell">✅ 方便</td><td>大城鋪裝、住宿集中，行李箱方便</td></tr>
+      <tr><td>張掖/嘉峪關/敦煌</td><td class="warn-cell">⚠️ 注意</td><td>景區接駁、戈壁拉車，後背包較靈活</td></tr></tbody>
+    </table>
+  </div>
+  <div class="section">
+    <h2 class="section-title"><span>📝</span>注意事項</h2>
+    <ul><li class="warn-item">⚠️ 莫高窟務必官網提前預約（旺季一票難求、窟內禁閃光）</li><li class="">河西日夜溫差大、日照強，防曬防沙＋多補水</li><li class="">河西小城健身房弱、多無正規蹲舉架，重訓集中在北京/西安兩頭</li><li class="">西安城牆可繞一圈跑步約 13.7km，城牆需另購票</li><li class="">無敦煌台灣直航，北京進、敦煌經蘭州/西安轉出；支付寶/微信為主；境外 App 需自備翻牆方案</li><li class="">與當地人交談避開敏感政治話題，低調為上</li></ul>
+  </div>
+</div>
+
+<div class="page-footer">旅遊行程提案 — 觀光視角　｜　費用/班次/景區開放為估算，臨行再確認</div>
+
+</body>
+</html>

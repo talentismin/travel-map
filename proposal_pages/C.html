@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>專案 C：西北絲路探索（無新疆版） — 旅居行程</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Arial', 'PingFang TC', 'Microsoft JhengHei', sans-serif; background: #111820; color: #dde; min-height: 100vh; }
+
+  .page-header { background: linear-gradient(135deg, #1a2e26 0%, #0e1a14 100%); border-bottom: 3px solid #FDCB6E; position: sticky; top: 0; z-index: 100; }
+  .header-inner { max-width: 960px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back-btn { display: flex; align-items: center; gap: 6px; color: #FDCB6E; text-decoration: none; font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 20px; border: 1.5px solid #FDCB6E; transition: all .2s; white-space: nowrap; }
+  .back-btn:hover { background: #FDCB6E22; }
+  .plan-badge { background: #FDCB6E; color: #111; font-weight: 900; font-size: 22px; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .header-text .title { font-size: 18px; font-weight: 800; color: #fff; }
+  .header-text .subtitle { font-size: 12px; color: #7AAA98; margin-top: 3px; }
+  .duration-badge { margin-left: auto; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; border: 1.5px solid #FDCB6E; color: #FDCB6E; white-space: nowrap; }
+
+  .hero { background: #0e1a14; border-bottom: 1px solid #1e2d28; padding: 28px 24px; }
+  .hero-inner { max-width: 960px; margin: 0 auto; }
+
+  .kpi-row { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
+  .kpi-card { background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 10px; padding: 14px 18px; flex: 1; min-width: 150px; }
+  .kpi-label { font-size: 10px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; }
+  .kpi-value { font-size: 14px; font-weight: 700; color: #fff; margin-top: 5px; line-height: 1.4; }
+  .kpi-value.gold { color: #C9A84C; }
+  .kpi-value.warn { color: #E8825A; }
+
+  .ratings-block { background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 10px; padding: 16px 20px; }
+  .ratings-title { font-size: 11px; color: #7AAA98; text-transform: uppercase; margin-bottom: 12px; }
+  .rating-row { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+  .rating-label { font-size: 13px; color: #ccc; width: 100px; flex-shrink: 0; }
+  .rating-score { font-size: 12px; color: #7AAA98; width: 28px; }
+  .bar-wrap { flex: 1; height: 8px; background: #1e3028; border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; }
+
+  .content { max-width: 960px; margin: 0 auto; padding: 24px; }
+  .section { margin-bottom: 28px; }
+  .section-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #2D4A3E; display: flex; align-items: center; gap: 8px; }
+  .section-title span { font-size: 18px; }
+
+  .stop-card { display: flex; gap: 14px; padding: 12px 16px; background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 8px; margin-bottom: 10px; position: relative; }
+  .stop-card.is-trial { border-color: #FDCB6E55; background: #1a2a24; }
+  .stop-card.is-trial::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #FDCB6E; border-radius: 8px 0 0 8px; }
+  .stop-num { width: 28px; height: 28px; border-radius: 50%; background: #FDCB6E22; border: 2px solid #FDCB6E; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #FDCB6E; flex-shrink: 0; margin-top: 2px; }
+  .stop-header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 5px; }
+  .stop-city { font-size: 15px; font-weight: 700; color: #fff; }
+  .stop-days { font-size: 12px; color: #7AAA98; margin-left: auto; white-space: nowrap; }
+  .stop-notes { font-size: 12px; color: #888; line-height: 1.5; }
+  .trial-badge { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; background: #FDCB6E22; border: 1px solid #FDCB6E55; color: #FDCB6E; }
+  .tour-badge { padding: 2px 8px; border-radius: 10px; font-size: 10px; background: #2D4A3E; color: #7AAA98; }
+  .winter-badge { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; background: #5B9BD522; border: 1px solid #5B9BD5; color: #5B9BD5; }
+  .summer-badge { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; background: #E8825A22; border: 1px solid #E8825A; color: #E8825A; }
+
+  ul { list-style: none; }
+  ul li { padding: 7px 0 7px 20px; position: relative; font-size: 13px; color: #ccc; line-height: 1.5; border-bottom: 1px solid #1a2a20; }
+  ul li:last-child { border-bottom: none; }
+  ul li::before { content: '›'; position: absolute; left: 0; color: #FDCB6E; font-weight: 700; font-size: 16px; }
+  ul li.warn-item { color: #E8825A; }
+  ul li.warn-item::before { color: #E8825A; }
+
+  .cost-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .cost-table td { padding: 9px 12px; border-bottom: 1px solid #1a2a20; color: #ccc; }
+  .cost-table .cost-val { color: #C9A84C; font-weight: 700; text-align: right; }
+  .cost-table tr:last-child td { border-bottom: none; font-size: 14px; }
+
+  .luggage-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .luggage-table th { background: #1a2a24; color: #7AAA98; text-align: left; padding: 8px 12px; font-size: 11px; text-transform: uppercase; border-bottom: 1px solid #2D4A3E; }
+  .luggage-table td { padding: 9px 12px; border-bottom: 1px solid #1a2a20; color: #ccc; }
+  .luggage-table tr:last-child td { border-bottom: none; }
+  .ok-cell { color: #5A8A72; font-weight: 600; }
+  .warn-cell { color: #E8825A; font-weight: 600; }
+
+  .concept-box { background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 8px; padding: 14px 16px; margin-bottom: 20px; display: flex; gap: 12px; font-size: 13px; color: #A8C5B8; line-height: 1.7; }
+  .concept-icon { font-size: 20px; flex-shrink: 0; }
+  .warning-box { background: #2D1A0E; border: 1.5px solid #E8825A; border-radius: 8px; padding: 12px 16px; display: flex; gap: 10px; font-size: 13px; color: #E8825A; line-height: 1.5; margin-bottom: 20px; }
+  .note-box { background: #1A2A3E; border: 1px solid #5B9BD5; border-radius: 8px; padding: 12px 16px; display: flex; gap: 10px; font-size: 13px; color: #A8C5FF; line-height: 1.5; margin-bottom: 20px; }
+
+  .flow-list { background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 8px; padding: 12px 16px; }
+  .flow-list li { color: #A8C5B8; }
+
+  .compare-link { display: inline-block; margin-top: 14px; padding: 8px 18px; border-radius: 20px; border: 1.5px solid #FDCB6E; color: #FDCB6E; text-decoration: none; font-size: 12px; font-weight: 700; transition: all .2s; }
+  .compare-link:hover { background: #FDCB6E22; }
+
+  .page-footer { text-align: center; padding: 20px; font-size: 12px; color: #3a4a42; border-top: 1px solid #1e2d28; margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-inner">
+    <a class="back-btn" href="../city_map.html">← 返回地圖</a>
+    <div class="plan-badge">C</div>
+    <div class="header-text">
+      <div class="title">專案 C：西北絲路探索（無新疆版）</div>
+      <div class="subtitle">西安 → 蘭州 → 夏河/甘南 → 張掖 → 嘉峪關 → 敦煌 → 西寧</div>
+    </div>
+    <div class="duration-badge">約 28 天</div>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-label">最佳出發月份</div>
+        <div class="kpi-value">9–10月（白天不酷熱、人潮較少）</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">入境航班</div>
+        <div class="kpi-value">TPE → XIY（西安）少數直飛4h10m或轉機</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">出境航班</div>
+        <div class="kpi-value ">XIY → TPE（西安）或 XNN→西安高鐵→飛台灣</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">機票費用（來回）</div>
+        <div class="kpi-value gold">NT$14,000–26,000 來回</div>
+      </div>
+    </div>
+    <div class="ratings-block">
+      <div class="ratings-title">方案評分</div>
+      
+        <div class="rating-row">
+          <span class="rating-label">健行跑步</span>
+          <span class="rating-score">4/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:80%;background:#5A8A72"></div></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-label">美食</span>
+          <span class="rating-score">3/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:60%;background:#C9A84C"></div></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-label">泡湯</span>
+          <span class="rating-score">2/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:40%;background:#E8825A"></div></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-label">CP值</span>
+          <span class="rating-score">4/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:80%;background:#5A8A72"></div></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-label">政治安全</span>
+          <span class="rating-score">5/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+        </div>
+    </div>
+    <a class="compare-link" href="../proposal_compare.html">⇄ 五方案總覽比較 →</a>
+  </div>
+</div>
+
+<div class="content">
+  
+  
+      <div class="note-box">
+        <span>📌</span>
+        <div>2025/04修訂：原路線含新疆，考量台灣旅客政治風險已全面調整，以甘南草原+青海替代。</div>
+      </div>
+  
+
+  <div class="section">
+    <h2 class="section-title"><span>🗺</span>行程停靠城市</h2>
+    
+        <div class="stop-card ">
+          <div class="stop-num">1</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">西安</span>
+              
+              <span class="tour-badge">觀光</span>
+              <span class="stop-days">5–6天</span>
+            </div>
+            <div class="stop-notes">兵馬俑、城牆晨跑13.7km、華山健行、回民街美食</div>
+          </div>
+        </div>
+        <div class="stop-card ">
+          <div class="stop-num">2</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">蘭州</span>
+              
+              <span class="tour-badge">觀光</span>
+              <span class="stop-days">2天</span>
+            </div>
+            <div class="stop-notes">黃河風情線、正宗蘭州拉麵（源頭必吃）、純中轉</div>
+          </div>
+        </div>
+        <div class="stop-card ">
+          <div class="stop-num">3</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">夏河/甘南草原</span>
+              
+              <span class="tour-badge">觀光</span>
+              <span class="stop-days">3–4天</span>
+            </div>
+            <div class="stop-notes">拉卜楞寺（藏傳佛教聖地）、桑科草原晨跑、海拔3,000m</div>
+          </div>
+        </div>
+        <div class="stop-card ">
+          <div class="stop-num">4</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">張掖</span>
+              
+              <span class="tour-badge">觀光</span>
+              <span class="stop-days">2–3天</span>
+            </div>
+            <div class="stop-notes">丹霞彩虹山（中國最壯觀丹霞地貌）、馬蹄寺石窟</div>
+          </div>
+        </div>
+        <div class="stop-card ">
+          <div class="stop-num">5</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">嘉峪關</span>
+              
+              <span class="tour-badge">觀光</span>
+              <span class="stop-days">1–2天</span>
+            </div>
+            <div class="stop-notes">萬里長城最西端、懸壁長城健行</div>
+          </div>
+        </div>
+        <div class="stop-card ">
+          <div class="stop-num">6</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">敦煌</span>
+              
+              <span class="tour-badge">觀光</span>
+              <span class="stop-days">4–5天</span>
+            </div>
+            <div class="stop-notes">莫高窟（需提前1–2月預約）、鳴沙山騎駱駝、玉門關遺址</div>
+          </div>
+        </div>
+        <div class="stop-card ">
+          <div class="stop-num">7</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">西寧/青海</span>
+              
+              <span class="tour-badge">觀光</span>
+              <span class="stop-days">4–5天</span>
+            </div>
+            <div class="stop-notes">塔爾寺、青海湖騎行或晨跑（海拔3,200m）、茶卡鹽湖天空之鏡</div>
+          </div>
+        </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span>🚄</span>交通方式</h2>
+    <ul><li class="">入境：台灣直飛西安（XIY），少數直飛或轉機</li><li class="">西安 → 蘭州：高鐵 2h</li><li class="">蘭州 → 夏河：巴士 3h（無高鐵，風景路線）</li><li class="">夏河 → 張掖：返蘭州轉高鐵，約4–5h</li><li class="">張掖 → 嘉峪關：高鐵 1h</li><li class="">嘉峪關 → 敦煌：高鐵 1.5h</li><li class="">敦煌 → 西寧：高鐵 ~4h（經嘉峪關轉）</li><li class="">出境：西寧高鐵3h至西安，再飛台灣</li></ul>
+  </div>
+
+  
+
+  <div class="section">
+    <h2 class="section-title"><span>💰</span>費用概估</h2>
+    <table class="cost-table"><tr><td>住宿</td><td class="cost-val">150–280 CNY</td></tr><tr><td>餐飲（西北物價低）</td><td class="cost-val">60–90 CNY</td></tr><tr><td>交通+景點</td><td class="cost-val">80–150 CNY</td></tr><tr><td>月均合計</td><td class="cost-val">約 10,000–16,000 CNY（比原新疆版便宜20–30%）</td></tr></table>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span>🧳</span>行李建議（28吋行李箱 + 後背包）</h2>
+    <table class="luggage-table">
+      <thead><tr><th>城市段</th><th>28吋適用度</th><th>說明</th></tr></thead>
+      <tbody><tr>
+      <td>西安、蘭州、西寧</td>
+      <td class="ok-cell">✅ 方便</td>
+      <td>大城市，交通便利</td>
+    </tr><tr>
+      <td>夏河/甘南草原</td>
+      <td class="warn-cell">⚠️ 注意</td>
+      <td>草原住宿路況差，建議輕裝進甘南，行李寄存蘭州</td>
+    </tr><tr>
+      <td>張掖、嘉峪關</td>
+      <td class="ok-cell">✅ 方便</td>
+      <td>城市型，高鐵方便</td>
+    </tr><tr>
+      <td>敦煌</td>
+      <td class="warn-cell">⚠️ 注意</td>
+      <td>沙漠健行只帶後背包，主行李存旅館</td>
+    </tr></tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span>📝</span>注意事項</h2>
+    <ul><li class="warn-item">⚠️ 莫高窟門票需提前1–2個月線上預約，旺季常秒殺</li><li class="">西北夏季白天炎熱（35°C+），早晚溫差大，建議早出晚歸</li><li class="">甘南草原/青海湖海拔3,000–3,200m，初到注意高原反應</li><li class="">夏河拉卜楞寺為藏傳佛教聖地，進寺需著長袖長褲</li><li class="">全程可非自駕完成，旅行團（甘南/敦煌當地日遊）性價比高</li></ul>
+  </div>
+</div>
+
+<div class="page-footer">旅居城市評估 — 43歲台灣軟體工程師視角 | 重訓・跑步・美食・數位遊牧</div>
+
+</body>
+</html>

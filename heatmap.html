@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2D4A3E">
+<title>月份旅遊熱力圖 — 旅居城市</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Arial','PingFang TC','Microsoft JhengHei',sans-serif; background:#111820; color:#dde; min-height:100vh; }
+
+.page-header {
+  background:linear-gradient(135deg,#1a2e26 0%,#0e1a14 100%);
+  border-bottom:3px solid #5A8A72;
+  position:sticky; top:0; z-index:100;
+}
+.header-inner {
+  max-width:1100px; margin:0 auto; padding:14px 24px;
+  display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+}
+.back-btn {
+  display:flex; align-items:center; gap:6px;
+  color:#5A8A72; text-decoration:none; font-size:13px; font-weight:700;
+  padding:6px 14px; border-radius:20px; border:1.5px solid #5A8A72;
+  transition:all .2s; white-space:nowrap;
+}
+.back-btn:hover { background:#5A8A7222; }
+.header-title { font-size:20px; font-weight:800; color:#fff; }
+.header-sub { font-size:12px; color:#7AAA98; margin-top:2px; }
+
+/* Controls */
+.controls {
+  max-width:1100px; margin:0 auto; padding:16px 24px 8px;
+  display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+}
+.ctrl-label { font-size:11px; color:#7AAA98; text-transform:uppercase; letter-spacing:1px; font-weight:700; }
+.ctrl-btn {
+  padding:4px 12px; border-radius:16px; border:1.5px solid #3A4A42;
+  background:transparent; color:#888; font-size:11px; font-weight:700;
+  cursor:pointer; transition:all .15s;
+}
+.ctrl-btn:hover { border-color:#7AAA98; color:#ccc; }
+.ctrl-btn.active { border-color:#5A8A72; background:#5A8A7222; color:#5A8A72; }
+.ctrl-sep { width:1px; height:24px; background:#2D4A3E; }
+
+/* Legend */
+.legend-row {
+  max-width:1100px; margin:0 auto; padding:6px 24px 14px;
+  display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center;
+}
+.legend-item { display:flex; align-items:center; gap:6px; font-size:11px; color:#888; }
+.legend-cell { width:22px; height:16px; border-radius:3px; }
+
+/* Heatmap table */
+.heatmap-wrap {
+  max-width:1100px; margin:0 auto; padding:0 16px 40px;
+  overflow-x:auto; -webkit-overflow-scrolling:touch;
+}
+.heatmap-table { border-collapse:separate; border-spacing:3px; min-width:700px; width:100%; }
+
+.ht-header th {
+  font-size:10px; font-weight:700; color:#7AAA98; text-transform:uppercase;
+  padding:4px 0; text-align:center; white-space:nowrap; letter-spacing:0.5px;
+}
+.ht-header th.city-col { text-align:left; padding-left:4px; width:110px; min-width:90px; }
+
+.city-name-cell {
+  display:flex; align-items:center; gap:7px;
+  padding:2px 4px 2px 0; cursor:pointer;
+  text-decoration:none;
+}
+.city-name-cell:hover .city-name-text { color:#fff; }
+.season-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.city-name-text { font-size:12px; font-weight:700; color:#ccc; white-space:nowrap; }
+.city-province { font-size:10px; color:#445; white-space:nowrap; }
+
+.heat-cell {
+  width:46px; height:32px; border-radius:4px;
+  text-align:center; vertical-align:middle;
+  font-size:11px; font-weight:700;
+  cursor:default; transition:transform .1s;
+  position:relative;
+}
+.heat-cell:hover { transform:scale(1.12); z-index:10; }
+
+/* Score colours */
+.sc-5 { background:#1a4a2e; color:#5AE89A; }
+.sc-4 { background:#253520; color:#8ED85A; }
+.sc-3 { background:#2a2a18; color:#C9A84C; }
+.sc-2 { background:#28201a; color:#886655; }
+.sc-1 { background:#1e1818; color:#44333344; }
+
+/* Group separator */
+.group-header td {
+  padding:12px 4px 4px;
+  font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+  color:#7AAA98; border-bottom:1px solid #2D4A3E;
+  background:transparent !important;
+}
+
+/* Tooltip */
+.ht-tooltip {
+  display:none; position:fixed; z-index:999;
+  background:#1a2a24; border:1px solid #5A8A72;
+  border-radius:8px; padding:8px 12px;
+  font-size:12px; color:#dde; pointer-events:none;
+  max-width:220px; line-height:1.5;
+  box-shadow:0 4px 16px rgba(0,0,0,.6);
+}
+.ht-tooltip.show { display:block; }
+.ht-tip-city { font-size:13px; font-weight:800; color:#fff; margin-bottom:3px; }
+.ht-tip-score { font-weight:700; }
+.sc-tip-5 { color:#5AE89A; }
+.sc-tip-4 { color:#8ED85A; }
+.sc-tip-3 { color:#C9A84C; }
+.sc-tip-2 { color:#886655; }
+.sc-tip-1 { color:#554444; }
+
+/* Best month highlight ring */
+.heat-cell.is-best { box-shadow:0 0 0 1.5px #FFD700; }
+
+@media (max-width: 600px) {
+  .header-inner { padding:10px 14px; }
+  .header-title { font-size:16px; }
+  .controls { padding:12px 14px 6px; }
+  .legend-row { padding:4px 14px 10px; }
+  .heatmap-wrap { padding:0 8px 32px; }
+  .heat-cell { width:34px; height:28px; font-size:10px; }
+  .city-name-text { font-size:11px; }
+}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-inner">
+    <a class="back-btn" href="city_map.html">← 返回地圖</a>
+    <div>
+      <div class="header-title">🌡 月份旅遊熱力圖</div>
+      <div class="header-sub">各城市 × 12 個月份最佳旅遊指數</div>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <span class="ctrl-label">篩選</span>
+  <button class="ctrl-btn active" data-filter="all">全部</button>
+  <button class="ctrl-btn" data-filter="summer">☀ 夏季</button>
+  <button class="ctrl-btn" data-filter="winter">❄ 冬季</button>
+  <button class="ctrl-btn" data-filter="year_round">🌿 四季</button>
+  <button class="ctrl-btn" data-filter="guangxi">✦ 廣西</button>
+  <button class="ctrl-btn" data-filter="overseas">✈ 境外</button>
+  <div class="ctrl-sep"></div>
+  <span class="ctrl-label">排序</span>
+  <button class="ctrl-btn sort-btn active" data-sort="season">依季節</button>
+  <button class="ctrl-btn sort-btn" data-sort="name">依名稱</button>
+  <button class="ctrl-btn sort-btn" data-sort="best">最佳月數</button>
+</div>
+
+<div class="legend-row">
+  <span class="ctrl-label" style="margin-right:4px;">指數說明</span>
+  <div class="legend-item"><div class="legend-cell sc-5"></div>5 絕佳</div>
+  <div class="legend-item"><div class="legend-cell sc-4"></div>4 良好</div>
+  <div class="legend-item"><div class="legend-cell sc-3"></div>3 尚可</div>
+  <div class="legend-item"><div class="legend-cell sc-2"></div>2 普通</div>
+  <div class="legend-item"><div class="legend-cell sc-1"></div>1 不建議</div>
+  <div style="margin-left:8px;font-size:11px;color:#556;border-left:1px solid #2D4A3E;padding-left:10px;">金邊框 = 當月最高分城市</div>
+</div>
+
+<div class="heatmap-wrap">
+  <table class="heatmap-table" id="heatmap-table">
+    <thead class="ht-header">
+      <tr>
+        <th class="city-col">城市</th>
+        <th>1月</th><th>2月</th><th>3月</th><th>4月</th><th>5月</th><th>6月</th>
+        <th>7月</th><th>8月</th><th>9月</th><th>10月</th><th>11月</th><th>12月</th>
+        <th style="padding-left:8px;color:#556;">最佳月</th>
+      </tr>
+    </thead>
+    <tbody id="heatmap-body"></tbody>
+  </table>
+</div>
+
+<div class="ht-tooltip" id="ht-tooltip"></div>
+
+<script>
+const SEASON_COLOR = {
+  summer:'#E8825A', winter:'#5B9BD5',
+  year_round:'#5A8A72', guangxi:'#C9A84C', overseas:'#9B59B6',
+};
+const SEASON_LABEL = {
+  summer:'☀ 夏季', winter:'❄ 冬季',
+  year_round:'🌿 四季皆宜', guangxi:'✦ 廣西', overseas:'✈ 境外',
+};
+const SCORE_LABEL = {5:'絕佳旅遊季',4:'良好',3:'尚可',2:'普通，有缺點',1:'不建議前往'};
+const MONTH_NAMES = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+
+const CITIES = [
+  { name:'成都', slug:'chengdu', province:'四川省', season:'summer',
+    months:[2,2,3,4,4,5,4,5,4,3,2,2], runRoute:'錦江河濱跑步道 + 龍泉山城市森林公園' },
+  { name:'大理', slug:'dali', province:'雲南省', season:'summer',
+    months:[4,4,5,5,4,3,3,3,3,5,4,4], runRoute:'洱海環湖路 120km + 蒼山登山步道' },
+  { name:'麗江', slug:'lijiang', province:'雲南省', season:'summer',
+    months:[3,3,4,5,4,3,3,3,4,5,4,3], runRoute:'束河古鎮外環路 + 玉龍雪山步道（3000m）' },
+  { name:'貴陽', slug:'guiyang', province:'貴州省', season:'summer',
+    months:[2,2,3,3,4,5,5,5,4,3,2,2], runRoute:'花溪河濱步道 10km + 觀山湖公園環湖跑' },
+  { name:'青島', slug:'qingdao', province:'山東省', season:'summer',
+    months:[1,1,2,3,4,4,3,5,4,3,2,1], runRoute:'棧橋—八大關—金沙灘海岸線 18km' },
+  { name:'西安', slug:'xian', province:'陝西省', season:'summer',
+    months:[2,2,3,4,4,3,2,3,4,4,2,2], runRoute:'古城牆跑道 13.7km + 環城公園護城河步道' },
+  { name:'西寧', slug:'xining', province:'青海省', season:'summer',
+    months:[1,1,2,3,4,5,5,5,4,2,1,1], runRoute:'湟水河濱公園 + 南山公園（海拔2275m）' },
+  { name:'大連', slug:'dalian', province:'遼寧省', season:'summer',
+    months:[1,1,2,3,4,4,5,5,4,3,2,1], runRoute:'星海灣海岸跑道 10km + 棒槌島沿海步道' },
+  { name:'廣州', slug:'guangzhou', province:'廣東省', season:'winter',
+    months:[4,3,3,3,3,2,2,2,3,4,5,5], runRoute:'珠江新城海心沙公園 5km + 白雲山越野' },
+  { name:'深圳', slug:'shenzhen', province:'廣東省', season:'winter',
+    months:[4,3,3,3,2,2,2,2,3,4,5,5], runRoute:'深圳灣公園沿海跑道 16km + 梧桐山步道' },
+  { name:'珠海', slug:'zhuhai', province:'廣東省', season:'winter',
+    months:[4,3,3,3,3,2,2,2,3,4,5,5], runRoute:'情侶路海濱跑道 28km（全國最長）' },
+  { name:'惠州', slug:'huizhou', province:'廣東省', season:'winter',
+    months:[4,3,3,3,3,2,2,2,3,4,5,5], runRoute:'惠州西湖環湖步道 18km + 南崑山越野' },
+  { name:'廈門', slug:'xiamen', province:'福建省', season:'winter',
+    months:[4,4,4,4,3,3,3,3,3,4,5,5], runRoute:'環島路海濱跑道（半馬賽道）' },
+  { name:'三亞', slug:'sanya', province:'海南省', season:'winter',
+    months:[5,5,4,4,3,2,2,2,2,3,4,5], runRoute:'三亞灣椰夢長廊 22km + 亞龍灣海岸線' },
+  { name:'騰衝', slug:'tengchong', province:'雲南省', season:'winter',
+    months:[4,4,5,5,4,3,3,3,3,4,4,4], runRoute:'火山地質公園步道（海拔1650m）' },
+  { name:'景洪', slug:'jinghong', province:'雲南省', season:'winter',
+    months:[5,5,4,4,3,3,3,3,3,4,5,5], runRoute:'瀾滄江沿岸步道（熱帶雨林）' },
+  { name:'昆明', slug:'kunming', province:'雲南省', season:'year_round',
+    months:[3,3,4,5,5,4,3,3,4,5,4,3], runRoute:'翠湖公園環湖步道 2.2km + 滇池海埂大道' },
+  { name:'杭州', slug:'hangzhou', province:'浙江省', season:'year_round',
+    months:[2,2,4,5,4,3,2,3,4,5,4,2], runRoute:'西湖環湖跑道 15km（全國最美城市跑道）' },
+  { name:'南京', slug:'nanjing', province:'江蘇省', season:'year_round',
+    months:[2,2,3,5,4,3,2,2,4,5,4,2], runRoute:'紫金山越野步道 + 明城牆環城步道 35km' },
+  { name:'重慶', slug:'chongqing', province:'重慶市', season:'year_round',
+    months:[3,3,4,4,4,2,1,1,3,4,3,3], runRoute:'南濱路江景跑道 14km（夏季禁止）',
+    warning:'夏季（6–9月）高溫 38–40°C' },
+  { name:'蘇州', slug:'suzhou', province:'江蘇省', season:'year_round',
+    months:[2,2,4,5,4,3,2,2,4,5,4,2], runRoute:'金雞湖環湖跑道 14km + 環太湖路 150km' },
+  { name:'南寧', slug:'nanning', province:'廣西壯族自治區', season:'guangxi',
+    months:[4,4,4,4,3,3,2,2,3,4,5,4], runRoute:'南湖公園環湖步道 3.5km + 邕江濱江步道' },
+  { name:'桂林', slug:'guilin', province:'廣西壯族自治區', season:'guangxi',
+    months:[3,3,3,4,4,3,3,3,4,5,4,3], runRoute:'漓江濱江步道（全國最美跑步風景）' },
+  { name:'北海', slug:'beihai', province:'廣西壯族自治區', season:'guangxi',
+    months:[4,4,4,4,3,2,2,2,3,4,5,5], runRoute:'北海銀灘沙灘跑道 24km' },
+  { name:'陽朔', slug:'yangshuo', province:'廣西壯族自治區', season:'guangxi',
+    months:[3,3,3,4,4,3,3,3,4,5,4,3], runRoute:'遇龍河沿岸鄉道（全球最美跑步風景之一）' },
+  { name:'峴港', slug:'danang', province:'越南', season:'overseas',
+    months:[3,4,5,5,5,4,4,4,2,2,2,3], runRoute:'美溪海灘跑道 10km + 五行山登山步道' },
+  { name:'清邁', slug:'chiangmai', province:'泰國', season:'overseas',
+    months:[5,4,2,2,2,3,3,3,3,4,5,5], runRoute:'護城河環城跑道 7km + Doi Suthep 越野（1676m）',
+    warning:'3–5月煙霾季禁止跑步' },
+  { name:'福岡', slug:'fukuoka', province:'日本九州', season:'overseas',
+    months:[3,3,4,5,4,3,2,2,3,5,4,3], runRoute:'大濠公園環湖跑道 2km + 海之中道沿海步道' },
+  { name:'札幌', slug:'sapporo', province:'日本北海道', season:'overseas',
+    months:[1,1,2,3,3,5,5,5,4,3,1,1], runRoute:'大通公園—中島公園沿線 10km + 藻岩山越野',
+    warning:'冬季（11–3月）積雪嚴寒' },
+  { name:'瓦倫西亞', slug:'valencia', province:'西班牙', season:'overseas',
+    months:[3,3,4,5,5,5,4,4,5,4,3,3], runRoute:'Turia河道公園 9km + 地中海海岸線' },
+  { name:'塔林', slug:'tallinn', province:'愛沙尼亞', season:'overseas',
+    months:[1,1,2,3,4,5,5,5,4,2,1,1], runRoute:'塔林舊城牆外環 + Pirita海濱跑道（白夜）',
+    warning:'冬季（11–3月）日照僅6h' },
+];
+
+// compute per-month max scores for highlighting
+const monthMax = Array.from({length:12}, (_, mi) => Math.max(...CITIES.map(c => c.months[mi])));
+
+let currentFilter = 'all';
+let currentSort   = 'season';
+
+const SEASON_ORDER = ['summer','winter','year_round','guangxi','overseas'];
+
+function sortedCities() {
+  let list = currentFilter === 'all' ? [...CITIES] : CITIES.filter(c => c.season === currentFilter);
+  if (currentSort === 'name') {
+    list.sort((a,b) => a.name.localeCompare(b.name,'zh-TW'));
+  } else if (currentSort === 'best') {
+    list.sort((a,b) => b.months.filter(s=>s>=4).length - a.months.filter(s=>s>=4).length);
+  } else {
+    list.sort((a,b) => SEASON_ORDER.indexOf(a.season) - SEASON_ORDER.indexOf(b.season));
+  }
+  return list;
+}
+
+function render() {
+  const cities = sortedCities();
+  const tbody   = document.getElementById('heatmap-body');
+  let html = '';
+  let lastSeason = null;
+
+  cities.forEach(city => {
+    if (currentSort === 'season' && city.season !== lastSeason) {
+      html += `<tr class="group-header"><td colspan="14">${SEASON_LABEL[city.season]}</td></tr>`;
+      lastSeason = city.season;
+    }
+
+    const bestCount = city.months.filter(s => s >= 4).length;
+    const bestMonths = city.months.reduce((acc, s, i) => s >= 4 ? [...acc, MONTH_NAMES[i]] : acc, []).join('、') || '—';
+
+    const cells = city.months.map((score, mi) => {
+      const isBest = score === monthMax[mi] && score >= 4;
+      return `<td class="heat-cell sc-${score}${isBest?' is-best':''}"
+        data-city="${city.name}" data-month="${MONTH_NAMES[mi]}" data-score="${score}"
+        data-route="${city.runRoute||''}" data-warning="${city.warning||''}"
+      >${score}</td>`;
+    }).join('');
+
+    html += `<tr>
+      <td style="padding:3px 0;">
+        <a class="city-name-cell" href="city_pages/${city.slug}.html" target="_blank" title="${city.runRoute||''}">
+          <div class="season-dot" style="background:${SEASON_COLOR[city.season]}"></div>
+          <div>
+            <div class="city-name-text">${city.name}</div>
+            <div class="city-province">${city.province}</div>
+          </div>
+        </a>
+      </td>
+      ${cells}
+      <td style="padding-left:8px;font-size:11px;color:#7AAA98;white-space:nowrap;">${bestCount} 個月</td>
+    </tr>`;
+  });
+
+  tbody.innerHTML = html;
+  bindTooltip();
+}
+
+const tooltip = document.getElementById('ht-tooltip');
+
+function bindTooltip() {
+  document.querySelectorAll('.heat-cell').forEach(cell => {
+    cell.addEventListener('mouseenter', e => {
+      const city    = cell.dataset.city;
+      const month   = cell.dataset.month;
+      const score   = parseInt(cell.dataset.score);
+      const route   = cell.dataset.route;
+      const warning = cell.dataset.warning;
+      const scoreClass = `sc-tip-${score}`;
+      tooltip.innerHTML = `
+        <div class="ht-tip-city">${city} · ${month}</div>
+        <div class="ht-tip-score ${scoreClass}">旅遊指數 ${score}/5　${SCORE_LABEL[score]}</div>
+        ${route ? `<div style="margin-top:5px;font-size:11px;color:#7DCCA8;">🏃 ${route}</div>` : ''}
+        ${warning ? `<div style="margin-top:4px;font-size:10px;color:#E8825A;">⚠️ ${warning}</div>` : ''}
+      `;
+      tooltip.classList.add('show');
+    });
+    cell.addEventListener('mousemove', e => {
+      tooltip.style.left = (e.clientX + 14) + 'px';
+      tooltip.style.top  = (e.clientY - 10) + 'px';
+    });
+    cell.addEventListener('mouseleave', () => tooltip.classList.remove('show'));
+  });
+}
+
+// filter buttons
+document.querySelectorAll('.ctrl-btn:not(.sort-btn)').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.ctrl-btn:not(.sort-btn)').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    render();
+  });
+});
+
+// sort buttons
+document.querySelectorAll('.sort-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentSort = btn.dataset.sort;
+    render();
+  });
+});
+
+render();
+</script>
+</body>
+</html>

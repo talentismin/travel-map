@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>專案 D：西南慢遊 + 旅居 Trial — 旅居行程</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Arial', 'PingFang TC', 'Microsoft JhengHei', sans-serif; background: #111820; color: #dde; min-height: 100vh; }
+
+  .page-header { background: linear-gradient(135deg, #1a2e26 0%, #0e1a14 100%); border-bottom: 3px solid #55EFC4; position: sticky; top: 0; z-index: 100; }
+  .header-inner { max-width: 960px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back-btn { display: flex; align-items: center; gap: 6px; color: #55EFC4; text-decoration: none; font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 20px; border: 1.5px solid #55EFC4; transition: all .2s; white-space: nowrap; }
+  .back-btn:hover { background: #55EFC422; }
+  .plan-badge { background: #55EFC4; color: #111; font-weight: 900; font-size: 22px; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .header-text .title { font-size: 18px; font-weight: 800; color: #fff; }
+  .header-text .subtitle { font-size: 12px; color: #7AAA98; margin-top: 3px; }
+  .duration-badge { margin-left: auto; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; border: 1.5px solid #55EFC4; color: #55EFC4; white-space: nowrap; }
+
+  .hero { background: #0e1a14; border-bottom: 1px solid #1e2d28; padding: 28px 24px; }
+  .hero-inner { max-width: 960px; margin: 0 auto; }
+
+  .kpi-row { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
+  .kpi-card { background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 10px; padding: 14px 18px; flex: 1; min-width: 150px; }
+  .kpi-label { font-size: 10px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; }
+  .kpi-value { font-size: 14px; font-weight: 700; color: #fff; margin-top: 5px; line-height: 1.4; }
+  .kpi-value.gold { color: #C9A84C; }
+  .kpi-value.warn { color: #E8825A; }
+
+  .ratings-block { background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 10px; padding: 16px 20px; }
+  .ratings-title { font-size: 11px; color: #7AAA98; text-transform: uppercase; margin-bottom: 12px; }
+  .rating-row { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+  .rating-label { font-size: 13px; color: #ccc; width: 100px; flex-shrink: 0; }
+  .rating-score { font-size: 12px; color: #7AAA98; width: 28px; }
+  .bar-wrap { flex: 1; height: 8px; background: #1e3028; border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; }
+
+  .content { max-width: 960px; margin: 0 auto; padding: 24px; }
+  .section { margin-bottom: 28px; }
+  .section-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #2D4A3E; display: flex; align-items: center; gap: 8px; }
+  .section-title span { font-size: 18px; }
+
+  .stop-card { display: flex; gap: 14px; padding: 12px 16px; background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 8px; margin-bottom: 10px; position: relative; }
+  .stop-card.is-trial { border-color: #55EFC455; background: #1a2a24; }
+  .stop-card.is-trial::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #55EFC4; border-radius: 8px 0 0 8px; }
+  .stop-num { width: 28px; height: 28px; border-radius: 50%; background: #55EFC422; border: 2px solid #55EFC4; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #55EFC4; flex-shrink: 0; margin-top: 2px; }
+  .stop-header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 5px; }
+  .stop-city { font-size: 15px; font-weight: 700; color: #fff; }
+  .stop-days { font-size: 12px; color: #7AAA98; margin-left: auto; white-space: nowrap; }
+  .stop-notes { font-size: 12px; color: #888; line-height: 1.5; }
+  .trial-badge { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; background: #55EFC422; border: 1px solid #55EFC455; color: #55EFC4; }
+  .tour-badge { padding: 2px 8px; border-radius: 10px; font-size: 10px; background: #2D4A3E; color: #7AAA98; }
+  .winter-badge { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; background: #5B9BD522; border: 1px solid #5B9BD5; color: #5B9BD5; }
+  .summer-badge { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; background: #E8825A22; border: 1px solid #E8825A; color: #E8825A; }
+
+  ul { list-style: none; }
+  ul li { padding: 7px 0 7px 20px; position: relative; font-size: 13px; color: #ccc; line-height: 1.5; border-bottom: 1px solid #1a2a20; }
+  ul li:last-child { border-bottom: none; }
+  ul li::before { content: '›'; position: absolute; left: 0; color: #55EFC4; font-weight: 700; font-size: 16px; }
+  ul li.warn-item { color: #E8825A; }
+  ul li.warn-item::before { color: #E8825A; }
+
+  .cost-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .cost-table td { padding: 9px 12px; border-bottom: 1px solid #1a2a20; color: #ccc; }
+  .cost-table .cost-val { color: #C9A84C; font-weight: 700; text-align: right; }
+  .cost-table tr:last-child td { border-bottom: none; font-size: 14px; }
+
+  .luggage-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .luggage-table th { background: #1a2a24; color: #7AAA98; text-align: left; padding: 8px 12px; font-size: 11px; text-transform: uppercase; border-bottom: 1px solid #2D4A3E; }
+  .luggage-table td { padding: 9px 12px; border-bottom: 1px solid #1a2a20; color: #ccc; }
+  .luggage-table tr:last-child td { border-bottom: none; }
+  .ok-cell { color: #5A8A72; font-weight: 600; }
+  .warn-cell { color: #E8825A; font-weight: 600; }
+
+  .concept-box { background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 8px; padding: 14px 16px; margin-bottom: 20px; display: flex; gap: 12px; font-size: 13px; color: #A8C5B8; line-height: 1.7; }
+  .concept-icon { font-size: 20px; flex-shrink: 0; }
+  .warning-box { background: #2D1A0E; border: 1.5px solid #E8825A; border-radius: 8px; padding: 12px 16px; display: flex; gap: 10px; font-size: 13px; color: #E8825A; line-height: 1.5; margin-bottom: 20px; }
+  .note-box { background: #1A2A3E; border: 1px solid #5B9BD5; border-radius: 8px; padding: 12px 16px; display: flex; gap: 10px; font-size: 13px; color: #A8C5FF; line-height: 1.5; margin-bottom: 20px; }
+
+  .flow-list { background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 8px; padding: 12px 16px; }
+  .flow-list li { color: #A8C5B8; }
+
+  .compare-link { display: inline-block; margin-top: 14px; padding: 8px 18px; border-radius: 20px; border: 1.5px solid #55EFC4; color: #55EFC4; text-decoration: none; font-size: 12px; font-weight: 700; transition: all .2s; }
+  .compare-link:hover { background: #55EFC422; }
+
+  .page-footer { text-align: center; padding: 20px; font-size: 12px; color: #3a4a42; border-top: 1px solid #1e2d28; margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-inner">
+    <a class="back-btn" href="../city_map.html">← 返回地圖</a>
+    <div class="plan-badge">D</div>
+    <div class="header-text">
+      <div class="title">專案 D：西南慢遊 + 旅居 Trial</div>
+      <div class="subtitle">成都 → 重慶 → 貴陽 → 桂林 → 昆明 → 大理</div>
+    </div>
+    <div class="duration-badge">約 35–38 天</div>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-label">最佳出發月份</div>
+        <div class="kpi-value">3–4月（春季）或 10–11月（秋季）</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">入境航班</div>
+        <div class="kpi-value">TPE → CTU（成都）部分直飛 3h20m</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">出境航班</div>
+        <div class="kpi-value ">KMG → TPE（昆明）部分直飛 3h</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">機票費用（來回）</div>
+        <div class="kpi-value gold">NT$13,500–22,000 來回</div>
+      </div>
+    </div>
+    <div class="ratings-block">
+      <div class="ratings-title">方案評分</div>
+      
+        <div class="rating-row">
+          <span class="rating-label">健行跑步</span>
+          <span class="rating-score">4/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:80%;background:#5A8A72"></div></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-label">美食</span>
+          <span class="rating-score">5/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-label">泡湯</span>
+          <span class="rating-score">4/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:80%;background:#5A8A72"></div></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-label">CP值</span>
+          <span class="rating-score">5/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-label">旅居評估</span>
+          <span class="rating-score">5/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+        </div>
+    </div>
+    <a class="compare-link" href="../proposal_compare.html">⇄ 五方案總覽比較 →</a>
+  </div>
+</div>
+
+<div class="content">
+  
+  
+  
+      <div class="concept-box">
+        <span class="concept-icon">💡</span>
+        <div>在路線A的骨幹上，將沿途4個旅居候選城市各切出「3天旅居模式」。這3天不排觀光景點，改為模擬實際居住狀態，評估長期旅居可行性。</div>
+      </div>
+
+  <div class="section">
+    <h2 class="section-title"><span>🗺</span>行程停靠城市</h2>
+    
+        <div class="stop-card is-trial">
+          <div class="stop-num">1</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">成都</span>
+              
+              <span class="trial-badge">旅居 Trial</span>
+              <span class="stop-days">7天（4觀光+3 Trial）</span>
+            </div>
+            <div class="stop-notes">Trial：租公寓型住宿、晨跑錦江、咖啡廳工作測試網路</div>
+          </div>
+        </div>
+        <div class="stop-card ">
+          <div class="stop-num">2</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">重慶</span>
+              
+              <span class="tour-badge">觀光</span>
+              <span class="stop-days">3天（純觀光）</span>
+            </div>
+            <div class="stop-notes">洪崖洞、火鍋、磁器口（非旅居候選）</div>
+          </div>
+        </div>
+        <div class="stop-card is-trial">
+          <div class="stop-num">3</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">貴陽+鎮遠</span>
+              
+              <span class="trial-badge">旅居 Trial</span>
+              <span class="stop-days">6天（3觀光+3 Trial）</span>
+            </div>
+            <div class="stop-notes">Trial：貴陽市區日常體驗；鎮遠純觀光</div>
+          </div>
+        </div>
+        <div class="stop-card ">
+          <div class="stop-num">4</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">桂林+陽朔</span>
+              
+              <span class="tour-badge">觀光</span>
+              <span class="stop-days">4天（純觀光）</span>
+            </div>
+            <div class="stop-notes">漓江、陽朔騎行（非旅居候選）</div>
+          </div>
+        </div>
+        <div class="stop-card is-trial">
+          <div class="stop-num">5</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">昆明</span>
+              
+              <span class="trial-badge">旅居 Trial</span>
+              <span class="stop-days">5天（2觀光+3 Trial）</span>
+            </div>
+            <div class="stop-notes">Trial：翠湖晨跑、西山步道、滇菜日常測試</div>
+          </div>
+        </div>
+        <div class="stop-card is-trial">
+          <div class="stop-num">6</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">大理</span>
+              
+              <span class="trial-badge">旅居 Trial</span>
+              <span class="stop-days">6天（3觀光+3 Trial）</span>
+            </div>
+            <div class="stop-notes">Trial：洱海環湖跑、咖啡廳網路實測（⚠️ 最關鍵項目）</div>
+          </div>
+        </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span>🚄</span>交通方式</h2>
+    <ul><li class="">入境：台灣直飛成都</li><li class="">成都 → 重慶：高鐵 1.5h</li><li class="">重慶 → 貴陽：高鐵 2h</li><li class="">貴陽 → 桂林：高鐵 3h</li><li class="">桂林 → 昆明：高鐵 3.5h</li><li class="">昆明 → 大理：高鐵 1.5h</li><li class="">出境：大理飛昆明轉台灣，或昆明直飛台灣</li></ul>
+  </div>
+
+  
+      <div class="section">
+        <h2 class="section-title"><span>🔬</span>旅居 Trial 標準流程（3天）</h2>
+        <ul class="flow-list">
+          <li>Day 1：找住宿（優先選有廚房的公寓型民宿）、實測網路速度、確認附近健身房</li><li>Day 2：規劃固定跑步路線並執行晨跑、逛附近菜市場/超市、尋找日常早餐店</li><li>Day 3：找咖啡廳或共享工作空間，開電腦工作3–4小時，測試專注度與網路穩定性</li>
+        </ul>
+      </div>
+
+  <div class="section">
+    <h2 class="section-title"><span>💰</span>費用概估</h2>
+    <table class="cost-table"><tr><td>住宿（公寓型）</td><td class="cost-val">180–280 CNY</td></tr><tr><td>餐飲</td><td class="cost-val">80–120 CNY</td></tr><tr><td>交通+景點</td><td class="cost-val">60–100 CNY</td></tr><tr><td>38天合計</td><td class="cost-val">約 12,000–19,000 CNY</td></tr></table>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span>🧳</span>行李建議（28吋行李箱 + 後背包）</h2>
+    <table class="luggage-table">
+      <thead><tr><th>城市段</th><th>28吋適用度</th><th>說明</th></tr></thead>
+      <tbody><tr>
+      <td>成都 Trial</td>
+      <td class="ok-cell">✅ 方便</td>
+      <td>公寓型住宿可直接放行李，適合長住模式</td>
+    </tr><tr>
+      <td>貴陽 Trial</td>
+      <td class="ok-cell">✅ 方便</td>
+      <td>現代城市，行李移動無障礙</td>
+    </tr><tr>
+      <td>昆明 Trial</td>
+      <td class="ok-cell">✅ 方便</td>
+      <td>市區平坦，公寓型住宿多</td>
+    </tr><tr>
+      <td>大理 Trial</td>
+      <td class="warn-cell">⚠️ 注意</td>
+      <td>古城石板路，建議住洱海邊而非古城核心</td>
+    </tr></tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span>📝</span>注意事項</h2>
+    <ul><li class="">七/八月為雲貴雨季，Trial晨跑與咖啡廳評估體驗受影響，強烈建議避開</li><li class="">本方案需請假35–38天以上</li><li class="">Trial住宿建議統一選「公寓型」（有廚房/洗衣機），更貼近真實旅居感</li><li class="">若某城trial體驗差，難立即大幅調整計畫（是此方案最大缺點）</li></ul>
+  </div>
+</div>
+
+<div class="page-footer">旅居城市評估 — 43歲台灣軟體工程師視角 | 重訓・跑步・美食・數位遊牧</div>
+
+</body>
+</html>

@@ -1,0 +1,36 @@
+{
+  "name": "釜山 10 天 9 夜 · 旅伴 App",
+  "short_name": "釜山",
+  "description": "逐日行程、注意事項、消費與日誌。離線可用。",
+  "id": "/itineraries/busan-2026",
+  "start_url": "./busan_itinerary_2026_app.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0E1A24",
+  "theme_color": "#0E1A24",
+  "orientation": "portrait",
+  "lang": "zh-TW",
+  "icons": [
+    {
+      "src": "./icon_busan-2026-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon_busan-2026-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon_busan-2026-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": [
+    "travel"
+  ]
+}

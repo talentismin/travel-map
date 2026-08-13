@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2D4A3E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>峇里島 Canggu — 旅居評估</title>
+<link rel="manifest" href="../manifest.json">
+<link rel="icon" href="../icons/icon.svg" type="image/svg+xml">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Arial', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+    background: #111820; color: #dde; min-height: 100vh;
+  }
+  .page-header {
+    background: linear-gradient(135deg, #1a2e26 0%, #0e1a14 100%);
+    border-bottom: 3px solid #9B59B6;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-inner {
+    max-width: 900px; margin: 0 auto;
+    padding: 16px 24px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .back-btn {
+    display: flex; align-items: center; gap: 6px;
+    color: #9B59B6; text-decoration: none;
+    font-size: 13px; font-weight: 600;
+    padding: 6px 14px; border-radius: 20px;
+    border: 1.5px solid #9B59B6;
+    transition: all .2s; white-space: nowrap;
+  }
+  .back-btn:hover { background: #9B59B622; }
+  .header-title { font-size: 22px; font-weight: 800; color: #fff; }
+  .header-province { font-size: 12px; color: #7AAA98; margin-top: 2px; }
+  .season-tag {
+    margin-left: auto; padding: 4px 14px;
+    border-radius: 20px; font-size: 12px; font-weight: 700;
+    background: #9B59B6; color: #fff; white-space: nowrap;
+  }
+  .hero {
+    background: linear-gradient(180deg, #0e1a14 0%, #111820 100%);
+    padding: 32px 24px;
+    border-bottom: 1px solid #1e2d28;
+  }
+  .hero-inner { max-width: 900px; margin: 0 auto; }
+  .hero-tagline { font-size: 16px; color: #A8C5B8; margin-bottom: 20px; line-height: 1.6; }
+
+  .kpi-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+  .kpi-card {
+    background: #1a2a24; border: 1px solid #2D4A3E;
+    border-radius: 10px; padding: 14px 20px;
+    flex: 1; min-width: 160px;
+  }
+  .kpi-label { font-size: 11px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; }
+  .kpi-value { font-size: 20px; font-weight: 800; color: #C9A84C; margin-top: 4px; }
+  .kpi-sub { font-size: 11px; color: #5A7A6A; margin-top: 2px; }
+  .kpi-stars { font-size: 22px; font-weight: 800; color: #FFD700; margin-top: 4px; }
+  .kpi-stars .empty-star { color: #333; }
+  .kpi-stars .half-star { color: #FFD700; }
+
+  .ratings-block { background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 10px; padding: 16px 20px; }
+  .ratings-title { font-size: 12px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
+  .rating-row { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+  .rating-label { font-size: 13px; color: #ccc; width: 90px; flex-shrink: 0; }
+  .rating-score { font-size: 12px; color: #7AAA98; width: 28px; flex-shrink: 0; }
+  .bar-wrap { flex: 1; height: 8px; background: #1e3028; border-radius: 4px; overflow: hidden; }
+  .bar-fill  { height: 100%; border-radius: 4px; transition: width .3s; }
+
+  .content { max-width: 900px; margin: 0 auto; padding: 24px; }
+  .section { margin-bottom: 28px; }
+  .section-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #2D4A3E; display: flex; align-items: center; gap: 8px; }
+  .section-icon { font-size: 18px; }
+
+  ul { list-style: none; }
+  ul li { padding: 7px 0 7px 20px; position: relative; font-size: 14px; color: #ccc; line-height: 1.5; border-bottom: 1px solid #1a2a20; }
+  ul li:last-child { border-bottom: none; }
+  ul li::before { content: '›'; position: absolute; left: 0; color: #9B59B6; font-weight: 700; font-size: 16px; }
+
+  .climate-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .climate-table th { background: #1a2a24; color: #7AAA98; text-align: left; padding: 8px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #2D4A3E; }
+  .climate-table td { padding: 9px 12px; border-bottom: 1px solid #1a2a20; color: #ccc; }
+  .climate-table tr:last-child td { border-bottom: none; }
+  .climate-table tr:hover td { background: #1a2a2488; }
+
+  .warning-box { background: #2D1A0E; border: 1.5px solid #E8825A; border-radius: 8px; padding: 12px 16px; display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: #E8825A; line-height: 1.5; margin-bottom: 20px; }
+  .warning-icon { font-size: 18px; flex-shrink: 0; }
+
+  .trial-list li { font-size: 13px; color: #A8C5B8; }
+  .prose { font-size: 14px; color: #ccc; line-height: 1.7; background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 8px; padding: 14px 16px; }
+  .best-season { display: inline-block; background: #9B59B622; border: 1px solid #9B59B655; color: #9B59B6; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 16px; }
+
+  /* 即時天氣 / AQI */
+  .live-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+  .live-card { flex: 1; min-width: 140px; background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 10px; padding: 12px 14px; font-size: 13px; }
+  .live-label { font-size: 10px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
+  .live-value { font-size: 18px; font-weight: 800; color: #fff; }
+  .live-sub { font-size: 11px; color: #7AAA98; margin-top: 2px; }
+  .live-aqi-good   { color: #5AE89A; }
+  .live-aqi-fair   { color: #C9A84C; }
+  .live-aqi-poor   { color: #E8825A; }
+
+  /* 上下城市導航 */
+  .city-nav { display: flex; gap: 10px; padding: 0 24px; max-width: 900px; margin: 28px auto 0; }
+  .city-nav a {
+    flex: 1; padding: 12px 14px; text-decoration: none;
+    border: 1px solid #2D4A3E; border-radius: 10px;
+    background: #1a2a24; color: #A8C5B8;
+    font-size: 12px; transition: all .2s; min-width: 0;
+  }
+  .city-nav a:hover { border-color: #9B59B6; color: #fff; }
+  .city-nav a .nv-label { font-size: 10px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; }
+  .city-nav a .nv-name { font-size: 14px; font-weight: 700; color: #fff; margin-top: 3px; }
+  .city-nav a.nv-prev { text-align: left; }
+  .city-nav a.nv-next { text-align: right; }
+  .city-nav a.nv-back { flex: 0 1 auto; text-align: center; padding: 12px 18px; }
+
+  .page-footer { text-align: center; padding: 20px; font-size: 12px; color: #3a4a42; border-top: 1px solid #1e2d28; margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-inner">
+    <a class="back-btn" href="../city_map.html?focus=balicanggu">← 返回地圖</a>
+    <div>
+      <div class="header-title">峇里島 Canggu</div>
+      <div class="header-province">印尼</div>
+    </div>
+    <div class="season-tag">✈ 境外</div>
+    <div style="margin-left:auto;font-size:11px;color:#3A5A4A;padding-right:4px;">📅 2026-04</div>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-tagline">Bali Strength／S2S 真・硬派重訓＋海灘跑＋頂級 coworking，數位遊牧天堂；交通與雨季是硬傷</div>
+
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-label">月均費用</div>
+        <div class="kpi-value">USD 1,000–1,900</div>
+        <div class="kpi-sub" id="cost-twd">NT$1,584–3,010/月</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">綜合推薦</div>
+        <div class="kpi-stars">★★★★<span class="empty-star">☆</span></div>
+        <div class="kpi-sub">4 / 5.0</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">最佳旅居季節</div>
+        <div style="font-size:14px;font-weight:700;color:#fff;margin-top:6px;">乾季（4–10月）最佳，均溫 24–32°C；11–3月雨季午後雷雨</div>
+      </div>
+    </div>
+
+    <div class="ratings-block">
+      <div class="ratings-title">各項評分</div>
+      
+          <div class="rating-row">
+            <span class="rating-label">健行跑步</span>
+            <span class="rating-score">4/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:80%;background:#5A8A72"></div></div>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">健身房</span>
+            <span class="rating-score">5/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">美食</span>
+            <span class="rating-score">4/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:80%;background:#5A8A72"></div></div>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">網路/VPN</span>
+            <span class="rating-score">5/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">CP值</span>
+            <span class="rating-score">3/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:60%;background:#C9A84C"></div></div>
+          </div>
+    </div>
+
+    <div class="live-row" id="live-row">
+      <div class="live-card"><div class="live-label">當前氣溫</div><div class="live-value" id="lv-temp">—</div><div class="live-sub" id="lv-temp-sub">載入中</div></div>
+      <div class="live-card"><div class="live-label">未來 3 日</div><div class="live-value" id="lv-forecast">—</div><div class="live-sub">最低 / 最高</div></div>
+      <div class="live-card"><div class="live-label">空氣品質 (歐盟 AQI)</div><div class="live-value" id="lv-aqi">—</div><div class="live-sub" id="lv-pm">PM2.5 載入中</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+  
+        <div class="warning-box">
+          <span class="warning-icon">⚠️</span>
+          <div>⚠️ 交通壅塞惡化＋11–3月雨季強降雨＋觀光定價偏高；旅居建議乾季 4–10月</div>
+        </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">🏃</span>跑步 / 健行路線</h2>
+    <ul><li>Echo Beach～Berawa～Batu Bolong 海灘：黑沙硬灘晨跑 4–8km，日落景觀，避開正午</li><li>Canggu 稻田小徑（Tumbak Bayuh／Shortcut 一帶）：田埂與小路串接 3–6km，鄉村氛圍</li><li>Tanah Lot 方向海岸線長跑：沿岸道路與海岬 10–15km，週末長距離</li><li>Mt. Batur 火山日出健行越野（車程約 2–2.5h，過夜或極早出發）：海拔 1,717m，4–6km 爬升看日出火山口</li><li>Campuhan Ridge（烏布方向，車程約 1h）：山脊草原步道越野，可與烏布串點</li></ul>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">💪</span>健身房 / 蹲舉架</h2>
+    <div class="prose">此清單健身房天花板之一。Bali Strength（strongman／powerlifting 取向，Power Rack、深蹲台、奧林匹克槓鈴與大重量片齊全）、S2S（Strength to Strength，多店、24h、自由重量區一流）、The Lab Bali。蹲舉 140kg／臥推 100kg 完全不是問題，硬派訓練者天堂，月費約 USD 60–110。</div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">♨️</span>溫泉</h2>
+    <div class="prose">Canggu 周邊無天然溫泉。北部山區 Banjar 溫泉（距約 2.5–3h）或 Toya Devasya（Batur 火山湖畔，可結合火山健行）需安排出遊。泡湯為弱項，以泳池與海濱替代。</div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">🍜</span>美食亮點</h2>
+    <ul><li>印尼沙嗲（Sate）、加多加多、Nasi Campur：在地 warung CP 值極高</li><li>Babi Guling（峇里烤乳豬）與 Bebek Betutu（慢烤鴨）：峇里經典</li><li>健康餐與 specialty coffee 天花板：數位遊牧帶動的 brunch／smoothie bowl 場景全球前段</li><li>海鮮燒烤（Jimbaran 海灘，車程 40 分）：沙灘晚餐</li><li>國際美食極齊（義／日／墨／純素），數位遊牧友善餐廳爆量</li></ul>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">🌤</span>氣候參考</h2>
+    <table class="climate-table">
+      <thead><tr><th>月份</th><th>氣溫</th><th>特點</th></tr></thead>
+      <tbody>
+          <tr>
+            <td>4–10月</td>
+            <td>23–32°C</td>
+            <td>乾季最佳，濕度較低，旅居黃金期</td>
+          </tr>
+          <tr>
+            <td>11–3月</td>
+            <td>24–33°C</td>
+            <td>⚠️ 雨季，午後／夜間強降雨，悶熱，部分海灘有海漂垃圾</td>
+          </tr>
+          <tr>
+            <td>全年</td>
+            <td>24–32°C</td>
+            <td>熱帶氣候，無冬季，紫外線強需防曬</td>
+          </tr></tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">📝</span>注意事項</h2>
+    <ul><li>⚠️ Canggu 交通壅塞近年惡化（單行小路＋觀光車流），通勤與跑步動線受影響</li><li>⚠️ 11–3月雨季午後／夜間強降雨，部分海灘旱季末～雨季有海漂垃圾</li><li>印尼落地簽 VoA 30 天（IDR 500,000，約NT$1,000），可線上延長一次共 60 天；e-VoA 亦可</li><li>VPN 完全自由、光纖普及（50–300Mbps）＋coworking（Tropical Nomad／BWork）密度全球前段</li><li>觀光定價：住宿與餐飲為印尼偏高水準，CP 值是相對弱項；需租機車（注意路況與安全）</li></ul>
+  </div>
+
+  
+        <div class="section">
+          <h2 class="section-title"><span class="section-icon">🔬</span>旅居 Trial 建議（3天流程）</h2>
+          <ul class="trial-list">
+            <li>Day 1：入住 Berawa／Pererenan 月租 villa、Echo Beach 晨跑 6km、warung 在地餐、coworking 測網速</li><li>Day 2：稻田小徑跑 5km、下午 Bali Strength／S2S 確認 Power Rack 與大重量片、海鮮燒烤</li><li>Day 3：Mt. Batur 火山日出健行＋火山湖溫泉、回程烏布 Campuhan Ridge 串點</li>
+          </ul>
+        </div>
+
+</div>
+
+<nav class="city-nav">
+  <a class="nv-prev" href="baguio.html"><div class="nv-label">← 上一城</div><div class="nv-name">碧瑤</div></a>
+  <a class="nv-back" href="../city_map.html?focus=balicanggu"><div class="nv-label">↑ 地圖</div><div class="nv-name">總覽</div></a>
+  <a class="nv-next" href="baliubud.html"><div class="nv-label">下一城 →</div><div class="nv-name">峇里島烏布</div></a>
+</nav>
+
+<div class="page-footer">旅居城市評估 — 43歲台灣軟體工程師視角 | 重訓・跑步・美食・數位遊牧</div>
+
+<script src="../lib/format.js"></script>
+<script src="../lib/fx.js"></script>
+<script src="../lib/weather.js"></script>
+<script>
+const CITY = {"slug":"balicanggu","lat":-8.65,"lng":115.13,"cost":{"currency":"USD","min":1000,"max":1900}};
+const FX_SNAPSHOT = {"CNY":1,"USD":7.2,"EUR":7.8,"JPY":0.048,"TWD":0.22};
+
+// 動態 TWD 換算（以即時匯率，失敗時退回快照）
+if (window.CT_FX && window.CT_FORMAT) {
+  CT_FX.getRates().then(rates => {
+    const merged = Object.assign({}, FX_SNAPSHOT, rates || {});
+    const twd = CT_FORMAT.formatTWDFromCost(CITY.cost, merged);
+    const el = document.getElementById('cost-twd');
+    if (el && twd) el.textContent = twd + '/月';
+  }).catch(() => {});
+}
+
+// 天氣 + AQI
+if (window.CT_WEATHER) {
+  CT_WEATHER.fetchWeather(CITY.lat, CITY.lng).then(w => {
+    if (!w) return;
+    document.getElementById('lv-temp').textContent = w.current + '°C';
+    document.getElementById('lv-temp-sub').textContent = w.weather || '—';
+    document.getElementById('lv-forecast').textContent = w.forecastMin + '° / ' + w.forecastMax + '°';
+  }).catch(() => {});
+  CT_WEATHER.fetchAQI(CITY.lat, CITY.lng).then(a => {
+    if (!a) return;
+    const el = document.getElementById('lv-aqi');
+    el.textContent = a.aqi;
+    el.classList.add(a.aqi <= 40 ? 'live-aqi-good' : a.aqi <= 80 ? 'live-aqi-fair' : 'live-aqi-poor');
+    document.getElementById('lv-pm').textContent = 'PM2.5 ' + a.pm25 + ' µg/m³';
+  }).catch(() => {});
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('../sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>

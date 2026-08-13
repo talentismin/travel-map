@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>西安・川渝・雲南線（觀光慢遊） — 旅遊行程</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Arial', 'PingFang TC', 'Microsoft JhengHei', sans-serif; background: #111820; color: #dde; min-height: 100vh; }
+  .page-header { background: linear-gradient(135deg, #1a2e26 0%, #0e1a14 100%); border-bottom: 3px solid #00CEC9; position: sticky; top: 0; z-index: 100; }
+  .header-inner { max-width: 960px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back-btn { display: flex; align-items: center; gap: 6px; color: #00CEC9; text-decoration: none; font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 20px; border: 1.5px solid #00CEC9; transition: all .2s; white-space: nowrap; }
+  .back-btn:hover { background: #00CEC922; }
+  .plan-badge { background: #00CEC9; color: #111; font-weight: 900; font-size: 22px; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .header-text .title { font-size: 18px; font-weight: 800; color: #fff; }
+  .header-text .subtitle { font-size: 12px; color: #7AAA98; margin-top: 3px; }
+  .duration-badge { margin-left: auto; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; border: 1.5px solid #00CEC9; color: #00CEC9; white-space: nowrap; }
+  .hero { background: #0e1a14; border-bottom: 1px solid #1e2d28; padding: 28px 24px; }
+  .hero-inner { max-width: 960px; margin: 0 auto; }
+  .kpi-row { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
+  .kpi-card { background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 10px; padding: 14px 18px; flex: 1; min-width: 150px; }
+  .kpi-label { font-size: 10px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; }
+  .kpi-value { font-size: 14px; font-weight: 700; color: #fff; margin-top: 5px; line-height: 1.4; }
+  .kpi-value.gold { color: #C9A84C; }
+  .ratings-block { background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 10px; padding: 16px 20px; }
+  .ratings-title { font-size: 11px; color: #7AAA98; text-transform: uppercase; margin-bottom: 12px; }
+  .rating-row { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+  .rating-label { font-size: 13px; color: #ccc; width: 100px; flex-shrink: 0; }
+  .rating-score { font-size: 12px; color: #7AAA98; width: 28px; }
+  .bar-wrap { flex: 1; height: 8px; background: #1e3028; border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; }
+  .content { max-width: 960px; margin: 0 auto; padding: 24px; }
+  .section { margin-bottom: 28px; }
+  .section-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #2D4A3E; display: flex; align-items: center; gap: 8px; }
+  .section-title span { font-size: 18px; }
+  .stop-card { display: flex; gap: 14px; padding: 12px 16px; background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 8px; margin-bottom: 10px; }
+  .stop-num { width: 28px; height: 28px; border-radius: 50%; background: #00CEC922; border: 2px solid #00CEC9; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #00CEC9; flex-shrink: 0; margin-top: 2px; }
+  .stop-header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 5px; }
+  .stop-city { font-size: 15px; font-weight: 700; color: #fff; }
+  .stop-days { font-size: 12px; color: #7AAA98; margin-left: auto; white-space: nowrap; }
+  .stop-notes { font-size: 12px; color: #888; line-height: 1.5; }
+  ul { list-style: none; }
+  ul li { padding: 7px 0 7px 20px; position: relative; font-size: 13px; color: #ccc; line-height: 1.5; border-bottom: 1px solid #1a2a20; }
+  ul li:last-child { border-bottom: none; }
+  ul li::before { content: '›'; position: absolute; left: 0; color: #00CEC9; font-weight: 700; font-size: 16px; }
+  ul li.warn-item { color: #E8A57A; } ul li.warn-item::before { color: #E8A57A; }
+  .cost-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .cost-table td { padding: 9px 12px; border-bottom: 1px solid #1a2a20; color: #ccc; }
+  .cost-table .cost-val { color: #C9A84C; font-weight: 700; text-align: right; }
+  .cost-table tr:last-child td { border-bottom: none; font-size: 14px; }
+  .luggage-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .luggage-table th { background: #1a2a24; color: #7AAA98; text-align: left; padding: 8px 12px; font-size: 11px; text-transform: uppercase; border-bottom: 1px solid #2D4A3E; }
+  .luggage-table td { padding: 9px 12px; border-bottom: 1px solid #1a2a20; color: #ccc; }
+  .luggage-table tr:last-child td { border-bottom: none; }
+  .ok-cell { color: #5A8A72; font-weight: 600; } .warn-cell { color: #E8825A; font-weight: 600; }
+  .page-footer { text-align: center; padding: 20px; font-size: 12px; color: #3a4a42; border-top: 1px solid #1e2d28; margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-inner">
+    <a class="back-btn" href="../city_map.html?mode=travel">← 返回旅遊地圖</a>
+    <div class="plan-badge">G</div>
+    <div class="header-text">
+      <div class="title">西安・川渝・雲南線（觀光慢遊）</div>
+      <div class="subtitle">西安 → 重慶 → 昆明 → 大理 → 沙溪 → 麗江 → 香格里拉</div>
+    </div>
+    <div class="duration-badge">約 34 天</div>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="kpi-row">
+      <div class="kpi-card"><div class="kpi-label">建議出發</div><div class="kpi-value">9–10 月（避雨季與香格里拉嚴寒）</div></div>
+      <div class="kpi-card"><div class="kpi-label">入境</div><div class="kpi-value">TPE → XIY（西安）經轉</div></div>
+      <div class="kpi-card"><div class="kpi-label">出境</div><div class="kpi-value">KMG（昆明）出境</div></div>
+      <div class="kpi-card"><div class="kpi-label">機票（來回）</div><div class="kpi-value gold">需經轉，臨行查詢</div></div>
+    </div>
+    <div class="ratings-block">
+      <div class="ratings-title">路線評分（觀光主軸）</div>
+      
+        <div class="rating-row">
+          <span class="rating-label">美食</span>
+          <span class="rating-score">5/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-label">自然健行</span>
+          <span class="rating-score">4/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:80%;background:#5A8A72"></div></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-label">歷史文化</span>
+          <span class="rating-score">5/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-label">慢遊</span>
+          <span class="rating-score">4/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:80%;background:#5A8A72"></div></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-label">不走回頭路</span>
+          <span class="rating-score">4/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:80%;background:#5A8A72"></div></div>
+        </div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div class="section">
+    <h2 class="section-title"><span>🗺</span>行程停靠城市</h2>
+    
+        <div class="stop-card">
+          <div class="stop-num">1</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">西安</span>
+              <span class="stop-days">5天</span>
+            </div>
+            <div class="stop-notes">兵馬俑、明城牆騎行、回民街、碑林、華山一日</div>
+          </div>
+        </div>
+        <div class="stop-card">
+          <div class="stop-num">2</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">重慶</span>
+              <span class="stop-days">5天</span>
+            </div>
+            <div class="stop-notes">洪崖洞夜景、火鍋、磁器口、武隆天坑一日</div>
+          </div>
+        </div>
+        <div class="stop-card">
+          <div class="stop-num">3</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">昆明</span>
+              <span class="stop-days">2天</span>
+            </div>
+            <div class="stop-notes">進雲南中繼，滇池西山/石林，補給休整</div>
+          </div>
+        </div>
+        <div class="stop-card">
+          <div class="stop-num">4</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">大理</span>
+              <span class="stop-days">7天</span>
+            </div>
+            <div class="stop-notes">洱海環湖騎跑、蒼山健行、古城慢遊、喜洲雙廊（本線基地）</div>
+          </div>
+        </div>
+        <div class="stop-card">
+          <div class="stop-num">5</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">沙溪古鎮</span>
+              <span class="stop-days">3天</span>
+            </div>
+            <div class="stop-notes">寺登街、石寶山，徹底放空</div>
+          </div>
+        </div>
+        <div class="stop-card">
+          <div class="stop-num">6</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">麗江</span>
+              <span class="stop-days">4天</span>
+            </div>
+            <div class="stop-notes">古城/木府、玉龍雪山、束河（怕擠住束河）</div>
+          </div>
+        </div>
+        <div class="stop-card">
+          <div class="stop-num">7</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">香格里拉</span>
+              <span class="stop-days">4天</span>
+            </div>
+            <div class="stop-notes">松贊林寺、普達措、虎跳峽（含海拔適應，勿急行）</div>
+          </div>
+        </div>
+  </div>
+  <div class="section">
+    <h2 class="section-title"><span>🚄</span>交通方式</h2>
+    <ul><li class="">入境：飛西安（TPE → XIY 多經轉）</li><li class="">西安 → 重慶：高鐵約 5–6h（正南向）</li><li class="">重慶 → 昆明：高鐵約 5h</li><li class="">昆明 → 大理：高鐵約 2h</li><li class="">大理 → 沙溪：巴士＋轉接約 2.5–3h（無鐵路，先排接駁）</li><li class="">沙溪 → 麗江：巴士約 2.5h</li><li class="">麗江 → 香格里拉：陸路約 4–5h（可中途安排虎跳峽健行）</li><li class="">香格里拉 → 昆明：航班約 1h，由昆明出境（直飛避免長途折返）</li></ul>
+  </div>
+  <div class="section">
+    <h2 class="section-title"><span>💰</span>費用概估（每日，未含機票）</h2>
+    <table class="cost-table"><tr><td>住宿（民宿/精品客棧）</td><td class="cost-val">200–400 CNY</td></tr><tr><td>餐飲</td><td class="cost-val">80–150 CNY</td></tr><tr><td>交通＋景點</td><td class="cost-val">80–150 CNY</td></tr><tr><td>每日合計（未含機票）</td><td class="cost-val">約 400–750 CNY</td></tr></table>
+  </div>
+  <div class="section">
+    <h2 class="section-title"><span>🧳</span>行李建議</h2>
+    <table class="luggage-table">
+      <thead><tr><th>城市段</th><th>行李箱適用</th><th>說明</th></tr></thead>
+      <tbody>
+      <tr><td>西安/重慶/昆明/大理/麗江市區</td><td class="ok-cell">✅ 方便</td><td>鋪裝路面、住宿集中，行李箱方便</td></tr>
+      <tr><td>沙溪</td><td class="warn-cell">⚠️ 注意</td><td>山路接駁、古鎮石板路，後背包較靈活</td></tr>
+      <tr><td>香格里拉</td><td class="warn-cell">⚠️ 注意</td><td>高海拔、跨城拉車，輕裝為宜</td></tr></tbody>
+    </table>
+  </div>
+  <div class="section">
+    <h2 class="section-title"><span>📝</span>注意事項</h2>
+    <ul><li class="warn-item">⚠️ 高原反應：海拔由低到高漸進，先在大理/麗江適應再上香格里拉(3300m)，不適立即下撤</li><li class="warn-item">⚠️ 香格里拉 11 月後嚴寒、高海拔路段可能封閉，景區開放臨行確認；末段可直飛昆明出境避免折返</li><li class="">西安偏鹹麵食、川渝麻辣、雲南酸辣溫和，口味跨度大，怕辣主動降辣</li><li class="">大理 → 沙溪無鐵路，巴士＋轉接要先排好</li><li class="">野生菌只在正規餐廳吃、務必煮熟</li><li class="">尊重白族/納西/藏族民俗與宗教禮儀；避開敏感政治與宗教話題</li><li class="">無台灣直航，西安進多經轉；支付寶/微信為主；境外 App 需自備翻牆方案</li><li class="">若天候/健康不佳，可放棄香格里拉、止於麗江（保留退路）</li></ul>
+  </div>
+</div>
+
+<div class="page-footer">旅遊行程提案 — 觀光視角　｜　費用/班次/景區開放為估算，臨行再確認</div>
+
+</body>
+</html>

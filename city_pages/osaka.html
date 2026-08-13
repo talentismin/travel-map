@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2D4A3E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>大阪 — 旅居評估</title>
+<link rel="manifest" href="../manifest.json">
+<link rel="icon" href="../icons/icon.svg" type="image/svg+xml">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Arial', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+    background: #111820; color: #dde; min-height: 100vh;
+  }
+  .page-header {
+    background: linear-gradient(135deg, #1a2e26 0%, #0e1a14 100%);
+    border-bottom: 3px solid #9B59B6;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-inner {
+    max-width: 900px; margin: 0 auto;
+    padding: 16px 24px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .back-btn {
+    display: flex; align-items: center; gap: 6px;
+    color: #9B59B6; text-decoration: none;
+    font-size: 13px; font-weight: 600;
+    padding: 6px 14px; border-radius: 20px;
+    border: 1.5px solid #9B59B6;
+    transition: all .2s; white-space: nowrap;
+  }
+  .back-btn:hover { background: #9B59B622; }
+  .header-title { font-size: 22px; font-weight: 800; color: #fff; }
+  .header-province { font-size: 12px; color: #7AAA98; margin-top: 2px; }
+  .season-tag {
+    margin-left: auto; padding: 4px 14px;
+    border-radius: 20px; font-size: 12px; font-weight: 700;
+    background: #9B59B6; color: #fff; white-space: nowrap;
+  }
+  .hero {
+    background: linear-gradient(180deg, #0e1a14 0%, #111820 100%);
+    padding: 32px 24px;
+    border-bottom: 1px solid #1e2d28;
+  }
+  .hero-inner { max-width: 900px; margin: 0 auto; }
+  .hero-tagline { font-size: 16px; color: #A8C5B8; margin-bottom: 20px; line-height: 1.6; }
+
+  .kpi-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+  .kpi-card {
+    background: #1a2a24; border: 1px solid #2D4A3E;
+    border-radius: 10px; padding: 14px 20px;
+    flex: 1; min-width: 160px;
+  }
+  .kpi-label { font-size: 11px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; }
+  .kpi-value { font-size: 20px; font-weight: 800; color: #C9A84C; margin-top: 4px; }
+  .kpi-sub { font-size: 11px; color: #5A7A6A; margin-top: 2px; }
+  .kpi-stars { font-size: 22px; font-weight: 800; color: #FFD700; margin-top: 4px; }
+  .kpi-stars .empty-star { color: #333; }
+  .kpi-stars .half-star { color: #FFD700; }
+
+  .ratings-block { background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 10px; padding: 16px 20px; }
+  .ratings-title { font-size: 12px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
+  .rating-row { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+  .rating-label { font-size: 13px; color: #ccc; width: 90px; flex-shrink: 0; }
+  .rating-score { font-size: 12px; color: #7AAA98; width: 28px; flex-shrink: 0; }
+  .bar-wrap { flex: 1; height: 8px; background: #1e3028; border-radius: 4px; overflow: hidden; }
+  .bar-fill  { height: 100%; border-radius: 4px; transition: width .3s; }
+
+  .content { max-width: 900px; margin: 0 auto; padding: 24px; }
+  .section { margin-bottom: 28px; }
+  .section-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #2D4A3E; display: flex; align-items: center; gap: 8px; }
+  .section-icon { font-size: 18px; }
+
+  ul { list-style: none; }
+  ul li { padding: 7px 0 7px 20px; position: relative; font-size: 14px; color: #ccc; line-height: 1.5; border-bottom: 1px solid #1a2a20; }
+  ul li:last-child { border-bottom: none; }
+  ul li::before { content: '›'; position: absolute; left: 0; color: #9B59B6; font-weight: 700; font-size: 16px; }
+
+  .climate-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .climate-table th { background: #1a2a24; color: #7AAA98; text-align: left; padding: 8px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #2D4A3E; }
+  .climate-table td { padding: 9px 12px; border-bottom: 1px solid #1a2a20; color: #ccc; }
+  .climate-table tr:last-child td { border-bottom: none; }
+  .climate-table tr:hover td { background: #1a2a2488; }
+
+  .warning-box { background: #2D1A0E; border: 1.5px solid #E8825A; border-radius: 8px; padding: 12px 16px; display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: #E8825A; line-height: 1.5; margin-bottom: 20px; }
+  .warning-icon { font-size: 18px; flex-shrink: 0; }
+
+  .trial-list li { font-size: 13px; color: #A8C5B8; }
+  .prose { font-size: 14px; color: #ccc; line-height: 1.7; background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 8px; padding: 14px 16px; }
+  .best-season { display: inline-block; background: #9B59B622; border: 1px solid #9B59B655; color: #9B59B6; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 16px; }
+
+  /* 即時天氣 / AQI */
+  .live-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+  .live-card { flex: 1; min-width: 140px; background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 10px; padding: 12px 14px; font-size: 13px; }
+  .live-label { font-size: 10px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
+  .live-value { font-size: 18px; font-weight: 800; color: #fff; }
+  .live-sub { font-size: 11px; color: #7AAA98; margin-top: 2px; }
+  .live-aqi-good   { color: #5AE89A; }
+  .live-aqi-fair   { color: #C9A84C; }
+  .live-aqi-poor   { color: #E8825A; }
+
+  /* 上下城市導航 */
+  .city-nav { display: flex; gap: 10px; padding: 0 24px; max-width: 900px; margin: 28px auto 0; }
+  .city-nav a {
+    flex: 1; padding: 12px 14px; text-decoration: none;
+    border: 1px solid #2D4A3E; border-radius: 10px;
+    background: #1a2a24; color: #A8C5B8;
+    font-size: 12px; transition: all .2s; min-width: 0;
+  }
+  .city-nav a:hover { border-color: #9B59B6; color: #fff; }
+  .city-nav a .nv-label { font-size: 10px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; }
+  .city-nav a .nv-name { font-size: 14px; font-weight: 700; color: #fff; margin-top: 3px; }
+  .city-nav a.nv-prev { text-align: left; }
+  .city-nav a.nv-next { text-align: right; }
+  .city-nav a.nv-back { flex: 0 1 auto; text-align: center; padding: 12px 18px; }
+
+  .page-footer { text-align: center; padding: 20px; font-size: 12px; color: #3a4a42; border-top: 1px solid #1e2d28; margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-inner">
+    <a class="back-btn" href="../city_map.html?focus=osaka">← 返回地圖</a>
+    <div>
+      <div class="header-title">大阪</div>
+      <div class="header-province">日本關西</div>
+    </div>
+    <div class="season-tag">✈ 境外</div>
+    <div style="margin-left:auto;font-size:11px;color:#3A5A4A;padding-right:4px;">📅 2026-04</div>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-tagline">天下廚房，大阪城公園與淀川長跑道，交通樞紐，台北直飛 2.5 小時</div>
+
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-label">月均費用</div>
+        <div class="kpi-value">¥160,000–250,000</div>
+        <div class="kpi-sub" id="cost-twd">NT$1,690–2,640/月</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">綜合推薦</div>
+        <div class="kpi-stars">★★★★<span class="half-star">½</span><span class="empty-star"></span></div>
+        <div class="kpi-sub">4.5 / 5.0</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">最佳旅居季節</div>
+        <div style="font-size:14px;font-weight:700;color:#fff;margin-top:6px;">春（3–5月）與秋（10–11月）最佳，均溫 15–24°C；7–8月濕熱、冬季濕冷但仍可旅居</div>
+      </div>
+    </div>
+
+    <div class="ratings-block">
+      <div class="ratings-title">各項評分</div>
+      
+          <div class="rating-row">
+            <span class="rating-label">健行跑步</span>
+            <span class="rating-score">4/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:80%;background:#5A8A72"></div></div>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">健身房</span>
+            <span class="rating-score">5/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">美食</span>
+            <span class="rating-score">5/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">網路/VPN</span>
+            <span class="rating-score">5/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">CP值</span>
+            <span class="rating-score">3/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:60%;background:#C9A84C"></div></div>
+          </div>
+    </div>
+
+    <div class="live-row" id="live-row">
+      <div class="live-card"><div class="live-label">當前氣溫</div><div class="live-value" id="lv-temp">—</div><div class="live-sub" id="lv-temp-sub">載入中</div></div>
+      <div class="live-card"><div class="live-label">未來 3 日</div><div class="live-value" id="lv-forecast">—</div><div class="live-sub">最低 / 最高</div></div>
+      <div class="live-card"><div class="live-label">空氣品質 (歐盟 AQI)</div><div class="live-value" id="lv-aqi">—</div><div class="live-sub" id="lv-pm">PM2.5 載入中</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+  
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">🏃</span>跑步 / 健行路線</h2>
+    <ul><li>淀川河川敷：北側河堤連續柏油／碎石跑道，可一路跑 20km＋無紅綠燈，大阪跑者長距離首選</li><li>大阪城公園：護城河外環約 4km，櫻花季與綠意絕佳，市中心日常跑首選</li><li>中之島／大川沿岸：水岸步道串連天滿橋至櫻之宮，約 5–8km，咖啡店補給方便</li><li>箕面瀧道越野（北郊，電車 30 分）：山林步道至箕面大瀧，5–10km 越野＋楓葉名所</li><li>六甲全山縱走支線（往神戶方向，週末）：可延伸至 56km 經典縱走，越野訓練天花板</li></ul>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">💪</span>健身房 / 蹲舉架</h2>
+    <div class="prose">重訓資源是此清單頂級之一。Gold's Gym（梅田／心齋橋／京橋多店，Power Rack、深蹲架、奧林匹克槓鈴齊全，月會員約¥12,000–16,000）、Anytime Fitness（全市密布、24h、含蹲舉架，¥7,000–9,000/月）、市民體育館重訓室（每次¥400–600 超 CP）。蹲舉 140kg／臥推 100kg 完全不是問題。</div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">♨️</span>溫泉</h2>
+    <div class="prose">市區 SPA WORLD（新世界，多國風呂＋岩盤浴，¥1,500 終日）、空庭温泉（弁天町，大型湯屋型溫泉樂園）。週末可電車直達有馬溫泉（神戶側，60分）、京都嵐山或和歌山白濱，泡湯選項極豐富。</div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">🍜</span>美食亮點</h2>
+    <ul><li>章魚燒／大阪燒／串炸（粉物三神），道頓堀、鶴橋、裏難波密度極高</li><li>黑門市場：生魚片、和牛串、河豚，邊走邊吃的廚房聖地</li><li>關西拉麵與烏龍：高湯系烏龍（道頓堀今井）、家系與淡麗醬油拉麵</li><li>立吞居酒屋文化：新梅田食道街、天滿，¥2,000 喝到飽吃到飽</li><li>台灣味補給：心齋橋／日本橋一帶有台式珍奶與台菜，思鄉不缺</li></ul>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">🌤</span>氣候參考</h2>
+    <table class="climate-table">
+      <thead><tr><th>月份</th><th>氣溫</th><th>特點</th></tr></thead>
+      <tbody>
+          <tr>
+            <td>3–5月</td>
+            <td>10–24°C</td>
+            <td>春季最佳，櫻花（3月底–4月初），跑步天堂</td>
+          </tr>
+          <tr>
+            <td>6–7月</td>
+            <td>23–31°C</td>
+            <td>梅雨季，濕度高，午後雷陣雨</td>
+          </tr>
+          <tr>
+            <td>7–8月</td>
+            <td>27–35°C</td>
+            <td>盛夏濕熱，戶外跑需清晨或夜間</td>
+          </tr>
+          <tr>
+            <td>9–11月</td>
+            <td>15–28°C</td>
+            <td>秋季次佳，10–11月楓葉，乾爽宜跑</td>
+          </tr>
+          <tr>
+            <td>12–2月</td>
+            <td>3–11°C</td>
+            <td>濕冷少雪，仍可旅居，跑步需保暖</td>
+          </tr></tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">📝</span>注意事項</h2>
+    <ul><li>物價是此清單前段班：CP 值是大阪相對弱項，住宿與外食明顯高於東南亞</li><li>台灣護照日本免簽 90 天，桃園／松山直飛關西機場（KIX）約 2.5h，班次極密</li><li>梅雨（6–7月）與盛夏（7–8月）濕熱，旅居體感最佳為 3–5月、10–11月</li><li>大眾運輸極發達（地鐵＋JR＋私鐵），無需租車；IC 卡（ICOCA）通用</li><li>網路完全自由無審查，光纖普及（200Mbps–1Gbps），VPN 非必要</li></ul>
+  </div>
+
+  
+        <div class="section">
+          <h2 class="section-title"><span class="section-icon">🔬</span>旅居 Trial 建議（3天流程）</h2>
+          <ul class="trial-list">
+            <li>Day 1：入住本町／中之島月租公寓、大阪城公園晨跑 4km、黑門市場美食巡禮、咖啡店測網速</li><li>Day 2：淀川河川敷長跑 12km、下午 Gold's Gym 梅田確認蹲舉架與槓鈴、晚上裏難波串炸</li><li>Day 3：箕面瀧道越野 8km＋楓葉、SPA WORLD 泡湯、道頓堀粉物收尾</li>
+          </ul>
+        </div>
+
+</div>
+
+<nav class="city-nav">
+  <a class="nv-prev" href="oaxaca.html"><div class="nv-label">← 上一城</div><div class="nv-name">瓦哈卡</div></a>
+  <a class="nv-back" href="../city_map.html?focus=osaka"><div class="nv-label">↑ 地圖</div><div class="nv-name">總覽</div></a>
+  <a class="nv-next" href="penang.html"><div class="nv-label">下一城 →</div><div class="nv-name">檳城</div></a>
+</nav>
+
+<div class="page-footer">旅居城市評估 — 43歲台灣軟體工程師視角 | 重訓・跑步・美食・數位遊牧</div>
+
+<script src="../lib/format.js"></script>
+<script src="../lib/fx.js"></script>
+<script src="../lib/weather.js"></script>
+<script>
+const CITY = {"slug":"osaka","lat":34.69,"lng":135.5,"cost":{"currency":"JPY","min":160000,"max":250000}};
+const FX_SNAPSHOT = {"CNY":1,"USD":7.2,"EUR":7.8,"JPY":0.048,"TWD":0.22};
+
+// 動態 TWD 換算（以即時匯率，失敗時退回快照）
+if (window.CT_FX && window.CT_FORMAT) {
+  CT_FX.getRates().then(rates => {
+    const merged = Object.assign({}, FX_SNAPSHOT, rates || {});
+    const twd = CT_FORMAT.formatTWDFromCost(CITY.cost, merged);
+    const el = document.getElementById('cost-twd');
+    if (el && twd) el.textContent = twd + '/月';
+  }).catch(() => {});
+}
+
+// 天氣 + AQI
+if (window.CT_WEATHER) {
+  CT_WEATHER.fetchWeather(CITY.lat, CITY.lng).then(w => {
+    if (!w) return;
+    document.getElementById('lv-temp').textContent = w.current + '°C';
+    document.getElementById('lv-temp-sub').textContent = w.weather || '—';
+    document.getElementById('lv-forecast').textContent = w.forecastMin + '° / ' + w.forecastMax + '°';
+  }).catch(() => {});
+  CT_WEATHER.fetchAQI(CITY.lat, CITY.lng).then(a => {
+    if (!a) return;
+    const el = document.getElementById('lv-aqi');
+    el.textContent = a.aqi;
+    el.classList.add(a.aqi <= 40 ? 'live-aqi-good' : a.aqi <= 80 ? 'live-aqi-fair' : 'live-aqi-poor');
+    document.getElementById('lv-pm').textContent = 'PM2.5 ' + a.pm25 + ' µg/m³';
+  }).catch(() => {});
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('../sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>

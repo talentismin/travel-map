@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>川渝・華中嶺南暖秋線（觀光慢遊） — 旅遊行程</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Arial', 'PingFang TC', 'Microsoft JhengHei', sans-serif; background: #111820; color: #dde; min-height: 100vh; }
+  .page-header { background: linear-gradient(135deg, #1a2e26 0%, #0e1a14 100%); border-bottom: 3px solid #9B59B6; position: sticky; top: 0; z-index: 100; }
+  .header-inner { max-width: 960px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back-btn { display: flex; align-items: center; gap: 6px; color: #9B59B6; text-decoration: none; font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 20px; border: 1.5px solid #9B59B6; transition: all .2s; white-space: nowrap; }
+  .back-btn:hover { background: #9B59B622; }
+  .plan-badge { background: #9B59B6; color: #111; font-weight: 900; font-size: 22px; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .header-text .title { font-size: 18px; font-weight: 800; color: #fff; }
+  .header-text .subtitle { font-size: 12px; color: #7AAA98; margin-top: 3px; }
+  .duration-badge { margin-left: auto; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; border: 1.5px solid #9B59B6; color: #9B59B6; white-space: nowrap; }
+  .hero { background: #0e1a14; border-bottom: 1px solid #1e2d28; padding: 28px 24px; }
+  .hero-inner { max-width: 960px; margin: 0 auto; }
+  .kpi-row { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
+  .kpi-card { background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 10px; padding: 14px 18px; flex: 1; min-width: 150px; }
+  .kpi-label { font-size: 10px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; }
+  .kpi-value { font-size: 14px; font-weight: 700; color: #fff; margin-top: 5px; line-height: 1.4; }
+  .kpi-value.gold { color: #C9A84C; }
+  .ratings-block { background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 10px; padding: 16px 20px; }
+  .ratings-title { font-size: 11px; color: #7AAA98; text-transform: uppercase; margin-bottom: 12px; }
+  .rating-row { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+  .rating-label { font-size: 13px; color: #ccc; width: 100px; flex-shrink: 0; }
+  .rating-score { font-size: 12px; color: #7AAA98; width: 28px; }
+  .bar-wrap { flex: 1; height: 8px; background: #1e3028; border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; }
+  .content { max-width: 960px; margin: 0 auto; padding: 24px; }
+  .section { margin-bottom: 28px; }
+  .section-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #2D4A3E; display: flex; align-items: center; gap: 8px; }
+  .section-title span { font-size: 18px; }
+  .stop-card { display: flex; gap: 14px; padding: 12px 16px; background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 8px; margin-bottom: 10px; }
+  .stop-num { width: 28px; height: 28px; border-radius: 50%; background: #9B59B622; border: 2px solid #9B59B6; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #9B59B6; flex-shrink: 0; margin-top: 2px; }
+  .stop-header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 5px; }
+  .stop-city { font-size: 15px; font-weight: 700; color: #fff; }
+  .stop-days { font-size: 12px; color: #7AAA98; margin-left: auto; white-space: nowrap; }
+  .stop-notes { font-size: 12px; color: #888; line-height: 1.5; }
+  ul { list-style: none; }
+  ul li { padding: 7px 0 7px 20px; position: relative; font-size: 13px; color: #ccc; line-height: 1.5; border-bottom: 1px solid #1a2a20; }
+  ul li:last-child { border-bottom: none; }
+  ul li::before { content: '›'; position: absolute; left: 0; color: #9B59B6; font-weight: 700; font-size: 16px; }
+  ul li.warn-item { color: #E8A57A; } ul li.warn-item::before { color: #E8A57A; }
+  .cost-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .cost-table td { padding: 9px 12px; border-bottom: 1px solid #1a2a20; color: #ccc; }
+  .cost-table .cost-val { color: #C9A84C; font-weight: 700; text-align: right; }
+  .cost-table tr:last-child td { border-bottom: none; font-size: 14px; }
+  .luggage-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .luggage-table th { background: #1a2a24; color: #7AAA98; text-align: left; padding: 8px 12px; font-size: 11px; text-transform: uppercase; border-bottom: 1px solid #2D4A3E; }
+  .luggage-table td { padding: 9px 12px; border-bottom: 1px solid #1a2a20; color: #ccc; }
+  .luggage-table tr:last-child td { border-bottom: none; }
+  .ok-cell { color: #5A8A72; font-weight: 600; } .warn-cell { color: #E8825A; font-weight: 600; }
+  .page-footer { text-align: center; padding: 20px; font-size: 12px; color: #3a4a42; border-top: 1px solid #1e2d28; margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-inner">
+    <a class="back-btn" href="../city_map.html?mode=travel">← 返回旅遊地圖</a>
+    <div class="plan-badge">K</div>
+    <div class="header-text">
+      <div class="title">川渝・華中嶺南暖秋線（觀光慢遊）</div>
+      <div class="subtitle">成都 → 重慶 → 張家界 → 桂林·陽朔 → 廈門</div>
+    </div>
+    <div class="duration-badge">約 30 天</div>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="kpi-row">
+      <div class="kpi-card"><div class="kpi-label">建議出發</div><div class="kpi-value">11 月上旬出發（張家界秋景；12月起部分纜車恐結冰停運）</div></div>
+      <div class="kpi-card"><div class="kpi-label">入境</div><div class="kpi-value">TPE → CTU（成都，直航）</div></div>
+      <div class="kpi-card"><div class="kpi-label">出境</div><div class="kpi-value">廈門 XMN 直航回台</div></div>
+      <div class="kpi-card"><div class="kpi-label">機票（來回）</div><div class="kpi-value gold">成都進、廈門出，直航段多，臨行查詢</div></div>
+    </div>
+    <div class="ratings-block">
+      <div class="ratings-title">路線評分（觀光主軸）</div>
+      
+        <div class="rating-row">
+          <span class="rating-label">美食</span>
+          <span class="rating-score">5/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-label">自然健行</span>
+          <span class="rating-score">5/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-label">歷史文化</span>
+          <span class="rating-score">3/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:60%;background:#C9A84C"></div></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-label">慢遊</span>
+          <span class="rating-score">4/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:80%;background:#5A8A72"></div></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-label">不走回頭路</span>
+          <span class="rating-score">5/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+        </div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div class="section">
+    <h2 class="section-title"><span>🗺</span>行程停靠城市</h2>
+    
+        <div class="stop-card">
+          <div class="stop-num">1</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">成都</span>
+              <span class="stop-days">6天</span>
+            </div>
+            <div class="stop-notes">熊貓基地、寬窄巷子、都江堰青城山、環城綠道跑步、川菜（本段基地）</div>
+          </div>
+        </div>
+        <div class="stop-card">
+          <div class="stop-num">2</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">重慶</span>
+              <span class="stop-days">4天</span>
+            </div>
+            <div class="stop-notes">洪崖洞、輕軌穿樓、過江纜車、火鍋</div>
+          </div>
+        </div>
+        <div class="stop-card">
+          <div class="stop-num">3</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">張家界</span>
+              <span class="stop-days">6天</span>
+            </div>
+            <div class="stop-notes">武陵源峰林、天門山玻璃棧道、金鞭溪健行、可順遊鳳凰古城</div>
+          </div>
+        </div>
+        <div class="stop-card">
+          <div class="stop-num">4</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">桂林·陽朔</span>
+              <span class="stop-days">7天</span>
+            </div>
+            <div class="stop-notes">灕江竹筏、遇龍河騎行、十里畫廊、龍脊梯田、陽朔慢活</div>
+          </div>
+        </div>
+        <div class="stop-card">
+          <div class="stop-num">5</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">廈門</span>
+              <span class="stop-days">5天</span>
+            </div>
+            <div class="stop-notes">鼓浪嶼、環島路跑步、閩南菜（直航出境）</div>
+          </div>
+        </div>
+  </div>
+  <div class="section">
+    <h2 class="section-title"><span>🚄</span>交通方式</h2>
+    <ul><li class="">入境：飛成都（直航）</li><li class="">成都 → 重慶：高鐵約 1h</li><li class="">重慶 → 張家界：高鐵約 5–6h（經懷化，班次/時刻臨行確認）</li><li class="">張家界 → 桂林：高鐵約 3–4h（經懷化）</li><li class="">桂林 → 廈門：高鐵約 5h</li><li class="">回程：廈門直航出境（西→中→南→東南單向不回頭）</li></ul>
+  </div>
+  <div class="section">
+    <h2 class="section-title"><span>💰</span>費用概估（每日，未含機票）</h2>
+    <table class="cost-table"><tr><td>住宿（民宿/連鎖）</td><td class="cost-val">180–400 CNY</td></tr><tr><td>餐飲</td><td class="cost-val">90–160 CNY</td></tr><tr><td>交通＋景點</td><td class="cost-val">100–180 CNY</td></tr><tr><td>每日合計（未含機票）</td><td class="cost-val">約 400–750 CNY</td></tr></table>
+  </div>
+  <div class="section">
+    <h2 class="section-title"><span>🧳</span>行李建議</h2>
+    <table class="luggage-table">
+      <thead><tr><th>城市段</th><th>行李箱適用</th><th>說明</th></tr></thead>
+      <tbody>
+      <tr><td>成都/重慶/廈門</td><td class="ok-cell">✅ 方便</td><td>大城鋪裝、地鐵發達，行李箱方便</td></tr>
+      <tr><td>張家界/陽朔</td><td class="warn-cell">⚠️ 注意</td><td>景區棧道、古鎮石板、漂流接駁，後背包較靈活</td></tr></tbody>
+    </table>
+  </div>
+  <div class="section">
+    <h2 class="section-title"><span>📝</span>注意事項</h2>
+    <ul><li class="">張家界 11 月為秋景，12 月起山頂結冰、部分纜車/棧道可能停運，行前查景區公告</li><li class="">川渝冬季濕冷但溫和、少日照，怕冷帶薄羽絨；麻辣可請店家微辣/鴛鴦鍋</li><li class="">陽朔觀光化、拉客多，漂流/表演找正規店並先確認價格</li><li class="">成都/重慶/廈門大城健身房有正規蹲舉架，重訓集中於此三城</li><li class="">成都直航、廈門直航回台；支付寶/微信為主；境外 App 需自備翻牆方案</li><li class="">與當地人交談避開敏感政治話題</li></ul>
+  </div>
+</div>
+
+<div class="page-footer">旅遊行程提案 — 觀光視角　｜　費用/班次/景區開放為估算，臨行再確認</div>
+
+</body>
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>專案 B：華中山水文化線 — 旅居行程</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Arial', 'PingFang TC', 'Microsoft JhengHei', sans-serif; background: #111820; color: #dde; min-height: 100vh; }
+
+  .page-header { background: linear-gradient(135deg, #1a2e26 0%, #0e1a14 100%); border-bottom: 3px solid #00CEC9; position: sticky; top: 0; z-index: 100; }
+  .header-inner { max-width: 960px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back-btn { display: flex; align-items: center; gap: 6px; color: #00CEC9; text-decoration: none; font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 20px; border: 1.5px solid #00CEC9; transition: all .2s; white-space: nowrap; }
+  .back-btn:hover { background: #00CEC922; }
+  .plan-badge { background: #00CEC9; color: #111; font-weight: 900; font-size: 22px; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .header-text .title { font-size: 18px; font-weight: 800; color: #fff; }
+  .header-text .subtitle { font-size: 12px; color: #7AAA98; margin-top: 3px; }
+  .duration-badge { margin-left: auto; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; border: 1.5px solid #00CEC9; color: #00CEC9; white-space: nowrap; }
+
+  .hero { background: #0e1a14; border-bottom: 1px solid #1e2d28; padding: 28px 24px; }
+  .hero-inner { max-width: 960px; margin: 0 auto; }
+
+  .kpi-row { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
+  .kpi-card { background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 10px; padding: 14px 18px; flex: 1; min-width: 150px; }
+  .kpi-label { font-size: 10px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; }
+  .kpi-value { font-size: 14px; font-weight: 700; color: #fff; margin-top: 5px; line-height: 1.4; }
+  .kpi-value.gold { color: #C9A84C; }
+  .kpi-value.warn { color: #E8825A; }
+
+  .ratings-block { background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 10px; padding: 16px 20px; }
+  .ratings-title { font-size: 11px; color: #7AAA98; text-transform: uppercase; margin-bottom: 12px; }
+  .rating-row { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+  .rating-label { font-size: 13px; color: #ccc; width: 100px; flex-shrink: 0; }
+  .rating-score { font-size: 12px; color: #7AAA98; width: 28px; }
+  .bar-wrap { flex: 1; height: 8px; background: #1e3028; border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; }
+
+  .content { max-width: 960px; margin: 0 auto; padding: 24px; }
+  .section { margin-bottom: 28px; }
+  .section-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #2D4A3E; display: flex; align-items: center; gap: 8px; }
+  .section-title span { font-size: 18px; }
+
+  .stop-card { display: flex; gap: 14px; padding: 12px 16px; background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 8px; margin-bottom: 10px; position: relative; }
+  .stop-card.is-trial { border-color: #00CEC955; background: #1a2a24; }
+  .stop-card.is-trial::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #00CEC9; border-radius: 8px 0 0 8px; }
+  .stop-num { width: 28px; height: 28px; border-radius: 50%; background: #00CEC922; border: 2px solid #00CEC9; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #00CEC9; flex-shrink: 0; margin-top: 2px; }
+  .stop-header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 5px; }
+  .stop-city { font-size: 15px; font-weight: 700; color: #fff; }
+  .stop-days { font-size: 12px; color: #7AAA98; margin-left: auto; white-space: nowrap; }
+  .stop-notes { font-size: 12px; color: #888; line-height: 1.5; }
+  .trial-badge { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; background: #00CEC922; border: 1px solid #00CEC955; color: #00CEC9; }
+  .tour-badge { padding: 2px 8px; border-radius: 10px; font-size: 10px; background: #2D4A3E; color: #7AAA98; }
+  .winter-badge { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; background: #5B9BD522; border: 1px solid #5B9BD5; color: #5B9BD5; }
+  .summer-badge { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; background: #E8825A22; border: 1px solid #E8825A; color: #E8825A; }
+
+  ul { list-style: none; }
+  ul li { padding: 7px 0 7px 20px; position: relative; font-size: 13px; color: #ccc; line-height: 1.5; border-bottom: 1px solid #1a2a20; }
+  ul li:last-child { border-bottom: none; }
+  ul li::before { content: '›'; position: absolute; left: 0; color: #00CEC9; font-weight: 700; font-size: 16px; }
+  ul li.warn-item { color: #E8825A; }
+  ul li.warn-item::before { color: #E8825A; }
+
+  .cost-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .cost-table td { padding: 9px 12px; border-bottom: 1px solid #1a2a20; color: #ccc; }
+  .cost-table .cost-val { color: #C9A84C; font-weight: 700; text-align: right; }
+  .cost-table tr:last-child td { border-bottom: none; font-size: 14px; }
+
+  .luggage-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .luggage-table th { background: #1a2a24; color: #7AAA98; text-align: left; padding: 8px 12px; font-size: 11px; text-transform: uppercase; border-bottom: 1px solid #2D4A3E; }
+  .luggage-table td { padding: 9px 12px; border-bottom: 1px solid #1a2a20; color: #ccc; }
+  .luggage-table tr:last-child td { border-bottom: none; }
+  .ok-cell { color: #5A8A72; font-weight: 600; }
+  .warn-cell { color: #E8825A; font-weight: 600; }
+
+  .concept-box { background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 8px; padding: 14px 16px; margin-bottom: 20px; display: flex; gap: 12px; font-size: 13px; color: #A8C5B8; line-height: 1.7; }
+  .concept-icon { font-size: 20px; flex-shrink: 0; }
+  .warning-box { background: #2D1A0E; border: 1.5px solid #E8825A; border-radius: 8px; padding: 12px 16px; display: flex; gap: 10px; font-size: 13px; color: #E8825A; line-height: 1.5; margin-bottom: 20px; }
+  .note-box { background: #1A2A3E; border: 1px solid #5B9BD5; border-radius: 8px; padding: 12px 16px; display: flex; gap: 10px; font-size: 13px; color: #A8C5FF; line-height: 1.5; margin-bottom: 20px; }
+
+  .flow-list { background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 8px; padding: 12px 16px; }
+  .flow-list li { color: #A8C5B8; }
+
+  .compare-link { display: inline-block; margin-top: 14px; padding: 8px 18px; border-radius: 20px; border: 1.5px solid #00CEC9; color: #00CEC9; text-decoration: none; font-size: 12px; font-weight: 700; transition: all .2s; }
+  .compare-link:hover { background: #00CEC922; }
+
+  .page-footer { text-align: center; padding: 20px; font-size: 12px; color: #3a4a42; border-top: 1px solid #1e2d28; margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-inner">
+    <a class="back-btn" href="../city_map.html">← 返回地圖</a>
+    <div class="plan-badge">B</div>
+    <div class="header-text">
+      <div class="title">專案 B：華中山水文化線</div>
+      <div class="subtitle">武漢 → 長沙 → 張家界 → 鳳凰古城 → 桂林</div>
+    </div>
+    <div class="duration-badge">約 28 天</div>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-label">最佳出發月份</div>
+        <div class="kpi-value">9–11月（避開暑假人潮+張家界旺季）</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">入境航班</div>
+        <div class="kpi-value">TPE → WUH（武漢）直飛 2h30m，每週3班</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">出境航班</div>
+        <div class="kpi-value warn">KWL → TPE（桂林）無直飛，需轉機13–18h ⚠️</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">機票費用（來回）</div>
+        <div class="kpi-value gold">NT$12,500–21,000 來回（桂林出境為最大缺點）</div>
+      </div>
+    </div>
+    <div class="ratings-block">
+      <div class="ratings-title">方案評分</div>
+      
+        <div class="rating-row">
+          <span class="rating-label">健行跑步</span>
+          <span class="rating-score">5/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-label">美食</span>
+          <span class="rating-score">4/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:80%;background:#5A8A72"></div></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-label">泡湯</span>
+          <span class="rating-score">3/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:60%;background:#C9A84C"></div></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-label">CP值</span>
+          <span class="rating-score">5/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+        </div>
+        <div class="rating-row">
+          <span class="rating-label">數位遊牧</span>
+          <span class="rating-score">4/5</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:80%;background:#5A8A72"></div></div>
+        </div>
+    </div>
+    <a class="compare-link" href="../proposal_compare.html">⇄ 五方案總覽比較 →</a>
+  </div>
+</div>
+
+<div class="content">
+  
+      <div class="warning-box">
+        <span>⚠️</span>
+        <div>桂林（KWL）無台北直飛航班，出境需轉機13–18小時，建議改從長沙（CSX）出境</div>
+      </div>
+  
+  
+
+  <div class="section">
+    <h2 class="section-title"><span>🗺</span>行程停靠城市</h2>
+    
+        <div class="stop-card ">
+          <div class="stop-num">1</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">武漢</span>
+              
+              <span class="tour-badge">觀光</span>
+              <span class="stop-days">3–4天</span>
+            </div>
+            <div class="stop-notes">黃鶴樓、東湖綠道晨跑（全國最長城市湖邊步道）、戶部巷美食</div>
+          </div>
+        </div>
+        <div class="stop-card ">
+          <div class="stop-num">2</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">長沙</span>
+              
+              <span class="tour-badge">觀光</span>
+              <span class="stop-days">3天</span>
+            </div>
+            <div class="stop-notes">岳麓山健行、橘子洲、文和友、臭豆腐</div>
+          </div>
+        </div>
+        <div class="stop-card ">
+          <div class="stop-num">3</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">張家界</span>
+              
+              <span class="tour-badge">觀光</span>
+              <span class="stop-days">5–6天</span>
+            </div>
+            <div class="stop-notes">武陵源（阿凡達取景地）、天門山、黃龍洞，需健行體力</div>
+          </div>
+        </div>
+        <div class="stop-card ">
+          <div class="stop-num">4</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">鳳凰古城</span>
+              
+              <span class="tour-badge">觀光</span>
+              <span class="stop-days">3–4天</span>
+            </div>
+            <div class="stop-notes">苗族文化、沱江沿岸步道、古城跑步</div>
+          </div>
+        </div>
+        <div class="stop-card ">
+          <div class="stop-num">5</div>
+          <div class="stop-body">
+            <div class="stop-header">
+              <span class="stop-city">桂林/陽朔</span>
+              
+              <span class="tour-badge">觀光</span>
+              <span class="stop-days">5–6天</span>
+            </div>
+            <div class="stop-notes">漓江、龍脊梯田、遇龍河騎行</div>
+          </div>
+        </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span>🚄</span>交通方式</h2>
+    <ul><li class="">入境：台灣直飛武漢（每週3班，中國東方/南方）</li><li class="">武漢 → 長沙：高鐵 1.5h</li><li class="">長沙 → 張家界：高鐵 2h</li><li class="">張家界 → 鳳凰：巴士 2h（無高鐵，風景路線）</li><li class="">鳳凰 → 桂林：高鐵+轉乘 3–4h</li><li class="warn-item">⚠️ 桂林出境無台北直飛，建議考慮改從長沙出境</li></ul>
+  </div>
+
+  
+
+  <div class="section">
+    <h2 class="section-title"><span>💰</span>費用概估</h2>
+    <table class="cost-table"><tr><td>住宿</td><td class="cost-val">150–280 CNY</td></tr><tr><td>餐飲</td><td class="cost-val">50–80 CNY</td></tr><tr><td>交通+景點</td><td class="cost-val">60–120 CNY</td></tr><tr><td>月均合計</td><td class="cost-val">約 9,000–14,000 CNY</td></tr></table>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span>🧳</span>行李建議（28吋行李箱 + 後背包）</h2>
+    <table class="luggage-table">
+      <thead><tr><th>城市段</th><th>28吋適用度</th><th>說明</th></tr></thead>
+      <tbody><tr>
+      <td>武漢、長沙</td>
+      <td class="ok-cell">✅ 方便</td>
+      <td>大城市，交通便利</td>
+    </tr><tr>
+      <td>張家界</td>
+      <td class="warn-cell">⚠️ 注意</td>
+      <td>景區山路多，28吋存旅館，健行只帶後背包</td>
+    </tr><tr>
+      <td>鳳凰古城</td>
+      <td class="warn-cell">⚠️ 注意</td>
+      <td>石板路橋梁多，拖行李費力，古城民宿可寄放</td>
+    </tr><tr>
+      <td>桂林/陽朔</td>
+      <td class="warn-cell">⚠️ 注意</td>
+      <td>健行景點輕裝為主</td>
+    </tr></tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title"><span>📝</span>注意事項</h2>
+    <ul><li class="">張家界旺季（黃金週、暑假）人潮極多，建議避開</li><li class="">鳳凰古城商業化程度較高，需篩選景點</li><li class="">湖南夏季炎熱，7–8月健行需做好防暑準備</li><li class="warn-item">⚠️ 桂林出境最大缺點：無台北直飛，轉機13–18h，強烈建議改長沙出境</li></ul>
+  </div>
+</div>
+
+<div class="page-footer">旅居城市評估 — 43歲台灣軟體工程師視角 | 重訓・跑步・美食・數位遊牧</div>
+
+</body>
+</html>

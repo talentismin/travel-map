@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2D4A3E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>北京 — 旅遊指南</title>
+<link rel="manifest" href="../manifest.json">
+<link rel="icon" href="../icons/icon.svg" type="image/svg+xml">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Arial', 'PingFang TC', 'Microsoft JhengHei', sans-serif; background: #111820; color: #dde; min-height: 100vh; }
+  .page-header { background: linear-gradient(135deg, #1a2e26 0%, #0e1a14 100%); border-bottom: 3px solid #C0504D; position: sticky; top: 0; z-index: 100; }
+  .header-inner { max-width: 900px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; gap: 16px; }
+  .back-btn { display: flex; align-items: center; gap: 6px; color: #C0504D; text-decoration: none; font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 20px; border: 1.5px solid #C0504D; transition: all .2s; white-space: nowrap; }
+  .back-btn:hover { background: #C0504D22; }
+  .header-title { font-size: 22px; font-weight: 800; color: #fff; }
+  .header-province { font-size: 12px; color: #7AAA98; margin-top: 2px; }
+  .season-tag { margin-left: auto; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; background: #C0504D; color: #fff; white-space: nowrap; }
+  .hero { background: linear-gradient(180deg, #0e1a14 0%, #111820 100%); padding: 32px 24px; border-bottom: 1px solid #1e2d28; }
+  .hero-inner { max-width: 900px; margin: 0 auto; }
+  .hero-tagline { font-size: 16px; color: #A8C5B8; margin-bottom: 20px; line-height: 1.6; }
+  .kpi-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+  .kpi-card { background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 10px; padding: 14px 20px; flex: 1; min-width: 160px; }
+  .kpi-label { font-size: 11px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; }
+  .kpi-value { font-size: 20px; font-weight: 800; color: #C9A84C; margin-top: 4px; }
+  .kpi-stars { font-size: 22px; font-weight: 800; color: #FFD700; margin-top: 4px; }
+  .kpi-stars .empty-star { color: #333; }
+  .kpi-stars .half-star { color: #FFD700; }
+  .ratings-block { background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 10px; padding: 16px 20px; }
+  .ratings-title { font-size: 12px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
+  .rating-row { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+  .rating-label { font-size: 13px; color: #ccc; width: 76px; flex-shrink: 0; }
+  .rating-score { font-size: 12px; color: #7AAA98; width: 28px; flex-shrink: 0; }
+  .bar-wrap { flex: 1; height: 8px; background: #1e3028; border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; transition: width .3s; }
+  .content { max-width: 900px; margin: 0 auto; padding: 24px; }
+  .section { margin-bottom: 28px; }
+  .section-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #2D4A3E; display: flex; align-items: center; gap: 8px; }
+  .section-icon { font-size: 18px; }
+  ul { list-style: none; }
+  ul li { padding: 7px 0 7px 20px; position: relative; font-size: 14px; color: #ccc; line-height: 1.5; border-bottom: 1px solid #1a2a20; }
+  ul li:last-child { border-bottom: none; }
+  ul li::before { content: '›'; position: absolute; left: 0; color: #C0504D; font-weight: 700; font-size: 16px; }
+  .warning-box { background: #2D1A0E; border: 1.5px solid #E8825A; border-radius: 8px; padding: 12px 16px; display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: #E8A57A; line-height: 1.5; margin-bottom: 20px; }
+  .warning-icon { font-size: 18px; flex-shrink: 0; }
+  .live-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+  .live-card { flex: 1; min-width: 140px; background: #1a2a24; border: 1px solid #2D4A3E; border-radius: 10px; padding: 12px 14px; font-size: 13px; }
+  .live-label { font-size: 10px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
+  .live-value { font-size: 18px; font-weight: 800; color: #fff; }
+  .live-sub { font-size: 11px; color: #7AAA98; margin-top: 2px; }
+  .live-aqi-good { color: #5AE89A; } .live-aqi-fair { color: #C9A84C; } .live-aqi-poor { color: #E8825A; }
+  .city-nav { display: flex; gap: 10px; padding: 0 24px; max-width: 900px; margin: 28px auto 0; }
+  .city-nav a { flex: 1; padding: 12px 14px; text-decoration: none; border: 1px solid #2D4A3E; border-radius: 10px; background: #1a2a24; color: #A8C5B8; font-size: 12px; transition: all .2s; min-width: 0; }
+  .city-nav a:hover { border-color: #C0504D; color: #fff; }
+  .city-nav a .nv-label { font-size: 10px; color: #7AAA98; text-transform: uppercase; letter-spacing: 0.8px; }
+  .city-nav a .nv-name { font-size: 14px; font-weight: 700; color: #fff; margin-top: 3px; }
+  .city-nav a.nv-prev { text-align: left; } .city-nav a.nv-next { text-align: right; } .city-nav a.nv-back { flex: 0 1 auto; text-align: center; padding: 12px 18px; }
+  .page-footer { text-align: center; padding: 20px; font-size: 12px; color: #3a4a42; border-top: 1px solid #1e2d28; margin-top: 20px; }
+  .itin-card { display: flex; align-items: center; gap: 14px; text-decoration: none; background: linear-gradient(135deg, #C0504D22 0%, #1a2a24 60%); border: 1.5px solid #C0504D; border-radius: 10px; padding: 16px 18px; margin-bottom: 24px; transition: all .2s; }
+  .itin-card:hover { background: linear-gradient(135deg, #C0504D33 0%, #1f322b 60%); }
+  .itin-icon { font-size: 26px; flex-shrink: 0; }
+  .itin-label { font-size: 10px; color: #C0504D; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; }
+  .itin-title { font-size: 15px; font-weight: 800; color: #fff; margin-top: 3px; }
+  .itin-note { font-size: 12px; color: #A8C5B8; margin-top: 3px; line-height: 1.5; }
+  .itin-arrow { margin-left: auto; color: #C0504D; font-size: 20px; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-inner">
+    <a class="back-btn" href="../city_map.html?mode=travel&focus=beijing">← 返回旅遊地圖</a>
+    <div>
+      <div class="header-title">北京</div>
+      <div class="header-province">北京市</div>
+    </div>
+    <div class="season-tag">華北</div>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-tagline">帝都經典，故宮長城天壇，第一次玩大陸的必修課</div>
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-label">每日花費（中檔含住宿）</div>
+        <div class="kpi-value">500–900 CNY/日</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">綜合推薦</div>
+        <div class="kpi-stars">★★★★★<span class="empty-star"></span></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">最佳遊覽季節</div>
+        <div style="font-size:14px;font-weight:700;color:#fff;margin-top:6px;">9–10月（秋高氣爽最舒服）、4–5月次之</div>
+      </div>
+    </div>
+    <div class="ratings-block">
+      <div class="ratings-title">觀光向評分</div>
+      
+          <div class="rating-row">
+            <span class="rating-label">美食</span>
+            <span class="rating-score">4/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:80%;background:#5A8A72"></div></div>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">自然健行</span>
+            <span class="rating-score">3/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:60%;background:#C9A84C"></div></div>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">歷史文化</span>
+            <span class="rating-score">5/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">景點密度</span>
+            <span class="rating-score">5/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#5A8A72"></div></div>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">慢遊</span>
+            <span class="rating-score">3/5</span>
+            <div class="bar-wrap"><div class="bar-fill" style="width:60%;background:#C9A84C"></div></div>
+          </div>
+    </div>
+    <div class="live-row" id="live-row">
+      <div class="live-card"><div class="live-label">當前氣溫</div><div class="live-value" id="lv-temp">—</div><div class="live-sub" id="lv-temp-sub">載入中</div></div>
+      <div class="live-card"><div class="live-label">未來 3 日</div><div class="live-value" id="lv-forecast">—</div><div class="live-sub">最低 / 最高</div></div>
+      <div class="live-card"><div class="live-label">空氣品質 (歐盟 AQI)</div><div class="live-value" id="lv-aqi">—</div><div class="live-sub" id="lv-pm">PM2.5 載入中</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  
+        <div class="warning-box">
+          <span class="warning-icon">🗓</span>
+          <div>9–10 月最佳；春季 3–4 月偶有沙塵、冬季嚴寒，敏感體質備口罩與保暖。</div>
+        </div>
+  
+
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">📸</span>必看亮點</h2>
+    <ul><li>故宮（紫禁城，需提前 7 天線上實名預約，旺季秒殺）</li><li>長城走慕田峪（纜車＋滑道、人潮比八達嶺少）</li><li>天壇、頤和園、什剎海／南鑼鼓巷胡同</li><li>國家博物館（免費需預約，半天起跳）</li></ul>
+  </div>
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">🍜</span>美食重點</h2>
+    <ul><li>北京烤鴨（全聚德觀光、四季民福評價佳）</li><li>炸醬麵、銅鍋涮羊肉、豆汁焦圈（重口味，怕鹹先說少鹽）</li></ul>
+  </div>
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">🏃</span>自然 / 健行 / 跑步</h2>
+    <ul><li>奧林匹克森林公園綠道（市區跑步首選）</li><li>頤和園昆明湖環湖步道</li><li>慕田峪／箭扣長城段健行（強度較高）</li></ul>
+  </div>
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">🏯</span>歷史文化</h2>
+    <ul><li>故宮、天壇、頤和園、長城、十三陵，明清皇家建築群密集</li></ul>
+  </div>
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">🇹🇼</span>給台灣旅客的提醒</h2>
+    <ul><li>故宮、國博、長城旺季都要線上實名預約，黃牛現場買不到</li><li>口味偏鹹重，怕鹹點菜主動說少鹽少油</li><li>台胞證；台灣有直航；地鐵發達不需自駕</li><li>支付寶／微信為主；Line/FB/Google 需自備翻牆方案，臨行確認</li><li>與當地人交談避開敏感政治話題，低調為上</li></ul>
+  </div>
+  <div class="section">
+    <h2 class="section-title"><span class="section-icon">📝</span>注意事項</h2>
+    <ul><li>景點分散、動線長，每天排 1–2 大點即可，別貪多</li><li>可作華北線（北京—平遙—西安）起點</li></ul>
+  </div>
+</div>
+
+<nav class="city-nav">
+  <a class="nv-prev" href="bali.html"><div class="nv-label">← 上一城</div><div class="nv-name">巴里島</div></a>
+  <a class="nv-back" href="../city_map.html?mode=travel&focus=beijing"><div class="nv-label">↑ 地圖</div><div class="nv-name">總覽</div></a>
+  <a class="nv-next" href="busan.html"><div class="nv-label">下一城 →</div><div class="nv-name">釜山</div></a>
+</nav>
+
+<div class="page-footer">旅遊城市指南 — 觀光視角 | 美食・自然健行・歷史文化・慢遊　｜　費用為估算，臨行再確認</div>
+
+<script src="../lib/weather.js"></script>
+<script>
+const CITY = {"slug":"beijing","lat":39.9,"lng":116.4};
+if (window.CT_WEATHER) {
+  CT_WEATHER.fetchWeather(CITY.lat, CITY.lng).then(w => {
+    if (!w) return;
+    document.getElementById('lv-temp').textContent = w.current + '°C';
+    document.getElementById('lv-temp-sub').textContent = w.weather || '—';
+    document.getElementById('lv-forecast').textContent = w.forecastMin + '° / ' + w.forecastMax + '°';
+  }).catch(() => {});
+  CT_WEATHER.fetchAQI(CITY.lat, CITY.lng).then(a => {
+    if (!a) return;
+    const el = document.getElementById('lv-aqi');
+    el.textContent = a.aqi;
+    el.classList.add(a.aqi <= 40 ? 'live-aqi-good' : a.aqi <= 80 ? 'live-aqi-fair' : 'live-aqi-poor');
+    document.getElementById('lv-pm').textContent = 'PM2.5 ' + a.pm25 + ' µg/m³';
+  }).catch(() => {});
+}
+if ('serviceWorker' in navigator) { navigator.serviceWorker.register('../sw.js').catch(() => {}); }
+</script>
+</body>
+</html>
